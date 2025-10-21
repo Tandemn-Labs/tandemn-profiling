@@ -43,7 +43,7 @@ def setup_lmcache_environment(ssd_path: str, cache_size_gb: float = 10.0):
     # IMPORTANT: Set CPU size to small value instead of 0 to avoid buffer allocation error
     # LMCache needs a minimal CPU buffer even when using disk-only mode
     os.environ["LMCACHE_LOCAL_CPU"] = "True"  # Must be True to avoid initialization issues
-    os.environ["LMCACHE_MAX_LOCAL_CPU_SIZE"] = "0.1"  # Small buffer (100MB) to avoid the zero-size error
+    os.environ["LMCACHE_MAX_LOCAL_CPU_SIZE"] = "20"  # Small buffer (100MB) to avoid the zero-size error
     # Enable disk persistence
     os.environ["LMCACHE_DISK_PERSISTENCE"] = "True"
     # Disable remote storage
@@ -249,6 +249,7 @@ def cleanup_llm(llm):
     try:
         if hasattr(llm, 'llm_engine'):
             engine = llm.llm_engine
+            engine.engine_core.shutdown()
             if hasattr(engine, 'engine_core'):
                 # Try to terminate the engine process
                 if hasattr(engine.engine_core, 'process'):
@@ -355,6 +356,7 @@ def main():
     DECODE_MAX_NUM_SEQS = int(CFG.get("DECODE_MAX_NUM_SEQS", 256))
     GPU_MEMORY_UTILIZATION = float(CFG.get("GPU_MEMORY_UTILIZATION", 0.95))
     INPUT_LENGTH = int(CFG.get("INPUT_LENGTH", 1000))
+    DECODE_NUM_PROMPTS = int(CFG.get("DECODE_NUM_PROMPTS", 2000))
     
     # Ensure SSD path exists
     Path(args.ssd_path).mkdir(parents=True, exist_ok=True)
@@ -445,6 +447,8 @@ def main():
         print(f"  - max_num_seqs: {DECODE_MAX_NUM_SEQS}")
         print(f"  - SSD storage: {args.ssd_path}")
         
+        new_prompts = new_prompts[:DECODE_NUM_PROMPTS]
+        print(f"✅ Loaded {len(new_prompts)} prompts")
         with create_llm(
             model=MODEL,
             kv_transfer_config=kv_transfer_config,
