@@ -23,12 +23,90 @@ from lmcache.integration.vllm.utils import ENGINE_NAME
 from lmcache.v1.cache_engine import LMCacheEngineBuilder
 import tempfile
 import shutil
+import logging
+import re
+import wandb
+
+logging.getLogger('vllm').setLevel(logging.INFO)
+logging.getLogger('lmcache').setLevel(logging.ERROR)
 
 billsum = load_dataset("billsum", split="ca_test")
 billsum = billsum.train_test_split(test_size=0.2)
 
 # Setup for vLLM v1 (required for LMCacheConnectorV1)
 os.environ["VLLM_USE_V1"] = "1"
+
+# Global wandb run
+wandb_run = None
+
+def parse_vllm_metrics(log_line):
+    """Parse vLLM metrics from log lines using regex"""
+    metrics = {}
+
+    # Pattern: Running: X reqs, Waiting: Y reqs, GPU KV cache usage: Z%
+    pattern = r"Running: (\d+) reqs, Waiting: (\d+) reqs, GPU KV cache usage: ([\d.]+)%"
+    match = re.search(pattern, log_line)
+    if match:
+        metrics['running_requests'] = int(match.group(1))
+        metrics['waiting_requests'] = int(match.group(2))
+        metrics['gpu_kv_cache_usage_pct'] = float(match.group(3))
+
+    # Throughput patterns
+    prompt_pattern = r"Avg prompt throughput: ([\d.]+) tokens/s"
+    gen_pattern = r"Avg generation throughput: ([\d.]+) tokens/s"
+
+    prompt_match = re.search(prompt_pattern, log_line)
+    gen_match = re.search(gen_pattern, log_line)
+
+    if prompt_match:
+        metrics['avg_prompt_throughput'] = float(prompt_match.group(1))
+    if gen_match:
+        metrics['avg_generation_throughput'] = float(gen_match.group(1))
+
+    return metrics if metrics else None
+
+def setup_logging_and_wandb(config, args, run_name=None):
+    """Setup file logging and wandb tracking"""
+    global wandb_run
+
+    # Create logs directory
+    logs_dir = Path("./benchmark_logs")
+    logs_dir.mkdir(exist_ok=True)
+
+    # Create log filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = logs_dir / f"benchmark_{args.mode}_{timestamp}.log"
+
+    # Setup file handler for logging
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+
+    # Add to root logger
+    root_logger = logging.getLogger()
+    root_logger.addHandler(file_handler)
+
+    # Initialize wandb
+    if run_name is None:
+        run_name = f"lmcache-{args.mode}-{timestamp}"
+
+    wandb_run = wandb.init(
+        project="lmcache-benchmarks",
+        name=run_name,
+        config={
+            **config,
+            "mode": args.mode,
+            "ssd_path": args.ssd_path,
+            "cache_size_gb": args.cache_size_gb,
+        },
+        tags=[args.mode, config.get("model", "unknown").split("/")[-1]],
+    )
+
+    print(f"📝 Logging to file: {log_file}")
+    print(f"📊 WandB run: {wandb_run.url}")
+
+    return log_file, wandb_run
 
 def setup_lmcache_environment(ssd_path: str, cache_size_gb: float = 10.0):
     """Setup LMCache environment for SSD storage"""
@@ -127,6 +205,8 @@ def benchmark_prefill_only(llm, prompts, output_file="prefill_prompts.json"):
 
 def benchmark_decode_only(llm, prompts, max_tokens=100, input_file="prefill_prompts.json"):
     """Measure decode-only speed by reusing prefill KV cache from SSD"""
+    global wandb_run
+
     print("\n" + "="*80)
     print(f"BENCHMARKING DECODE-ONLY (max_tokens={max_tokens})")
     print("="*80)
@@ -138,15 +218,34 @@ def benchmark_decode_only(llm, prompts, max_tokens=100, input_file="prefill_prom
         min_tokens=max_tokens,
         ignore_eos=True
     )
-    
+
+    # Setup custom logging handler to capture vLLM metrics
+    class WandbMetricsHandler(logging.Handler):
+        def __init__(self):
+            super().__init__()
+            self.step = 0
+
+        def emit(self, record):
+            if wandb_run and "Running:" in record.getMessage():
+                metrics = parse_vllm_metrics(record.getMessage())
+                if metrics:
+                    wandb_run.log(metrics, step=self.step)
+                    self.step += 1
+
+    metrics_handler = WandbMetricsHandler()
+    logging.getLogger('vllm').addHandler(metrics_handler)
+
     start_time = time.time()
     outputs = llm.generate(prompts, sampling_params)
     end_time = time.time()
-    
+
+    # Remove handler
+    logging.getLogger('vllm').removeHandler(metrics_handler)
+
     total_time = end_time - start_time
     total_output_tokens = sum(len(o.outputs[0].token_ids) for o in outputs)
     decoded_texts = [o.outputs[0].text for o in outputs]
-    
+
     avg_decode_time = total_time / len(prompts)
     avg_tokens_per_req = total_output_tokens / len(prompts)
     avg_tpot = (avg_decode_time / avg_tokens_per_req) * 1000 if avg_tokens_per_req > 0 else 0
@@ -158,8 +257,8 @@ def benchmark_decode_only(llm, prompts, max_tokens=100, input_file="prefill_prom
     print(f"  Decode throughput: {total_output_tokens / total_time:.2f} tokens/sec")
     print(f"  Avg TPOT (per decode token): {avg_tpot:.2f} ms")
     print(f"  Avg decode latency: {avg_decode_time * 1000:.2f} ms per prompt")
-    
-    return {
+
+    results = {
         'total_time': total_time,
         'num_prompts': len(prompts),
         'total_tokens': total_output_tokens,
@@ -168,6 +267,19 @@ def benchmark_decode_only(llm, prompts, max_tokens=100, input_file="prefill_prom
         'avg_latency_ms': avg_decode_time * 1000,
         'decoded_outputs': decoded_texts
     }
+
+    # Log final summary to wandb
+    if wandb_run:
+        wandb_run.log({
+            'final/total_time_sec': total_time,
+            'final/num_prompts': len(prompts),
+            'final/total_output_tokens': total_output_tokens,
+            'final/decode_throughput_tokens_per_sec': total_output_tokens / total_time,
+            'final/avg_tpot_ms': avg_tpot,
+            'final/avg_decode_latency_ms': avg_decode_time * 1000,
+        })
+
+    return results
 
 def save_results(config, prefill_results=None, decode_results=None, output_dir="./benchmark_results"):
     """Save benchmark results to JSON and CSV files"""
@@ -352,7 +464,7 @@ def main():
     MAX_MODEL_LEN = int(CFG.get("MAX_MODEL_LEN", 4096))
     PREFILL_MAX_NUM_BATCHED_TOKENS = int(CFG.get("PREFILL_MAX_NUM_BATCHED_TOKENS", 32768))
     PREFILL_MAX_NUM_SEQS = int(CFG.get("PREFILL_MAX_NUM_SEQS", 128))
-    DECODE_MAX_NUM_BATCHED_TOKENS = int(CFG.get("DECODE_MAX_NUM_BATCHED_TOKENS", 65536))
+    #DECODE_MAX_NUM_BATCHED_TOKENS = int(CFG.get("DECODE_MAX_NUM_BATCHED_TOKENS", 65536))
     DECODE_MAX_NUM_SEQS = int(CFG.get("DECODE_MAX_NUM_SEQS", 256))
     GPU_MEMORY_UTILIZATION = float(CFG.get("GPU_MEMORY_UTILIZATION", 0.95))
     INPUT_LENGTH = int(CFG.get("INPUT_LENGTH", 1000))
@@ -370,7 +482,7 @@ def main():
         "max_model_len": MAX_MODEL_LEN,
         "prefill_max_num_batched_tokens": PREFILL_MAX_NUM_BATCHED_TOKENS,
         "prefill_max_num_seqs": PREFILL_MAX_NUM_SEQS,
-        "decode_max_num_batched_tokens": DECODE_MAX_NUM_BATCHED_TOKENS,
+        #"decode_max_num_batched_tokens": DECODE_MAX_NUM_BATCHED_TOKENS,
         "decode_max_num_seqs": DECODE_MAX_NUM_SEQS,
         "gpu_memory_utilization": GPU_MEMORY_UTILIZATION,
         "input_length": INPUT_LENGTH,
@@ -383,7 +495,10 @@ def main():
     print("="*80)
     print(f"Mode: {args.mode}")
     print(f"Config: {json.dumps(config, indent=2)}")
-    
+
+    # Setup logging and wandb
+    log_file, wandb_run = setup_logging_and_wandb(config, args)
+
     # Configure KV cache transfer with LMCache
     kv_transfer_config = KVTransferConfig(
         kv_connector="LMCacheConnectorV1",
@@ -443,8 +558,8 @@ def main():
             print(f"✅ Loaded {len(new_prompts)} prompts")
         
         print(f"Initializing vLLM with LMCache decode parameters...")
-        print(f"  - max_num_batched_tokens: {DECODE_MAX_NUM_BATCHED_TOKENS}")
-        print(f"  - max_num_seqs: {DECODE_MAX_NUM_SEQS}")
+        #print(f"  - max_num_batched_tokens: {DECODE_MAX_NUM_BATCHED_TOKENS}")
+        #print(f"  - max_num_seqs: {DECODE_MAX_NUM_SEQS}")
         print(f"  - SSD storage: {args.ssd_path}")
         
         new_prompts = new_prompts[:DECODE_NUM_PROMPTS]
@@ -455,14 +570,15 @@ def main():
             max_model_len=MAX_MODEL_LEN,
             gpu_memory_utilization=GPU_MEMORY_UTILIZATION,
             trust_remote_code=True,
-            max_num_batched_tokens=DECODE_MAX_NUM_BATCHED_TOKENS,
+            #max_num_batched_tokens=DECODE_MAX_NUM_BATCHED_TOKENS,
             max_num_seqs=DECODE_MAX_NUM_SEQS,
             enable_prefix_caching=False,
-            enforce_eager=True
+            enforce_eager=True,
+            disable_log_stats=False
         ) as llm_decode:
-            
-            decode_results = benchmark_decode_only(llm_decode, new_prompts, max_tokens=3500, input_file=args.prefill_prompts_file)
-    
+
+            decode_results = benchmark_decode_only(llm_decode, new_prompts, max_tokens=700, input_file=args.prefill_prompts_file)
+
     # ===== FINAL SUMMARY =====
     print("\n" + "="*80)
     print("📈 FINAL SUMMARY (LMCache with SSD)")
@@ -472,22 +588,27 @@ def main():
         print(f"\n🔸 PREFILL-ONLY:")
         print(f"    Throughput: {prefill_results['throughput']:.2f} tokens/sec")
         print(f"    Avg Latency: {prefill_results['avg_latency_ms']:.2f} ms")
-    
+
     if decode_results:
         print(f"\n🔸 DECODE-ONLY (with LMCache SSD cache):")
         print(f"    Throughput: {decode_results['throughput']:.2f} tokens/sec")
         print(f"    Avg TPOT: {decode_results['avg_tpot_ms']:.2f} ms")
         print(f"    Avg Latency: {decode_results['avg_latency_ms']:.2f} ms")
-    
+
     if prefill_results and decode_results:
         print(f"\n🎯 Prefill vs Decode:")
         print(f"    Prefill speed: {prefill_results['throughput']:.2f} tokens/sec")
         print(f"    Decode speed: {decode_results['throughput']:.2f} tokens/sec")
         ratio = decode_results['throughput'] / prefill_results['throughput']
         print(f"    Ratio (decode/prefill): {ratio:.2f}x")
-    
+
     json_file = save_results(config, prefill_results, decode_results)
-    
+
+    # Finish wandb run
+    if wandb_run:
+        wandb_run.finish()
+        print(f"📊 WandB run completed: {wandb_run.url}")
+
     print("\n✅ Benchmark complete with LMCache SSD storage!")
     print("="*80)
 
