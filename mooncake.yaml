@@ -1,0 +1,19 @@
+# LMCache Configuration
+local_cpu: False
+remote_url: "mooncakestore://localhost:50051/"
+max_local_cpu_size: 2  # small local buffer
+numa_mode: "auto"      # reduce tail latency with multi-NUMA/multi-NIC
+pre_caching_hash_algorithm: builtin
+
+# Mooncake Configuration (via extra_config)
+extra_config:
+  use_exists_sync: true
+  save_chunk_meta: False  # Enable chunk metadata optimization
+  local_hostname: "localhost"
+  metadata_server: "http://localhost:8080/metadata"
+  protocol: "tcp"
+  device_name: ""        # leave empty; autodetect device(s)
+  global_segment_size: 21474836480   # 20 GiB per worker
+  master_server_address: "localhost:50051"
+  local_buffer_size: 0    # rely on LMCache local_cpu as the buffer
+  mooncake_prefer_local_alloc: true  # prefer local segment if available
