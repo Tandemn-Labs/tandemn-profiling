@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 
+import os
+os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
+
 import ray
 import time
 from datasets import load_dataset
 from vllm import LLM, SamplingParams
+# ray.init(address=os.environ["RAY_ADDRESS"], log_to_driver=False)
 
-ray.init(address="127.0.0.1:6379")
+
 llm = LLM(
-    model="meta-llama/Llama-3.2-3B-Instruct",  # Change to your desired model
-    tensor_parallel_size=2,  # Use both GPUs
+    model="Qwen/Qwen3-0.6B",  # Change to your desired model
+    pipeline_parallel_size=2,  # Use both GPUs
+    tensor_parallel_size=1,    # Explicitly set TP=1
     dtype="auto",
+    distributed_executor_backend="ray",
     max_model_len=4096,
     trust_remote_code=True,
+    gpu_memory_utilization=0.9,
 )
 
 tokenizer = llm.get_tokenizer()
@@ -52,8 +59,8 @@ sampling_params = SamplingParams(
 print("="*70)
 print("🏃 STARTING BENCHMARK")
 print("="*70)
-print(f"Model: meta-llama/Llama-3.2-3B-Instruct")
-print(f"Tensor Parallel: 2 GPUs")
+print(f"Model: Qwen/Qwen3-0.6B")
+print(f"Pipeline Parallel: 2 GPUs")
 print(f"Number of requests: {NUM_SAMPLES}")
 print(f"Input tokens per request: {INPUT_LENGTH}")
 print(f"Output tokens per request: {OUTPUT_LENGTH}")

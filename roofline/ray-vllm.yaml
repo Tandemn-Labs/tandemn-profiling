@@ -3,8 +3,8 @@ name: vllm-ray-ec2
 resources:
   cloud: aws
   # Pick one:
-  instance_type: p3.2xlarge
-  # accelerators: L4:1
+  # instance_type: p3.2xlarge
+  accelerators: L40S:1
   # Or CPU-only (vLLM won’t be meaningful without GPU):
   use_spot: false
   # cpus: 16+
@@ -12,6 +12,9 @@ resources:
   ports:
     - 6379   # Ray head port (user Ray)
     - 8265   # Ray dashboard
+
+workdir: . 
+# this will sync the current directory 
 
 num_nodes: 2
 
@@ -27,10 +30,10 @@ setup: |
 
   # Install YOUR Ray version (pin it). This ensures start_cluster will keep it.
   # Also keep click pinned due to Ray CLI compatibility notes in SkyPilot template.
-  uv pip install -U "ray[default]" "click<8.3.0"
+  # uv pip install -U "ray[default]" "click<8.3.0"
 
   # Install vLLM (pin as desired)
-  uv pip install "vllm"
+  uv pip install "vllm" "datasets"
 
 run: |
   set -euxo pipefail
@@ -43,14 +46,25 @@ run: |
   export RAY_DASHBOARD_HOST=0.0.0.0
   export RAY_HEAD_PORT=6379
   export RAY_DASHBOARD_PORT=8265
+  export RAY_ADDRESS="127.0.0.1:6379"
+
 
   # Start head+workers across all nodes
   ~/sky_templates/ray/start_cluster
 
+
   if [ "${SKYPILOT_NODE_RANK}" = "0" ]; then
     echo "Ray head should be up at: 127.0.0.1:${RAY_HEAD_PORT}"
     ray status --address="127.0.0.1:${RAY_HEAD_PORT}" || true
-
-    # Optional: start a vLLM server on the head node
-    # vllm serve <your_model> --host 0.0.0.0 --port 8000
+    
+    # Optional: Auto-run autolauncher.py if it exists
+    if [ -f "autolauncher.py" ]; then
+      echo ""
+      echo "========================================"
+      echo "🚀 Launching autolauncher.py on head node"
+      echo "========================================"
+      python autolauncher.py
+      echo ""
+      echo "✅ autolauncher.py completed!"
+    fi
   fi
