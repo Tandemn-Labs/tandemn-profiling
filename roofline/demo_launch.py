@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
 
@@ -64,46 +62,79 @@ print(f"Pipeline Parallel: 2 GPUs")
 print(f"Number of requests: {NUM_SAMPLES}")
 print(f"Input tokens per request: {INPUT_LENGTH}")
 print(f"Output tokens per request: {OUTPUT_LENGTH}")
-print(f"Total tokens: {NUM_SAMPLES * (INPUT_LENGTH + OUTPUT_LENGTH):,}")
 print("="*70 + "\n")
 
-start_time = time.time()
+start_time = time.perf_counter()
 outputs = llm.generate(prompts, sampling_params)
-end_time = time.time()
+end_time = time.perf_counter()
 
-# Calculate metrics
-total_time = end_time - start_time
-total_input_tokens = NUM_SAMPLES * INPUT_LENGTH
-total_output_tokens = NUM_SAMPLES * OUTPUT_LENGTH
-total_tokens = total_input_tokens + total_output_tokens
+# Calculate metrics using vLLM's native way
+elapsed_time = end_time - start_time
 
-overall_throughput = total_tokens / total_time
-input_throughput = total_input_tokens / total_time
-output_throughput = total_output_tokens / total_time
-avg_latency_per_request = total_time / NUM_SAMPLES
-avg_time_per_output_token = total_time / total_output_tokens
+# Count tokens from actual outputs (vLLM native way)
+total_prompt_tokens = 0
+total_output_tokens = 0
+
+for output in outputs:
+    # Count actual prompt tokens from the output
+    if output.prompt_token_ids:
+        total_prompt_tokens += len(output.prompt_token_ids)
+    
+    # Count actual generated tokens from each completion output
+    for completion_output in output.outputs:
+        total_output_tokens += len(completion_output.token_ids)
+
+total_tokens = total_prompt_tokens + total_output_tokens
+
+# Calculate throughput (vLLM native approach)
+requests_per_second = len(outputs) / elapsed_time
+overall_throughput = total_tokens / elapsed_time
+input_throughput = total_prompt_tokens / elapsed_time
+output_throughput = total_output_tokens / elapsed_time
 
 # Print results
 print("\n" + "="*70)
-print("📊 BENCHMARK RESULTS")
+print("📊 BENCHMARK RESULTS (Using vLLM Native Metrics)")
 print("="*70)
-print(f"Total time: {total_time:.2f} seconds")
-print(f"Number of requests: {NUM_SAMPLES}")
-print(f"Total input tokens: {total_input_tokens:,}")
+print(f"Elapsed time: {elapsed_time:.2f} seconds")
+print(f"Number of requests: {len(outputs)}")
+print(f"Total prompt tokens: {total_prompt_tokens:,}")
 print(f"Total output tokens: {total_output_tokens:,}")
 print(f"Total tokens (input + output): {total_tokens:,}")
 print(f"\n🚀 THROUGHPUT:")
-print(f"   Overall: {overall_throughput:.2f} tokens/sec")
-print(f"   Input (prefill): {input_throughput:.2f} tokens/sec")
-print(f"   Output (decode): {output_throughput:.2f} tokens/sec")
-print(f"\n⏱️  LATENCY:")
-print(f"   Avg per request: {avg_latency_per_request*1000:.2f} ms")
-print(f"   Avg per output token (TPOT): {avg_time_per_output_token*1000:.2f} ms")
+print(f"   Requests/s: {requests_per_second:.2f}")
+print(f"   Overall: {overall_throughput:.2f} tokens/s")
+print(f"   Input (prefill): {input_throughput:.2f} tokens/s")
+print(f"   Output (decode): {output_throughput:.2f} tokens/s")
+
+# If you want detailed per-request timing metrics:
+print(f"\n⏱️  DETAILED TIMING (from vLLM RequestMetrics):")
+if outputs and outputs[0].metrics:
+    # Example: show metrics for first request
+    first_metrics = outputs[0].metrics
+    print(f"   First request arrival time: {first_metrics.arrival_time:.4f}s")
+    if first_metrics.first_token_time:
+        ttft = first_metrics.first_token_time - first_metrics.arrival_time
+        print(f"   Time to first token (TTFT): {ttft*1000:.2f} ms")
+    if first_metrics.finished_time:
+        total_time = first_metrics.finished_time - first_metrics.arrival_time
+        print(f"   Total request time: {total_time*1000:.2f} ms")
+    
+    # Calculate average TTFT across all requests
+    ttfts = []
+    for output in outputs:
+        if output.metrics and output.metrics.first_token_time:
+            ttft = output.metrics.first_token_time - output.metrics.arrival_time
+            ttfts.append(ttft)
+    if ttfts:
+        avg_ttft = sum(ttfts) / len(ttfts)
+        print(f"   Average TTFT: {avg_ttft*1000:.2f} ms")
+
 print("="*70)
 
 # Verify output lengths
 print(f"\n🔍 Verifying output lengths...")
-actual_lengths = [len(tokenizer.encode(o.outputs[0].text)) for o in outputs[:10]]
+actual_lengths = [len(output.outputs[0].token_ids) for output in outputs[:10]]
 print(f"   First 10 output lengths: {actual_lengths}")
 print(f"   All should be ~{OUTPUT_LENGTH} tokens")
 
