@@ -1,0 +1,56 @@
+name: vllm-ray-ec2
+
+resources:
+  cloud: aws
+  # Pick one:
+  instance_type: p3.2xlarge
+  # accelerators: L4:1
+  # Or CPU-only (vLLM won’t be meaningful without GPU):
+  use_spot: false
+  # cpus: 16+
+  # Open ports only if you want external access (dashboard / vLLM server).
+  ports:
+    - 6379   # Ray head port (user Ray)
+    - 8265   # Ray dashboard
+
+num_nodes: 2
+
+
+setup: |
+  set -euxo pipefail
+
+  python3 -m pip install -U pip
+  python3 -m pip install -U uv
+
+  uv venv --python 3.12 --seed
+  source .venv/bin/activate
+
+  # Install YOUR Ray version (pin it). This ensures start_cluster will keep it.
+  # Also keep click pinned due to Ray CLI compatibility notes in SkyPilot template.
+  uv pip install -U "ray[default]" "click<8.3.0"
+
+  # Install vLLM (pin as desired)
+  uv pip install "vllm"
+
+run: |
+  set -euxo pipefail
+  source .venv/bin/activate
+
+  # Ensure the Ray template uses *your venv ray*, not system ray.
+  export RAY_CMD="uv run ray"
+
+  # Optional: expose dashboard publicly
+  export RAY_DASHBOARD_HOST=0.0.0.0
+  export RAY_HEAD_PORT=6379
+  export RAY_DASHBOARD_PORT=8265
+
+  # Start head+workers across all nodes
+  ~/sky_templates/ray/start_cluster
+
+  if [ "${SKYPILOT_NODE_RANK}" = "0" ]; then
+    echo "Ray head should be up at: 127.0.0.1:${RAY_HEAD_PORT}"
+    ray status --address="127.0.0.1:${RAY_HEAD_PORT}" || true
+
+    # Optional: start a vLLM server on the head node
+    # vllm serve <your_model> --host 0.0.0.0 --port 8000
+  fi
