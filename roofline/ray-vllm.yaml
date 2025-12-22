@@ -28,10 +28,6 @@ setup: |
   uv venv --python 3.12 --seed
   source .venv/bin/activate
 
-  # Install YOUR Ray version (pin it). This ensures start_cluster will keep it.
-  # Also keep click pinned due to Ray CLI compatibility notes in SkyPilot template.
-  # uv pip install -U "ray[default]" "click<8.3.0"
-
   # Install vLLM (pin as desired)
   uv pip install "vllm" "datasets"
 

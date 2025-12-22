@@ -3,8 +3,9 @@ import json
 from dataclasses import dataclass
 import subprocess
 from collections import defaultdict
+import sys
+from pathlib import Path
 
-from tandemn_provisioner import aws_ec2_provisioning
 
 VALID_GPUS_PER_NODE=[8,4,1]
 
@@ -18,7 +19,7 @@ def get_cluster_config(tp,pp):
 def load_experiments(csv_path):
     experiments = []
     with open(csv_path) as f:
-        reader = csv.reader(f)
+        reader = csv.DictReader(f)
         for row in reader:
             experiments.append({
                 'tp': int(row['tensor_degree']),
@@ -59,13 +60,13 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name):
     return f"""
 name: {cluster_name}
 resources:
-  cloud:aws
+  cloud: aws
   accelerators: L40S:{gpus_per_node}
-  use_spot: true
+  use_spot: false
 num_nodes: {num_nodes}
-workdir .
-setup: |
-set -euxo pipefail
+workdir: .
+setup: | 
+  set -euxo pipefail
   python3 -m pip install -U pip
   python3 -m pip install -U uv
 
@@ -95,7 +96,7 @@ from vllm import LLM, SamplingParams
 
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
-NUM_SAMPLES = 50
+NUM_SAMPLES = 100
 
 def run_benchmark(exp):
     """Run single benchmark experiment."""
@@ -105,13 +106,17 @@ def run_benchmark(exp):
     print("="*70)
     
     try:
+        backend = "ray" if (exp['tp'] > 1 or exp['pp'] > 1) else None
+
         llm = LLM(
             model=exp['model'],
             tensor_parallel_size=exp['tp'],
             pipeline_parallel_size=exp['pp'],
             max_model_len=exp['max_input_length'] + exp['max_output_length'],
             trust_remote_code=True,
-            distributed_executor_backend="ray",
+            distributed_executor_backend=backend,
+            gpu_memory_utilization=0.95,
+            quantization="awq"
         )
         
         tokenizer = llm.get_tokenizer()
@@ -178,20 +183,121 @@ if __name__ == "__main__":
     main()
 '''
 
+def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
+    gpus_per_node, num_nodes = cluster_config
+    cluster_name = f"roofline-{gpus_per_node}gpu-{num_nodes}node"
+    local_results = Path(f"results_{cluster_name}.json")
+    
+    print(f"\n{'='*70}")
+    print(f"Cluster: {cluster_name}")
+    print(f"Config: {gpus_per_node} GPUs/node × {num_nodes} nodes")
+    print(f"Experiments: {len(experiments)}")
+    print("="*70)
+    
+    if dry_run:
+        print("[DRY RUN] Would launch and run:")
+        for exp in experiments[:3]:
+            print(f"  - TP={exp['tp']}, PP={exp['pp']}, "
+                  f"in={exp['max_input_length']}, out={exp['max_output_length']}")
+        if len(experiments) > 3:
+            print(f"  ... and {len(experiments)-3} more")
+        return []
+    
+    # 1. Write YAML
+    work_dir = Path.home() / "roofline_benchmarks"
+    work_dir.mkdir(exist_ok=True)
+    yaml_path = work_dir / f"{cluster_name}.yaml"
+    script_path = work_dir / f"benchmark_{cluster_name}.py"
+    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name)
+    # yaml_path = Path(f"/tmp/{cluster_name}.yaml")
+    yaml_path.write_text(yaml_content)
+    
+    # 2. Write benchmark script
+    script_content = generate_benchmark_script(experiments)
+    # script_path = Path(f"/tmp/benchmark_{cluster_name}.py")
+    script_path.write_text(script_content)
+    
+    try:
+        # 3. Launch cluster
+        print(f"🚀 Launching {cluster_name}...")
+        subprocess.run(["sky", "launch", "-y", "-c", cluster_name, str(yaml_path)], check=True)
+        
+        # 4. Run benchmarks
+        print(f"🔥 Running benchmarks...")
+        subprocess.run([
+            "sky", "exec", cluster_name, 
+            "--num-nodes", str(num_nodes),
+            "--gpus", f"L40S:{gpus_per_node}",
+            "--workdir", str(script_path.parent),
+            f"source ~/sky_workdir/.venv/bin/activate && python {script_path.name}"
+        ], check=True)
+        
+        # 5. Fetch results
+        print(f"📥 Fetching results...")
+        subprocess.run([
+            "sky", "rsync",  'down',
+            f"{cluster_name}:/tmp/benchmark_results.json",  
+            str(local_results)
+        ], check=True)
+        
+        print(f"✅ Results saved to {local_results}")
+        with open(local_results) as f:
+            return json.load(f)
+        
+    except Exception as e:
+        # Mark ALL experiments in this cluster as failed
+        print(f"❌ Cluster error: {e}")
+        failed_results = [{**exp, 'status': 'cluster_error', 'error': str(e)} for exp in experiments]
+        with open(local_results, 'w') as f:
+            json.dump(failed_results, f, indent=2)
+        return failed_results
+        
+    finally:
+        # 6. Teardown
+        print(f"🗑️  Tearing down {cluster_name}...")
+        subprocess.run(["sky", "down", "-y", cluster_name])
 
 
+
+
+def save_results_csv(all_results, output_path="benchmark_results.csv"):
+    """Save all results to CSV."""
+    if not all_results:
+        return
+    fieldnames = list(all_results[0].keys())
+    with open(output_path, 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(all_results)
+    print(f"📊 Saved {len(all_results)} results to {output_path}")
 
 
 def main():
     csv_path = "experiment_l40_llama.csv"
+    dry_run = "--run" not in sys.argv
     
     experiments = load_experiments(csv_path)
     groups = group_by_cluster(experiments)
     
-    print(f"Loaded {len(experiments)} experiments")
-    print(f"Grouped into {len(groups)} cluster configurations:")
+    print(f"📊 Loaded {len(experiments)} experiments")
+    print(f"📦 Grouped into {len(groups)} cluster configurations:")
     for (gpus, nodes), exps in sorted(groups.items()):
-        print(f"  {gpus} GPU/node × {nodes} nodes: {len(exps)} experiments")
+        print(f"   {gpus} GPU/node × {nodes} nodes: {len(exps)} experiments")
+    
+    if dry_run:
+        print("\n💡 This is a DRY RUN. Add --run to actually launch clusters.")
+    
+    # Run each group and collect all results
+    all_results = []
+    for cluster_config, exps in sorted(groups.items()):
+        results = run_cluster_benchmarks(cluster_config, exps, dry_run=dry_run)
+        if results:
+            all_results.extend(results)
+        break
+    
+    # Save combined results to CSV
+    if all_results:
+        save_results_csv(all_results)
 
 
 if __name__ == "__main__":
