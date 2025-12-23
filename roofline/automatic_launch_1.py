@@ -6,7 +6,6 @@ from collections import defaultdict
 import sys
 from pathlib import Path
 
-
 VALID_GPUS_PER_NODE=[8,4,1]
 
 def get_cluster_config(tp,pp):
@@ -41,21 +40,22 @@ def group_by_cluster(experiments):
 def generate_yaml(gpus_per_node, num_nodes, cluster_name):
     ray_run = ""
     if num_nodes > 1:
-        ray_run = """
-        # Start Ray cluster across all nodes
-        export RAY_CMD="uv run ray"
-        export RAY_DASHBOARD_HOST=0.0.0.0
-        export RAY_HEAD_PORT=6379
-        export RAY_DASHBOARD_PORT=8265
-        export RAY_ADDRESS="127.0.0.1:6379"
-
-        # Start Ray head + workers on all nodes
-        ~/sky_templates/ray/start_cluster
-
-        if [ "${SKYPILOT_NODE_RANK}" = "0" ]; then
-            echo "Ray cluster started on head node"
-            ray status --address="127.0.0.1:${RAY_HEAD_PORT}" || true
-        fi
+        ray_run = f"""
+  # Start Ray cluster across all nodes
+  export RAY_CMD="uv run ray"
+  export RAY_DASHBOARD_HOST=0.0.0.0
+  export RAY_HEAD_PORT=6379
+  export RAY_DASHBOARD_PORT=8265
+  
+  ~/sky_templates/ray/start_cluster
+  
+  if [ "${{SKYPILOT_NODE_RANK}}" = "0" ]; then
+      echo "Ray cluster started on head node"
+      ray status --address="127.0.0.1:${{RAY_HEAD_PORT}}" || true
+      
+      # Run benchmark here while Ray is still up
+      python benchmark_{cluster_name}.py
+  fi
         """
     return f"""
 name: {cluster_name}
@@ -63,6 +63,9 @@ resources:
   cloud: aws
   accelerators: L40S:{gpus_per_node}
   use_spot: false
+  disk_size: 500GB
+  memory: "64GB+"
+  region: us-east-1
 num_nodes: {num_nodes}
 workdir: .
 setup: | 
@@ -73,8 +76,9 @@ setup: |
   uv venv --python 3.12 --seed
   source .venv/bin/activate
 
-  # Install vLLM (pin as desired)
-  uv pip install "vllm" "datasets"
+  # Install vLLM and LMCache
+  uv pip install "vllm==0.11.0" "datasets" "lmcache==0.3.6"
+  mkdir -p /tmp/lmcache_disk
 
 run: |
   set -euxo pipefail
@@ -89,10 +93,31 @@ def generate_benchmark_script(experiments):
     
     return f'''#!/usr/bin/env python3
 import os
+# LMCache environment variables
+os.environ["LMCACHE_USE_EXPERIMENTAL"] = "True"
+os.environ["LMCACHE_CHUNK_SIZE"] = "256"
+# CPU Backend
+os.environ["LMCACHE_LOCAL_CPU"] = "True"
+os.environ["LMCACHE_MAX_LOCAL_CPU_SIZE"] = "10.0"
+# SSD backend
+os.environ['LMCACHE_LOCAL_DISK'] = "/tmp/lmcache_disk"
+os.environ['LMCACHE_MAX_LOCAL_DISK_SIZE'] = "100"
+os.environ["LMCACHE_DISK_PERSISTENCE"] = "True"
+os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
+
+
 import json
 import time
+import ray
 from datasets import load_dataset
 from vllm import LLM, SamplingParams
+from vllm.config import KVTransferConfig
+import shutil
+
+# Clean up existing cache directory
+cache_dir = "/tmp/lmcache_disk"
+if os.path.exists(cache_dir):
+    shutil.rmtree(cache_dir)
 
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
@@ -107,6 +132,13 @@ def run_benchmark(exp):
     
     try:
         backend = "ray" if (exp['tp'] > 1 or exp['pp'] > 1) else None
+        
+        # Enable LMCache for KV cache management
+        ktc = KVTransferConfig(
+            kv_connector="LMCacheConnectorV1",
+            kv_role="kv_both",
+            kv_buffer_device="cpu"
+        )
 
         llm = LLM(
             model=exp['model'],
@@ -115,8 +147,10 @@ def run_benchmark(exp):
             max_model_len=exp['max_input_length'] + exp['max_output_length'],
             trust_remote_code=True,
             distributed_executor_backend=backend,
-            gpu_memory_utilization=0.95,
-            quantization="awq"
+            gpu_memory_utilization=0.90,
+            # quantization="awq",
+            enforce_eager=True,
+            kv_transfer_config=ktc
         )
         
         tokenizer = llm.get_tokenizer()
@@ -147,6 +181,24 @@ def run_benchmark(exp):
             sum(len(c.token_ids) for c in o.outputs) for o in outputs
         )
         
+        # Cleanup BEFORE creating result
+        del llm
+        
+        # Clean up lmcache backend
+        try:
+            from lmcache.integration.vllm.utils import ENGINE_NAME
+            from lmcache.v1.cache_engine import LMCacheEngineBuilder
+            LMCacheEngineBuilder.destroy(ENGINE_NAME)
+        except:
+            pass
+        
+        # Force GPU cleanup
+        import torch
+        import gc
+        gc.collect()
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+        
         result = {{
             **exp,
             'elapsed_time': elapsed,
@@ -158,12 +210,25 @@ def run_benchmark(exp):
             'status': 'success'
         }}
         
-        # Cleanup
-        del llm
-        
     except Exception as e:
-        result = {{**exp, 'status': 'error', 'error': str(e)}}
-    
+        import traceback
+        error_msg = str(e)
+        if "CUDA out of memory" in error_msg or "OutOfMemoryError" in error_msg:
+            error_msg = f"OOM: {{error_msg[:200]}}"
+        
+        result = {{**exp, 'status': 'error', 'error': error_msg}}
+        
+        # Force GPU cleanup on error
+        try:
+            import torch
+            import gc
+            if 'llm' in locals():
+                del llm
+            gc.collect()
+            torch.cuda.empty_cache()
+            torch.cuda.synchronize()
+        except:
+            pass
     return result
 
 def main():
@@ -204,7 +269,7 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
         return []
     
     # 1. Write YAML
-    work_dir = Path.home() / "roofline_benchmarks"
+    work_dir = Path("roofline_benchmarks")
     work_dir.mkdir(exist_ok=True)
     yaml_path = work_dir / f"{cluster_name}.yaml"
     script_path = work_dir / f"benchmark_{cluster_name}.py"
@@ -222,16 +287,6 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
         print(f"🚀 Launching {cluster_name}...")
         subprocess.run(["sky", "launch", "-y", "-c", cluster_name, str(yaml_path)], check=True)
         
-        # 4. Run benchmarks
-        print(f"🔥 Running benchmarks...")
-        subprocess.run([
-            "sky", "exec", cluster_name, 
-            "--num-nodes", str(num_nodes),
-            "--gpus", f"L40S:{gpus_per_node}",
-            "--workdir", str(script_path.parent),
-            f"source ~/sky_workdir/.venv/bin/activate && python {script_path.name}"
-        ], check=True)
-        
         # 5. Fetch results
         print(f"📥 Fetching results...")
         subprocess.run([
@@ -247,6 +302,15 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
     except Exception as e:
         # Mark ALL experiments in this cluster as failed
         print(f"❌ Cluster error: {e}")
+        print(f"📥 Attempting to fetch partial results...")
+        try:
+            subprocess.run([
+                "sky", "rsync", 'down',
+                f"{cluster_name}:/tmp/benchmark_results.json",  
+                str(local_results)
+            ], check=False)  # Don't fail if file doesn't exist
+        except:
+            pass
         failed_results = [{**exp, 'status': 'cluster_error', 'error': str(e)} for exp in experiments]
         with open(local_results, 'w') as f:
             json.dump(failed_results, f, indent=2)
@@ -289,11 +353,16 @@ def main():
     
     # Run each group and collect all results
     all_results = []
+    count = 0
     for cluster_config, exps in sorted(groups.items()):
-        results = run_cluster_benchmarks(cluster_config, exps, dry_run=dry_run)
-        if results:
-            all_results.extend(results)
-        break
+        if count == 1:
+            results = run_cluster_benchmarks(cluster_config, exps, dry_run=dry_run)
+            if results:
+                all_results.extend(results)
+            break
+        else:
+            count+=1
+            continue
     
     # Save combined results to CSV
     if all_results:
