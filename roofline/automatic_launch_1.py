@@ -6,14 +6,23 @@ from collections import defaultdict
 import sys
 from pathlib import Path
 
-VALID_GPUS_PER_NODE=[8,4,1]
+VALID_GPUS_PER_NODE = [1, 4, 8]
 
-def get_cluster_config(tp,pp):
-    world_size=tp*pp
-    for gpus in VALID_GPUS_PER_NODE:
-        if world_size % gpus == 0:
-            return gpus, world_size // gpus
-    return 1, world_size
+def get_cluster_config(tp, pp):
+    """
+    Your rules imply:
+      - Never colocate PP stages on same node.
+      - Each stage uses TP GPUs on its node.
+    Therefore:
+      - GPUs per node == TP
+      - Num nodes == PP
+    """
+    if tp not in VALID_GPUS_PER_NODE:
+        raise ValueError(f"Unsupported TP={tp}. Allowed: {VALID_GPUS_PER_NODE}")
+    if pp < 1:
+        raise ValueError(f"Invalid PP={pp}. Must be >= 1")
+    return tp, pp
+
 
 def load_experiments(csv_path):
     experiments = []
@@ -54,7 +63,7 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name):
       ray status --address="127.0.0.1:${{RAY_HEAD_PORT}}" || true
       
       # Run benchmark here while Ray is still up
-      python benchmark_{cluster_name}.py
+      python roofline_benchmarks/benchmark_{cluster_name}.py
   fi
         """
     return f"""
@@ -65,7 +74,6 @@ resources:
   use_spot: false
   disk_size: 500GB
   memory: "64GB+"
-  region: us-east-1
 num_nodes: {num_nodes}
 workdir: .
 setup: | 
@@ -104,6 +112,7 @@ os.environ['LMCACHE_LOCAL_DISK'] = "/tmp/lmcache_disk"
 os.environ['LMCACHE_MAX_LOCAL_DISK_SIZE'] = "100"
 os.environ["LMCACHE_DISK_PERSISTENCE"] = "True"
 os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
+os.environ["LMCACHE_LOG_LEVEL"] = "WARNING"
 
 
 import json
@@ -121,7 +130,7 @@ if os.path.exists(cache_dir):
 
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
-NUM_SAMPLES = 100
+NUM_SAMPLES = 10
 
 def run_benchmark(exp):
     """Run single benchmark experiment."""
@@ -148,9 +157,10 @@ def run_benchmark(exp):
             trust_remote_code=True,
             distributed_executor_backend=backend,
             gpu_memory_utilization=0.90,
-            # quantization="awq",
+            quantization="awq",
             enforce_eager=True,
-            kv_transfer_config=ktc
+            kv_transfer_config=ktc,
+            enable_prefix_caching=True
         )
         
         tokenizer = llm.get_tokenizer()
@@ -159,7 +169,7 @@ def run_benchmark(exp):
         # Prepare prompts
         prompts = []
         for i in range(min(NUM_SAMPLES, len(dataset))):
-            text = dataset[i]["text"]
+            text = "Please summarize the following text: " + dataset[i]["text"]
             tokens = tokenizer.encode(text, add_special_tokens=False)[:exp['max_input_length']]
             prompts.append(tokenizer.decode(tokens))
         
@@ -250,7 +260,8 @@ if __name__ == "__main__":
 
 def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
     gpus_per_node, num_nodes = cluster_config
-    cluster_name = f"roofline-{gpus_per_node}gpu-{num_nodes}node"
+    # cluster_name = f"roofline-{gpus_per_node}gpu-{num_nodes}node"
+    cluster_name = f"roofline-tp{gpus_per_node}-pp{num_nodes}"
     local_results = Path(f"results_{cluster_name}.json")
     
     print(f"\n{'='*70}")
@@ -290,7 +301,7 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
         # 5. Fetch results
         print(f"📥 Fetching results...")
         subprocess.run([
-            "sky", "rsync",  'down',
+            "scp",
             f"{cluster_name}:/tmp/benchmark_results.json",  
             str(local_results)
         ], check=True)
@@ -304,11 +315,12 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
         print(f"❌ Cluster error: {e}")
         print(f"📥 Attempting to fetch partial results...")
         try:
+            print(f"📥 Fetching results...")
             subprocess.run([
-                "sky", "rsync", 'down',
+                "scp",
                 f"{cluster_name}:/tmp/benchmark_results.json",  
                 str(local_results)
-            ], check=False)  # Don't fail if file doesn't exist
+            ], check=True)
         except:
             pass
         failed_results = [{**exp, 'status': 'cluster_error', 'error': str(e)} for exp in experiments]
@@ -354,7 +366,13 @@ def main():
     # Run each group and collect all results
     all_results = []
     count = 0
-    for cluster_config, exps in sorted(groups.items()):
+    
+    def cluster_sort_key(item):
+        (gpus_per_node, num_nodes), _ = item
+        # Cost/spot-friendly: TP asc (1,4,8), then PP asc (1..4)
+        return (gpus_per_node, num_nodes)
+
+    for cluster_config, exps in sorted(groups.items(), key=cluster_sort_key):
         if count == 1:
             results = run_cluster_benchmarks(cluster_config, exps, dry_run=dry_run)
             if results:
