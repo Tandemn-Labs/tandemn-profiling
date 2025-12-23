@@ -59,7 +59,7 @@ run: |
       echo "========================================"
       echo "🚀 Launching autolauncher.py on head node"
       echo "========================================"
-      python autolauncher.py
+      python demo_launch.py
       echo ""
       echo "✅ autolauncher.py completed!"
     fi
