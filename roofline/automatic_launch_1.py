@@ -5,18 +5,11 @@ import subprocess
 from collections import defaultdict
 import sys
 from pathlib import Path
+import requests 
 
 VALID_GPUS_PER_NODE = [1, 4, 8]
 
 def get_cluster_config(tp, pp):
-    """
-    Your rules imply:
-      - Never colocate PP stages on same node.
-      - Each stage uses TP GPUs on its node.
-    Therefore:
-      - GPUs per node == TP
-      - Num nodes == PP
-    """
     if tp not in VALID_GPUS_PER_NODE:
         raise ValueError(f"Unsupported TP={tp}. Allowed: {VALID_GPUS_PER_NODE}")
     if pp < 1:
@@ -47,7 +40,9 @@ def group_by_cluster(experiments):
     return dict(groups)
 
 def generate_yaml(gpus_per_node, num_nodes, cluster_name):
-    ray_run = ""
+    ray_run = f"""
+  python roofline_benchmarks/benchmark_{cluster_name}.py
+    """
     if num_nodes > 1:
         ray_run = f"""
   # Start Ray cluster across all nodes
@@ -74,6 +69,7 @@ resources:
   use_spot: false
   disk_size: 500GB
   memory: "64GB+"
+  ports: 8265 # Ray dashboard port
 num_nodes: {num_nodes}
 workdir: .
 setup: | 
@@ -85,7 +81,7 @@ setup: |
   source .venv/bin/activate
 
   # Install vLLM and LMCache
-  uv pip install "vllm==0.11.0" "datasets" "lmcache==0.3.6"
+  uv pip install "vllm==0.11.0" "datasets" "lmcache==0.3.6" "requests"
   mkdir -p /tmp/lmcache_disk
 
 run: |
@@ -94,6 +90,12 @@ run: |
 
   echo "Cluster ready for benchmarking"
 """
+
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
+
+def send_discord_message(message):
+    payload = {"content": message}
+    requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
 
 def generate_benchmark_script(experiments):
     """Generate Python benchmark script for a set of experiments."""
@@ -106,15 +108,15 @@ os.environ["LMCACHE_USE_EXPERIMENTAL"] = "True"
 os.environ["LMCACHE_CHUNK_SIZE"] = "256"
 # CPU Backend
 os.environ["LMCACHE_LOCAL_CPU"] = "True"
-os.environ["LMCACHE_MAX_LOCAL_CPU_SIZE"] = "10.0"
+os.environ["LMCACHE_MAX_LOCAL_CPU_SIZE"] = "30.0"
 # SSD backend
 os.environ['LMCACHE_LOCAL_DISK'] = "/tmp/lmcache_disk"
-os.environ['LMCACHE_MAX_LOCAL_DISK_SIZE'] = "100"
+os.environ['LMCACHE_MAX_LOCAL_DISK_SIZE'] = "300"
 os.environ["LMCACHE_DISK_PERSISTENCE"] = "True"
 os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
 os.environ["LMCACHE_LOG_LEVEL"] = "WARNING"
 
-
+import requests
 import json
 import time
 import ray
@@ -122,15 +124,42 @@ from datasets import load_dataset
 from vllm import LLM, SamplingParams
 from vllm.config import KVTransferConfig
 import shutil
+import subprocess
+import time
+
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
+
+def send_discord_message(message):
+    payload = {{"content": message}}
+    requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
 
 # Clean up existing cache directory
 cache_dir = "/tmp/lmcache_disk"
 if os.path.exists(cache_dir):
     shutil.rmtree(cache_dir)
 
+os.makedirs(cache_dir, exist_ok=True)
+
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
-NUM_SAMPLES = 10
+NUM_SAMPLES = 30
+
+def restart_ray_cluster():
+    """Drop and re-create the Ray cluster before the next distributed run."""
+    if os.environ.get("SKYPILOT_NODE_RANK") != "0":
+        return  # only head node manages cluster lifetime
+    ray.shutdown()  # detach vLLM’s Ray client first
+    subprocess.run(
+        "~/sky_templates/ray/stop_cluster || true",
+        shell=True,
+        check=False,
+    )
+    subprocess.run(
+        "~/sky_templates/ray/start_cluster",
+        shell=True,
+        check=True,
+    )
+    time.sleep(5)  # give workers time to rejoin
 
 def run_benchmark(exp):
     """Run single benchmark experiment."""
@@ -140,7 +169,9 @@ def run_benchmark(exp):
     print("="*70)
     
     try:
-        backend = "ray" if (exp['tp'] > 1 or exp['pp'] > 1) else None
+        backend = "ray" if (exp['pp'] > 1) else None
+        if backend == "ray":
+            restart_ray_cluster()
         
         # Enable LMCache for KV cache management
         ktc = KVTransferConfig(
@@ -153,11 +184,11 @@ def run_benchmark(exp):
             model=exp['model'],
             tensor_parallel_size=exp['tp'],
             pipeline_parallel_size=exp['pp'],
-            max_model_len=exp['max_input_length'] + exp['max_output_length'],
+            max_model_len=min(exp['max_input_length'] + exp['max_output_length'], 32768),
             trust_remote_code=True,
             distributed_executor_backend=backend,
             gpu_memory_utilization=0.90,
-            quantization="awq",
+            # quantization="awq",
             enforce_eager=True,
             kv_transfer_config=ktc,
             enable_prefix_caching=True
@@ -200,6 +231,8 @@ def run_benchmark(exp):
             from lmcache.v1.cache_engine import LMCacheEngineBuilder
             LMCacheEngineBuilder.destroy(ENGINE_NAME)
         except:
+            if backend == "ray":
+                restart_ray_cluster()
             pass
         
         # Force GPU cleanup
@@ -225,7 +258,9 @@ def run_benchmark(exp):
         error_msg = str(e)
         if "CUDA out of memory" in error_msg or "OutOfMemoryError" in error_msg:
             error_msg = f"OOM: {{error_msg[:200]}}"
-        
+        send_discord_message(f"❌ Cluster {{cluster_name}} FAILED: {{error_msg}}")
+        if backend == "ray":
+            restart_ray_cluster()
         result = {{**exp, 'status': 'error', 'error': error_msg}}
         
         # Force GPU cleanup on error
@@ -272,7 +307,7 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
     
     if dry_run:
         print("[DRY RUN] Would launch and run:")
-        for exp in experiments[:3]:
+        for exp in experiments:
             print(f"  - TP={exp['tp']}, PP={exp['pp']}, "
                   f"in={exp['max_input_length']}, out={exp['max_output_length']}")
         if len(experiments) > 3:
@@ -307,6 +342,7 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
         ], check=True)
         
         print(f"✅ Results saved to {local_results}")
+        send_discord_message(f"✅ Results saved to {local_results}")
         with open(local_results) as f:
             return json.load(f)
         
@@ -314,6 +350,7 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
         # Mark ALL experiments in this cluster as failed
         print(f"❌ Cluster error: {e}")
         print(f"📥 Attempting to fetch partial results...")
+        send_discord_message(f"❌ Cluster {cluster_name} FAILED: {str(e)[:100]}")
         try:
             print(f"📥 Fetching results...")
             subprocess.run([
@@ -373,7 +410,7 @@ def main():
         return (gpus_per_node, num_nodes)
 
     for cluster_config, exps in sorted(groups.items(), key=cluster_sort_key):
-        if count == 1:
+        if count == 5:
             results = run_cluster_benchmarks(cluster_config, exps, dry_run=dry_run)
             if results:
                 all_results.extend(results)
