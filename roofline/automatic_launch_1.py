@@ -170,8 +170,8 @@ def run_benchmark(exp):
     
     try:
         backend = "ray" if (exp['pp'] > 1) else None
-        if backend == "ray":
-            restart_ray_cluster()
+        # if backend == "ray":
+        #     restart_ray_cluster()
         
         # Enable LMCache for KV cache management
         ktc = KVTransferConfig(
@@ -231,8 +231,8 @@ def run_benchmark(exp):
             from lmcache.v1.cache_engine import LMCacheEngineBuilder
             LMCacheEngineBuilder.destroy(ENGINE_NAME)
         except:
-            if backend == "ray":
-                restart_ray_cluster()
+            # if backend == "ray":
+            #     restart_ray_cluster()
             pass
         
         # Force GPU cleanup
@@ -241,7 +241,7 @@ def run_benchmark(exp):
         gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
-        
+        send_discord_message(f"✅ Results saved to {{local_results}}")
         result = {{
             **exp,
             'elapsed_time': elapsed,
@@ -259,8 +259,8 @@ def run_benchmark(exp):
         if "CUDA out of memory" in error_msg or "OutOfMemoryError" in error_msg:
             error_msg = f"OOM: {{error_msg[:200]}}"
         send_discord_message(f"❌ Cluster {{cluster_name}} FAILED: {{error_msg}}")
-        if backend == "ray":
-            restart_ray_cluster()
+        # if backend == "ray":
+        #     restart_ray_cluster()
         result = {{**exp, 'status': 'error', 'error': error_msg}}
         
         # Force GPU cleanup on error
