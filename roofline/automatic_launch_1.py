@@ -40,17 +40,44 @@ def group_by_cluster(experiments):
     return dict(groups)
 
 def generate_yaml(gpus_per_node, num_nodes, cluster_name):
-    ray_run = f"""
+    lmcache_exports = """
+  # LMCache environment variables (must be set before Ray workers start)
+  export LMCACHE_USE_EXPERIMENTAL="True"
+  export LMCACHE_CHUNK_SIZE="256"
+  export LMCACHE_LOCAL_CPU="True"
+  export LMCACHE_MAX_LOCAL_CPU_SIZE="40.0"
+  export LMCACHE_SAVE_UNFULL_CHUNK="True"
+  # export VLLM_USE_RAY_WRAPPED_PP_COMM=0
+  export LMCACHE_ENABLE_ASYNC_LOADING="False"
+  export LMCACHE_REMOTE_SERDE="cachegen"
+  export LMCACHE_USE_LAYERWISE="True"
+  export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR="True"
+  export NCCL_P2P_DISABLE=1
+  export NCCL_TIMEOUT=3600
+  export TORCH_NCCL_BLOCKING_WAIT=1
+  export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+  export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+  export TORCH_DISTRIBUTED_DEBUG=DETAIL  
+  export NCCL_DEBUG=INFO 
+  # export LMCACHE_LOOKUP_TIMEOUT_MS="12000" 
+  # export LMCACHE_LOCAL_DISK="/tmp/lmcache_disk"
+  # export LMCACHE_MAX_LOCAL_DISK_SIZE="100"
+  # export LMCACHE_DISK_PERSISTENCE="True"
+  # export LMCACHE_LOG_LEVEL="INFO"
+"""
+    
+    ray_run = f"""{lmcache_exports}
   python roofline_benchmarks/benchmark_{cluster_name}.py
     """
     if num_nodes > 1:
-        ray_run = f"""
+        ray_run = f"""{lmcache_exports}
   # Start Ray cluster across all nodes
   export RAY_CMD="uv run ray"
   export RAY_DASHBOARD_HOST=0.0.0.0
   export RAY_HEAD_PORT=6379
   export RAY_DASHBOARD_PORT=8265
-  
+  export RAY_CGRAPH_get_timeout=1800
+  export RAY_CGRAPH_submit_timeout=180
   ~/sky_templates/ray/start_cluster
   
   if [ "${{SKYPILOT_NODE_RANK}}" = "0" ]; then
@@ -58,7 +85,7 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name):
       ray status --address="127.0.0.1:${{RAY_HEAD_PORT}}" || true
       
       # Run benchmark here while Ray is still up
-      python roofline_benchmarks/benchmark_{cluster_name}.py
+      PYTHONHASHSEED=0 python roofline_benchmarks/benchmark_{cluster_name}.py
   fi
         """
     return f"""
@@ -69,10 +96,11 @@ resources:
   use_spot: false
   disk_size: 500GB
   memory: "64GB+"
-  ports: 8265 # Ray dashboard port
+  region: us-east-1
 num_nodes: {num_nodes}
 workdir: .
 setup: | 
+  export PYTHONHASHSEED=0
   set -euxo pipefail
   python3 -m pip install -U pip
   python3 -m pip install -U uv
@@ -81,7 +109,16 @@ setup: |
   source .venv/bin/activate
 
   # Install vLLM and LMCache
-  uv pip install "vllm==0.11.0" "datasets" "lmcache==0.3.6" "requests"
+
+  uv pip install "datasets" "requests"
+  uv pip install "vllm==0.10.0" # old vllm
+  # uv pip install "lmcache==0.3.11"
+  git clone https://github.com/lmcache/lmcache.git
+  cd lmcache
+  git checkout v0.3.6
+  uv pip install . --no-build-isolation
+  cd ..
+
   mkdir -p /tmp/lmcache_disk
 
 run: |
@@ -103,18 +140,8 @@ def generate_benchmark_script(experiments):
     
     return f'''#!/usr/bin/env python3
 import os
-# LMCache environment variables
-os.environ["LMCACHE_USE_EXPERIMENTAL"] = "True"
-os.environ["LMCACHE_CHUNK_SIZE"] = "256"
-# CPU Backend
-os.environ["LMCACHE_LOCAL_CPU"] = "True"
-os.environ["LMCACHE_MAX_LOCAL_CPU_SIZE"] = "30.0"
-# SSD backend
-os.environ['LMCACHE_LOCAL_DISK'] = "/tmp/lmcache_disk"
-os.environ['LMCACHE_MAX_LOCAL_DISK_SIZE'] = "300"
-os.environ["LMCACHE_DISK_PERSISTENCE"] = "True"
 os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
-os.environ["LMCACHE_LOG_LEVEL"] = "WARNING"
+os.environ["LMCACHE_LOG_LEVEL"] = "INFO"
 
 import requests
 import json
@@ -123,6 +150,7 @@ import ray
 from datasets import load_dataset
 from vllm import LLM, SamplingParams
 from vllm.config import KVTransferConfig
+from vllm.distributed import cleanup_dist_env_and_memory
 import shutil
 import subprocess
 import time
@@ -144,22 +172,6 @@ EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
 NUM_SAMPLES = 30
 
-def restart_ray_cluster():
-    """Drop and re-create the Ray cluster before the next distributed run."""
-    if os.environ.get("SKYPILOT_NODE_RANK") != "0":
-        return  # only head node manages cluster lifetime
-    ray.shutdown()  # detach vLLM’s Ray client first
-    subprocess.run(
-        "~/sky_templates/ray/stop_cluster || true",
-        shell=True,
-        check=False,
-    )
-    subprocess.run(
-        "~/sky_templates/ray/start_cluster",
-        shell=True,
-        check=True,
-    )
-    time.sleep(5)  # give workers time to rejoin
 
 def run_benchmark(exp):
     """Run single benchmark experiment."""
@@ -173,25 +185,32 @@ def run_benchmark(exp):
         # if backend == "ray":
         #     restart_ray_cluster()
         
-        # Enable LMCache for KV cache management
+        # # Enable LMCache for KV cache management
         ktc = KVTransferConfig(
             kv_connector="LMCacheConnectorV1",
             kv_role="kv_both",
             kv_buffer_device="cpu"
         )
+        # ktc = KVTransferConfig(
+        #     kv_connector="OffloadingConnector",
+        #     kv_role="kv_both",
+        #     kv_connector_extra_config={{"block_size":64,"num_cpu_blocks":1000}}
+        # )
 
         llm = LLM(
             model=exp['model'],
             tensor_parallel_size=exp['tp'],
             pipeline_parallel_size=exp['pp'],
-            max_model_len=min(exp['max_input_length'] + exp['max_output_length'], 32768),
+            max_model_len=min(exp['max_input_length'] + exp['max_output_length'] -1, 32768), # -1 because of the eos token removing
             trust_remote_code=True,
             distributed_executor_backend=backend,
-            gpu_memory_utilization=0.90,
+            gpu_memory_utilization=0.85,
             # quantization="awq",
             enforce_eager=True,
-            kv_transfer_config=ktc,
-            enable_prefix_caching=True
+            # kv_transfer_config=ktc,
+            #enable_chunked_prefill=True,
+            # truncate_prompt_tokens=exp['max_input_length'],
+            #enable_prefix_caching=True
         )
         
         tokenizer = llm.get_tokenizer()
@@ -221,10 +240,9 @@ def run_benchmark(exp):
         total_output_tokens = sum(
             sum(len(c.token_ids) for c in o.outputs) for o in outputs
         )
-        
+        time.sleep(30)
         # Cleanup BEFORE creating result
-        del llm
-        
+        cleanup_dist_env_and_memory(shutdown_ray=False) #DO  NOT SHUT DOWN RAY
         # Clean up lmcache backend
         try:
             from lmcache.integration.vllm.utils import ENGINE_NAME
@@ -241,7 +259,7 @@ def run_benchmark(exp):
         gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
-        send_discord_message(f"✅ Results saved to {{local_results}}")
+        send_discord_message(f"✅ Results saved to {{exp['tp']}}-{{exp['pp']}}")
         result = {{
             **exp,
             'elapsed_time': elapsed,
@@ -258,7 +276,7 @@ def run_benchmark(exp):
         error_msg = str(e)
         if "CUDA out of memory" in error_msg or "OutOfMemoryError" in error_msg:
             error_msg = f"OOM: {{error_msg[:200]}}"
-        send_discord_message(f"❌ Cluster {{cluster_name}} FAILED: {{error_msg}}")
+        send_discord_message(f"❌ Cluster {{exp['tp']}}-{{exp['pp']}} FAILED: {{error_msg}}")
         # if backend == "ray":
         #     restart_ray_cluster()
         result = {{**exp, 'status': 'error', 'error': error_msg}}
@@ -267,8 +285,9 @@ def run_benchmark(exp):
         try:
             import torch
             import gc
-            if 'llm' in locals():
-                del llm
+            cleanup_dist_env_and_memory(shutdown_ray=False) #DO  NOT SHUT DOWN RAY
+            # if 'llm' in locals():
+                # del llm
             gc.collect()
             torch.cuda.empty_cache()
             torch.cuda.synchronize()
@@ -278,11 +297,12 @@ def run_benchmark(exp):
 
 def main():
     results = []
-    for exp in EXPERIMENTS:
+    for i, exp in enumerate(EXPERIMENTS):
+        # if i in [0,1,2,3]:
+        #     continue
         result = run_benchmark(exp)
         results.append(result)
         print(f"Result: {{result}}")
-        
         # Save incrementally
         with open(RESULTS_FILE, 'w') as f:
             json.dump(results, f, indent=2)
@@ -298,6 +318,8 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
     # cluster_name = f"roofline-{gpus_per_node}gpu-{num_nodes}node"
     cluster_name = f"roofline-tp{gpus_per_node}-pp{num_nodes}"
     local_results = Path(f"results_{cluster_name}.json")
+    local_logs = Path(f"logs_{cluster_name}")  # ADD THIS
+    local_logs.mkdir(exist_ok=True)  # ADD THIS
     
     print(f"\n{'='*70}")
     print(f"Cluster: {cluster_name}")
@@ -366,6 +388,18 @@ def run_cluster_benchmarks(cluster_config, experiments, dry_run=True):
         return failed_results
         
     finally:
+        # ===== ADD LOG COLLECTION BEFORE TEARDOWN =====
+        print(f"📋 Collecting logs from {cluster_name}...")
+        
+        # Collect logs from all nodes
+        try:
+            subprocess.run([
+                "sky", "logs", cluster_name, 
+                "--save", str(local_logs / "sky_command_output.txt")
+            ], check=False)
+        except Exception as log_error:
+            print(f"⚠️  Warning: Could not collect all logs: {log_error}")
+            send_discord_message(f"⚠️  Log collection incomplete: {str(log_error)[:100]}")
         # 6. Teardown
         print(f"🗑️  Tearing down {cluster_name}...")
         subprocess.run(["sky", "down", "-y", cluster_name])
@@ -410,7 +444,7 @@ def main():
         return (gpus_per_node, num_nodes)
 
     for cluster_config, exps in sorted(groups.items(), key=cluster_sort_key):
-        if count == 5:
+        if count == 10: # 6,7 failed
             results = run_cluster_benchmarks(cluster_config, exps, dry_run=dry_run)
             if results:
                 all_results.extend(results)
@@ -426,3 +460,30 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+    # some notes
+    # without lmcache, vllm v0.10.2 worked for tp4,pp3 (almost?)
+    # now testing with vllm v0.11.0 and no lmcache (this also worked)
+    # have to test with vllm v0.11.0 and lmcache v0.3.9 (trying this now) (didnt work, one exp worked, rest didnt, mostly due to ray dag)
+    # have to test with vllm v0.11.0 and lmcache v0.3.10 (same issue)
+    # have to test with vllm v0.13.0 and lmcache v0.3.10 (same issue) (this issue is interesting - layers not found? wtf?)
+    # there is something called as a lmcache mp connector, will check into that as well
+    # need to check if ray restarts help withn vllmv0.11 and v0.3.9 (does not help)
+    # my suspicion is that i had not put the time between two llm establishments and cleanup_dist_env_and_memory was not used (this HELPS!)
+    # export VLLM_USE_RAY_WRAPPED_PP_COMM=0 maybe trying this helps? (same as all)
+    # have to test with vllm v0.13.0 and lmcache v0.3.11 (latest versions, and building from source????)
+    # this seems like another flag to try enable_async_loading: True (didnt do anything significiant)
+    # vllm with v0.10.2 is NOT WORKING for pp=4 tp=4, maybe thats also an issue, 
+    # will try offloading connector as well
+
+    # TP=4/PP=4 worked with vllm v0.10.0 and max_gpu_util = 0.85 and 
+    # export NCCL_P2P_DISABLE=1
+    # export NCCL_TIMEOUT=1800
+    # export TORCH_NCCL_BLOCKING_WAIT=1
+    # export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+    # export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+    # export TORCH_DISTRIBUTED_DEBUG=DETAIL  
+    # export NCCL_DEBUG=INFO 
+
+    # trying lmcache w it (didnt work tbh)
