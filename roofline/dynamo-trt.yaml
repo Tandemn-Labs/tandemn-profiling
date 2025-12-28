@@ -1,0 +1,48 @@
+name: dynamo-trt
+
+resources:
+  cloud: aws
+  region: us-east-1
+  accelerators: L40S:1
+  use_spot: true
+
+workdir: .
+
+envs:
+  NGC_IMAGE: nvcr.io/nvidia/ai-dynamo/tensorrtllm-runtime:0.7.0.post2
+
+setup: |
+  set -e
+  
+  # Setup Docker access
+  sudo usermod -aG docker $USER || true
+  sudo chmod 666 /var/run/docker.sock || true
+  
+  # Pull NGC container
+  docker pull ${NGC_IMAGE}
+
+run: |
+  set -e
+  
+  # Run everything inside the container
+  docker run --rm \
+    --gpus all \
+    --network host \
+    --shm-size=10G \
+    --ipc host \
+    -v $(pwd):/workspace \
+    -w /workspace \
+    ${NGC_IMAGE} \
+    bash -c '
+      # Start services
+      nats-server -js -m 8222 >/dev/null 2>&1 &
+      etcd --listen-client-urls http://0.0.0.0:2379 \
+           --advertise-client-urls http://localhost:2379 >/dev/null 2>&1 &
+      sleep 5
+      
+      # Install extra deps
+      pip install -q datasets requests transformers
+      
+      # Run your script
+      python demo_launch_dyanmo.py
+    '
