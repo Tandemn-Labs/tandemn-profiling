@@ -53,14 +53,12 @@ run: |
     echo "Ray head should be up at: 127.0.0.1:${RAY_HEAD_PORT}"
     ray status --address="127.0.0.1:${RAY_HEAD_PORT}" || true
     
-    # Optional: Auto-run autolauncher.py if it exists
-    if [ -f "autolauncher.py" ]; then
-      echo ""
-      echo "========================================"
-      echo "🚀 Launching autolauncher.py on head node"
-      echo "========================================"
-      python demo_launch.py
-      echo ""
-      echo "✅ autolauncher.py completed!"
-    fi
+    # Run the vLLM benchmark
+    echo ""
+    echo "========================================"
+    echo "🚀 Launching demo_launch_vllm.py on head node"
+    echo "========================================"
+    python demo_launch_vllm.py
+    echo ""
+    echo "✅ Benchmark completed!"
   fi
