@@ -1,0 +1,66 @@
+[{
+    "tp": 1,
+    "pp": 4,
+    "max_input_length": 4096,
+    "max_output_length": 1024,
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "elapsed_time": 1363.6195911369998,
+    "total_prompt_tokens": 122341,
+    "total_output_tokens": 30662,
+    "requests_per_sec": 0.0220002705996514,
+    "output_tokens_per_sec": 22.485743237550373,
+    "total_tokens_per_sec": 112.20358008528211,
+    "status": "success"
+  },
+  {
+    "tp": 1,
+    "pp": 4,
+    "max_input_length": 4096,
+    "max_output_length": 4096,
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "elapsed_time": 7109.24530914,
+    "total_prompt_tokens": 122341,
+    "total_output_tokens": 122822,
+    "requests_per_sec": 0.004219857199389435,
+    "output_tokens_per_sec": 17.27637669811364,
+    "total_tokens_per_sec": 34.485095019130405,
+    "status": "success"
+  },
+  {
+    "tp": 1,
+    "pp": 4,
+    "max_input_length": 4096,
+    "max_output_length": 7000,
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "elapsed_time": 14938.410243276001,
+    "total_prompt_tokens": 122341,
+    "total_output_tokens": 209942,
+    "requests_per_sec": 0.0020082458247860373,
+    "output_tokens_per_sec": 14.053838164907674,
+    "total_tokens_per_sec": 22.243531579912627,
+    "status": "success"
+  },
+  {
+    "tp": 1,
+    "pp": 4,
+    "max_input_length": 10000,
+    "max_output_length": 1024,
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "status": "error",
+    "error": "EngineCore encountered an issue. See stack trace (above) for the root cause."
+  },
+  {
+    "tp": 1,
+    "pp": 4,
+    "max_input_length": 10000,
+    "max_output_length": 4096,
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "elapsed_time": 13098.708060645,
+    "total_prompt_tokens": 290237,
+    "total_output_tokens": 122824,
+    "requests_per_sec": 0.0022903022085158796,
+    "output_tokens_per_sec": 9.376802615291814,
+    "total_tokens_per_sec": 31.534484018392593,
+    "status": "success"
+  }
+]
