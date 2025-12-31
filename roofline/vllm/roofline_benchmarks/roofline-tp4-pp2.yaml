@@ -1,0 +1,44 @@
+
+name: roofline-tp4-pp2
+resources:
+  cloud: aws
+  accelerators: L40S:4
+  use_spot: false
+  disk_size: 500GB
+  memory: "64GB+"
+  ports: 8265 # Ray dashboard port
+num_nodes: 2
+workdir: .
+setup: | 
+  set -euxo pipefail
+  python3 -m pip install -U pip
+  python3 -m pip install -U uv
+
+  uv venv --python 3.12 --seed
+  source .venv/bin/activate
+
+  # Install vLLM and LMCache
+  uv pip install "vllm==0.11.0" "datasets" "lmcache==0.3.6" "requests"
+  mkdir -p /tmp/lmcache_disk
+
+run: |
+  set -euxo pipefail
+  source .venv/bin/activate 
+  # Start Ray cluster across all nodes
+  export RAY_CMD="uv run ray"
+  export RAY_DASHBOARD_HOST=0.0.0.0
+  export RAY_HEAD_PORT=6379
+  export RAY_DASHBOARD_PORT=8265
+  
+  ~/sky_templates/ray/start_cluster
+  
+  if [ "${SKYPILOT_NODE_RANK}" = "0" ]; then
+      echo "Ray cluster started on head node"
+      ray status --address="127.0.0.1:${RAY_HEAD_PORT}" || true
+      
+      # Run benchmark here while Ray is still up
+      python roofline_benchmarks/benchmark_roofline-tp4-pp2.py
+  fi
+        
+
+  echo "Cluster ready for benchmarking"

@@ -59,6 +59,7 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name):
   export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
   export TORCH_DISTRIBUTED_DEBUG=DETAIL  
   export NCCL_DEBUG=INFO 
+  export VLLM_USE_RAY_COMPILED_DAG_CHANNEL_TYPE="shm"
   # export LMCACHE_LOOKUP_TIMEOUT_MS="12000" 
   # export LMCACHE_LOCAL_DISK="/tmp/lmcache_disk"
   # export LMCACHE_MAX_LOCAL_DISK_SIZE="100"
@@ -208,7 +209,7 @@ def run_benchmark(exp):
             # quantization="awq",
             enforce_eager=True,
             # kv_transfer_config=ktc,
-            #enable_chunked_prefill=True,
+            enable_chunked_prefill=False,
             # truncate_prompt_tokens=exp['max_input_length'],
             #enable_prefix_caching=True
         )
@@ -298,7 +299,7 @@ def run_benchmark(exp):
 def main():
     results = []
     for i, exp in enumerate(EXPERIMENTS):
-        # if i in [0,1,2,3]:
+        # if i in [0,1,2,5,6,7,8,9,10]:
         #     continue
         result = run_benchmark(exp)
         results.append(result)
@@ -444,7 +445,7 @@ def main():
         return (gpus_per_node, num_nodes)
 
     for cluster_config, exps in sorted(groups.items(), key=cluster_sort_key):
-        if count == 10: # 6,7 failed
+        if count == 2: # 6,7 failed
             results = run_cluster_benchmarks(cluster_config, exps, dry_run=dry_run)
             if results:
                 all_results.extend(results)
@@ -487,3 +488,4 @@ if __name__ == "__main__":
     # export NCCL_DEBUG=INFO 
 
     # trying lmcache w it (didnt work tbh)
+    # some people recommend trying VLLM_USE_RAY_COMPILED_DAG_CHANNEL_TYPE=shm (byepass NCCL all at once, really harsh way to go, but we might have to use it to byepass vllm issues)
