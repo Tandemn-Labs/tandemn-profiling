@@ -1,0 +1,11 @@
+[
+  {
+    "tp": 1,
+    "pp": 4,
+    "max_input_length": 8192,
+    "max_output_length": 2048,
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "status": "error",
+    "error": "EngineCore encountered an issue. See stack trace (above) for the root cause."
+  }
+]
