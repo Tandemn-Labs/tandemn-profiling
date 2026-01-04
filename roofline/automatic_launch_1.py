@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import subprocess
 from collections import defaultdict
 import sys
+import argparse
 from pathlib import Path
 import requests
 import signal
@@ -11,16 +12,67 @@ import atexit
 import logging
 from datetime import datetime
 
-AVAILABLE_INSTANCE_GPUS = [1, 4, 8]  # AWS L40S instances only come in 1, 4, 8 GPU configs
-
-# AWS L40S instance pricing (on-demand, approximate, as of 2024)
-# Note: Pricing may vary slightly by region
-# Source: https://aws.amazon.com/ec2/instance-types/g6/
-INSTANCE_PRICING = {
-    1: {"instance_type": "g6.2xlarge", "price_per_hour": 1.212},     # 1x L40S
-    4: {"instance_type": "g6.12xlarge", "price_per_hour": 4.848},    # 4x L40S
-    8: {"instance_type": "g6.48xlarge", "price_per_hour": 9.696},    # 8x L40S
+# GPU type configurations
+# Each GPU type maps to: available GPU counts per instance, instance family, and pricing
+GPU_CONFIGS = {
+    "L40S": {
+        "available_gpus": [1, 4, 8],
+        "instance_family": "g6e",
+        "pricing": {
+            1: {"instance_type": "g6e.2xlarge", "price_per_hour": 0.99},
+            4: {"instance_type": "g6e.12xlarge", "price_per_hour": 4.68},
+            8: {"instance_type": "g6e.48xlarge", "price_per_hour": 13.35},
+        }
+    },
+    "L4": {
+        "available_gpus": [1, 2, 4],
+        "instance_family": "g6",
+        "pricing": {
+            1: {"instance_type": "g6.2xlarge", "price_per_hour": 0.526},
+            2: {"instance_type": "g6.12xlarge", "price_per_hour": 0.752},
+            4: {"instance_type": "g6.48xlarge", "price_per_hour": 1.204},
+        }
+    },
+    "A10G": {
+        "available_gpus": [1, 4, 8],
+        "instance_family": "g5",
+        "pricing": {
+            1: {"instance_type": "g5.2xlarge", "price_per_hour": 1.006},
+            4: {"instance_type": "g5.12xlarge", "price_per_hour": 4.096},
+            8: {"instance_type": "g5.48xlarge", "price_per_hour": 16.384},
+        }
+    },
+    "A100-40gb": {
+        "available_gpus": [1, 4, 8],
+        "instance_family": "p4d",
+        "pricing": {
+            1: {"instance_type": "p4d.24xlarge", "price_per_hour": 32.77},  # 8 GPUs, but can use 1
+            4: {"instance_type": "p4d.24xlarge", "price_per_hour": 32.77},  # 8 GPUs, but can use 4
+            8: {"instance_type": "p4d.24xlarge", "price_per_hour": 32.77},  # 8 GPUs (40GB per GPU)
+        }
+    },
+    "A100-80gb": {
+        "available_gpus": [1, 4, 8],
+        "instance_family": "p4de",
+        "pricing": {
+            1: {"instance_type": "p4de.24xlarge", "price_per_hour": 40.96},  # 8 GPUs, but can use 1
+            4: {"instance_type": "p4de.24xlarge", "price_per_hour": 40.96},  # 8 GPUs, but can use 4
+            8: {"instance_type": "p4de.24xlarge", "price_per_hour": 40.96},  # 8 GPUs (80GB per GPU)
+        }
+    },
+    "H100": {
+        "available_gpus": [1, 4, 8],
+        "instance_family": "p5",
+        "pricing": {
+            1: {"instance_type": "p5.48xlarge", "price_per_hour": 98.32},  # 8 GPUs, but can use 1
+            4: {"instance_type": "p5.48xlarge", "price_per_hour": 98.32},  # 8 GPUs, but can use 4
+            8: {"instance_type": "p5.48xlarge", "price_per_hour": 98.32},  # 8 GPUs
+        }
+    },
 }
+
+# Default GPU type (for backward compatibility)
+DEFAULT_GPU_TYPE = "L40S"
 
 # Global logger instance
 logger = logging.getLogger("benchmark")
@@ -114,9 +166,9 @@ atexit.register(cleanup_on_exit)
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
-def get_cluster_config(tp, pp):
+def get_cluster_config(tp, pp, gpu_type=DEFAULT_GPU_TYPE):
     """
-    Calculate the best instance configuration for given TP/PP.
+    Calculate the best instance configuration for given TP/PP and GPU type.
 
     Returns (gpus_per_node, num_nodes) that can accommodate TP×PP GPUs.
 
@@ -129,18 +181,21 @@ def get_cluster_config(tp, pp):
         raise ValueError(f"Invalid PP={pp}. Must be >= 1")
     if tp < 1:
         raise ValueError(f"Invalid TP={tp}. Must be >= 1")
+    if gpu_type not in GPU_CONFIGS:
+        raise ValueError(f"Invalid GPU type: {gpu_type}. Must be one of {list(GPU_CONFIGS.keys())}")
 
     total_gpus = tp * pp
+    available_gpus = GPU_CONFIGS[gpu_type]["available_gpus"]
 
     # Find the smallest instance type that can fit TP GPUs (for fast TP communication)
     gpus_per_node = None
-    for gpu_count in AVAILABLE_INSTANCE_GPUS:
+    for gpu_count in available_gpus:
         if gpu_count >= tp:
             gpus_per_node = gpu_count
             break
 
     if gpus_per_node is None:
-        raise ValueError(f"TP={tp} exceeds max GPUs per instance ({max(AVAILABLE_INSTANCE_GPUS)})")
+        raise ValueError(f"TP={tp} exceeds max GPUs per instance ({max(available_gpus)}) for {gpu_type}")
 
     # Calculate how many nodes we need
     num_nodes = (total_gpus + gpus_per_node - 1) // gpus_per_node  # Ceiling division
@@ -148,7 +203,7 @@ def get_cluster_config(tp, pp):
     # Make sure we have enough total GPUs
     actual_gpus = gpus_per_node * num_nodes
     if actual_gpus < total_gpus:
-        raise ValueError(f"Cannot fit TP={tp}, PP={pp} ({total_gpus} GPUs) into available instances")
+        raise ValueError(f"Cannot fit TP={tp}, PP={pp} ({total_gpus} GPUs) into available {gpu_type} instances")
 
     return gpus_per_node, num_nodes
 
@@ -167,15 +222,15 @@ def load_experiments(csv_path):
             })
     return experiments
 
-def group_by_cluster(experiments):
+def group_by_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE):
     groups = defaultdict(list)
     for exp in experiments:
-        gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'])
+        gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type)
         key = (gpus_per_node, num_nodes)
         groups[key].append(exp)
     return dict(groups)
 
-def group_by_input_output_then_cluster(experiments):
+def group_by_input_output_then_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE):
     """Group experiments first by input/output length, then by cluster config."""
     # First level: group by input/output length
     io_groups = defaultdict(list)
@@ -188,14 +243,14 @@ def group_by_input_output_then_cluster(experiments):
     for io_key, io_exps in io_groups.items():
         cluster_groups = defaultdict(list)
         for exp in io_exps:
-            gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'])
+            gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type)
             cluster_key = (gpus_per_node, num_nodes)
             cluster_groups[cluster_key].append(exp)
         result[io_key] = dict(cluster_groups)
     
     return result
 
-def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments):
+def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE):
     lmcache_exports = """
   # LMCache environment variables (must be set before Ray workers start)
   export LMCACHE_USE_EXPERIMENTAL="True"
@@ -269,12 +324,22 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments):
   # Cleanup Ray
   uv run ray stop
         """
+    # Handle A100 variants: use A100 as accelerator name but specify instance type
+    accelerator_name = gpu_type
+    instance_type_constraint = ""
+    if gpu_type in ["A100-40gb", "A100-80gb"]:
+        accelerator_name = "A100"
+        # Force specific instance type (p4d for 40gb, p4de for 80gb)
+        gpu_config = GPU_CONFIGS[gpu_type]
+        instance_type = gpu_config["pricing"][gpus_per_node]["instance_type"]
+        instance_type_constraint = f"  instance_type: {instance_type}\n"
+    
     return f"""
 name: {cluster_name}
 resources:
   cloud: aws
-  accelerators: L40S:{gpus_per_node}
-  use_spot: false
+  accelerators: {accelerator_name}:{gpus_per_node}
+{instance_type_constraint}  use_spot: false
   disk_size: 500GB
   memory: "64GB+"
   # No region constraint - SkyPilot will try all available AWS regions
@@ -316,14 +381,15 @@ def send_discord_message(message):
     payload = {"content": message}
     requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
 
-def generate_benchmark_script(experiments, gpus_per_node, num_nodes):
+def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DEFAULT_GPU_TYPE):
     """Generate Python benchmark script for a set of experiments."""
     exp_list = json.dumps(experiments, indent=2)
 
     # Calculate cluster pricing info
-    price_per_node = INSTANCE_PRICING[gpus_per_node]["price_per_hour"]
+    gpu_config = GPU_CONFIGS[gpu_type]
+    price_per_node = gpu_config["pricing"][gpus_per_node]["price_per_hour"]
     total_price_per_hour = price_per_node * num_nodes
-    instance_type = INSTANCE_PRICING[gpus_per_node]["instance_type"]
+    instance_type = gpu_config["pricing"][gpus_per_node]["instance_type"]
     if num_nodes > 1:
         cluster_instance_type = f"{num_nodes}x {instance_type}"
     else:
@@ -1119,7 +1185,7 @@ if __name__ == "__main__":
     main()
 '''
 
-def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True):
+def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True, gpu_type=DEFAULT_GPU_TYPE):
     gpus_per_node, num_nodes = cluster_config
     # Use TP/PP from the first experiment for naming (all experiments in a group have compatible TP/PP)
     tp = experiments[0]['tp']
@@ -1131,15 +1197,27 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
 
     # Create consolidated result directory with datetime
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    subdir_name = f"result_tp{tp}-pp{pp}-{timestamp}"
+    subdir_name = f"tp{tp}-pp{pp}-{timestamp}"
     
-    # If parent_dir is provided, create subdirectory inside it
+    # Get instance family and GPU name for directory organization
+    gpu_config = GPU_CONFIGS[gpu_type]
+    instance_family = gpu_config["instance_family"]
+    # Use gpu_type as GPU name (e.g., "L4", "L40S", "A100-40gb", "A100-80gb")
+    gpu_name = gpu_type
+    instance_dir = f"aws-{instance_family}-{gpu_name}"
+    
+    # If parent_dir is provided, create subdirectory structure: parent_dir/aws-{instance_family}-{gpu_name}/tp{tp}-pp{pp}-{timestamp}
     if parent_dir:
         parent_path = Path(parent_dir)
         parent_path.mkdir(exist_ok=True)
-        result_dir = parent_path / subdir_name
+        instance_path = parent_path / instance_dir
+        instance_path.mkdir(exist_ok=True)
+        result_dir = instance_path / subdir_name
     else:
-        result_dir = Path(subdir_name)
+        # If no parent_dir, create: aws-{instance_family}-{gpu_name}/tp{tp}-pp{pp}-{timestamp}
+        instance_path = Path(instance_dir)
+        instance_path.mkdir(exist_ok=True)
+        result_dir = instance_path / subdir_name
 
     print(f"\n{'='*70}")
     print(f"Cluster: {cluster_name}")
@@ -1171,11 +1249,11 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
     work_dir.mkdir(exist_ok=True)
     yaml_path = work_dir / f"{cluster_name}.yaml"
     script_path = work_dir / f"benchmark_{cluster_name}.py"
-    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments)
+    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type)
     yaml_path.write_text(yaml_content)
 
     # 2. Write benchmark script
-    script_content = generate_benchmark_script(experiments, gpus_per_node, num_nodes)
+    script_content = generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type)
     script_path.write_text(script_content)
 
     # Track active cluster for cleanup on unexpected exit
@@ -1291,19 +1369,42 @@ def main():
     # Check for orphaned clusters from previous crashed runs
     check_orphaned_cluster()
 
-    # Parse arguments: python automatic_launch_1.py [csv_file] [--run]
-    # Default to experiment_L40_llama.csv if no CSV file specified
-    csv_path = "experiment_L40_llama.csv"
-    dry_run = "--run" not in sys.argv
+    # Parse arguments
+    parser = argparse.ArgumentParser(
+        description='Run benchmark experiments on AWS GPU instances',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=f'''
+Available GPU types: {', '.join(GPU_CONFIGS.keys())}
+Default: {DEFAULT_GPU_TYPE}
 
-    # Check if a CSV file was provided as argument
-    for arg in sys.argv[1:]:
-        if arg.endswith('.csv'):
-            csv_path = arg
-            break
+Examples:
+  python automatic_launch_1.py --gpu L40S
+  python automatic_launch_1.py experiment.csv --gpu A100 --run
+  python automatic_launch_1.py --gpu H100 --run
+        '''
+    )
+    parser.add_argument('csv_file', nargs='?', default='experiment_L40_llama.csv',
+                       help='CSV file with experiment configurations (default: experiment_L40_llama.csv)')
+    parser.add_argument('--gpu', '--gpu-type', dest='gpu_type', 
+                       choices=list(GPU_CONFIGS.keys()),
+                       default=DEFAULT_GPU_TYPE,
+                       help=f'GPU type to use (default: {DEFAULT_GPU_TYPE})')
+    parser.add_argument('--run', action='store_true',
+                       help='Actually launch clusters (default: dry run)')
+    
+    args = parser.parse_args()
+    
+    csv_path = args.csv_file
+    gpu_type = args.gpu_type
+    dry_run = not args.run
+
+    print(f"🔧 Using GPU type: {gpu_type}")
+    print(f"📊 Loading experiments from: {csv_path}")
+    if dry_run:
+        print("💡 DRY RUN mode - add --run to actually launch clusters")
 
     experiments = load_experiments(csv_path)
-    io_groups = group_by_input_output_then_cluster(experiments)
+    io_groups = group_by_input_output_then_cluster(experiments, gpu_type)
 
     print(f"📊 Loaded {len(experiments)} experiments")
     print(f"📦 Grouped by input/output length, then by cluster config:")
@@ -1329,7 +1430,7 @@ def main():
             parent_dir = f"result-{input_len}in_{output_len}out"
             
             for cluster_config, exps in sorted(cluster_groups.items(), key=cluster_sort_key):
-                results = run_cluster_benchmarks(cluster_config, exps, parent_dir=parent_dir, dry_run=dry_run)
+                results = run_cluster_benchmarks(cluster_config, exps, parent_dir=parent_dir, dry_run=dry_run, gpu_type=gpu_type)
                 if results:
                     all_results.extend(results)
 
