@@ -154,8 +154,7 @@ run: |
           --gpus-per-node "${SKYPILOT_NUM_GPUS_PER_NODE}" \
           --free-gpu-memory-fraction "${FREE_GPU_MEMORY_FRACTION}" \
           --max-num-tokens "${MAX_NUM_TOKENS}" \
-          --max-batch-size "${MAX_BATCH_SIZE}" \
-          --override-engine-args '{{"build_config": null, "backend": "_autodeploy"}'
+          --max-batch-size "${MAX_BATCH_SIZE}"
   else  
     # Keep worker node alive; mpirun will SSH in and launch the remote rank.  
     while true; do sleep 3600; done
