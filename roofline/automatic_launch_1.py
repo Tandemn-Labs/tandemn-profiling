@@ -432,6 +432,7 @@ class GPUMonitorActor:
         self._stop_event = None
         self._pynvml_available = False
         self._pynvml = None
+        self._device_count = 0
 
         try:
             import pynvml
@@ -442,17 +443,26 @@ class GPUMonitorActor:
             print(f"[{{self.node_id}}] GPU monitor initialized with {{self._device_count}} GPUs")
         except Exception as e:
             print(f"[{{self.node_id}}] pynvml not available: {{e}}")
+            import traceback
+            traceback.print_exc()
             self._device_count = 0
 
     def start(self):
         """Start collecting samples."""
         if not self._pynvml_available:
+            print(f"[{{self.node_id}}] Cannot start monitoring: pynvml not available")
             return
-        self.timeseries = []
-        self._start_time = time.time()
-        self._stop_event = threading.Event()
-        self._thread = threading.Thread(target=self._monitor_loop, daemon=True)
-        self._thread.start()
+        try:
+            self.timeseries = []
+            self._start_time = time.time()
+            self._stop_event = threading.Event()
+            self._thread = threading.Thread(target=self._monitor_loop, daemon=True)
+            self._thread.start()
+            print(f"[{{self.node_id}}] Monitoring thread started")
+        except Exception as e:
+            print(f"[{{self.node_id}}] Failed to start monitoring thread: {{e}}")
+            import traceback
+            traceback.print_exc()
 
     def stop(self):
         """Stop collecting samples."""
@@ -502,10 +512,24 @@ class GPUMonitorActor:
     def get_node_id(self):
         """Return this actor's node ID."""
         return self.node_id
+    
+    def get_ray_node_id(self):
+        """Return the Ray node ID where this actor is running."""
+        try:
+            import ray
+            # Get the current node's resource ID
+            node_id = ray.get_runtime_context().get_node_id()
+            return node_id
+        except:
+            return None
 
     def get_device_count(self):
         """Return number of GPUs on this node."""
         return self._device_count
+    
+    def health_check(self):
+        """Simple health check to verify actor is responsive."""
+        return {{"status": "ok", "node_id": self.node_id, "gpus": self._device_count}}
 
 
 class DistributedGPUMonitor:
@@ -524,27 +548,90 @@ class DistributedGPUMonitor:
 
         print(f"📡 Found {{len(alive_nodes)}} Ray nodes for GPU monitoring")
 
-        for idx, node in enumerate(alive_nodes):
-            node_id = f"node{{idx}}"
-            node_ip = node.get('NodeManagerAddress', 'unknown')
+        # Try using placement group to ensure one actor per node
+        # If that fails, fall back to creating actors without pinning
+        try:
+            from ray.util.placement_group import placement_group, remove_placement_group
+            from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
+            
+            # Create a placement group with one bundle per node
+            bundles = [{{"CPU": 0.1}} for _ in alive_nodes]
+            pg = placement_group(bundles, strategy="STRICT_SPREAD")
+            ray.get(pg.ready(), timeout=30.0)
+            print(f"   Created placement group with {{len(bundles)}} bundles")
+            
+            # Create actors using placement group
+            for idx, node in enumerate(alive_nodes):
+                node_id = f"node{{idx}}"
+                node_ip = node.get('NodeManagerAddress', 'unknown')
+                
+                try:
+                    actor = GPUMonitorActor.options(
+                        scheduling_strategy=PlacementGroupSchedulingStrategy(
+                            placement_group=pg,
+                            placement_group_bundle_index=idx
+                        ),
+                        num_cpus=0.1,
+                    ).remote(node_id, self.sample_interval)
+                    
+                    self.actors.append(actor)
+                    self.node_map[node_id] = actor
+                    print(f"  ✓ Deployed monitor on {{node_id}} ({{node_ip}}) using placement group")
+                except Exception as e:
+                    print(f"  ✗ Failed to deploy on {{node_id}}: {{e}}")
+                    import traceback
+                    traceback.print_exc()
+        except Exception as pg_error:
+            print(f"   Placement group approach failed: {{pg_error}}")
+            print(f"   Falling back to simple actor creation (no pinning)...")
+            
+            # Fallback: create actors without pinning, let Ray schedule them
+            for idx, node in enumerate(alive_nodes):
+                node_id = f"node{{idx}}"
+                node_ip = node.get('NodeManagerAddress', 'unknown')
+                
+                try:
+                    actor = GPUMonitorActor.options(
+                        num_cpus=0.1,
+                    ).remote(node_id, self.sample_interval)
+                    
+                    self.actors.append(actor)
+                    self.node_map[node_id] = actor
+                    print(f"  ✓ Deployed monitor actor (will query node location)")
+                    
+                    # Try to get the Ray node where the actor is actually running
+                    try:
+                        ray_node_id = ray.get(actor.get_ray_node_id.remote(), timeout=5.0)
+                        print(f"     Actor running on Ray node: {{ray_node_id}}")
+                    except Exception as node_check_err:
+                        print(f"     Could not determine actor node: {{node_check_err}}")
+                except Exception as e:
+                    print(f"  ✗ Failed to deploy on {{node_id}}: {{e}}")
+                    import traceback
+                    traceback.print_exc()
 
-            # Create actor pinned to this specific node
-            resources = {{f"node:{{node.get('NodeID')}}": 0.001}}
+        # Start all actors with individual timeouts to avoid hanging
+        print(f"   Starting monitoring on {{len(self.actors)}} nodes...")
+        started_count = 0
+        for idx, actor in enumerate(self.actors):
             try:
-                actor = GPUMonitorActor.options(
-                    resources=resources,
-                    num_cpus=0.1,  # Minimal CPU
-                ).remote(node_id, self.sample_interval)
-
-                self.actors.append(actor)
-                self.node_map[node_id] = actor
-                print(f"  ✓ Deployed monitor on {{node_id}} ({{node_ip}})")
+                # Start each actor individually with timeout
+                print(f"   Starting monitor on node{{idx}}...")
+                future = actor.start.remote()
+                ray.get(future, timeout=10.0)  # 10 second timeout per actor
+                started_count += 1
+                print(f"   ✓ Started monitor on node{{idx}}")
             except Exception as e:
-                print(f"  ✗ Failed to deploy on {{node_id}}: {{e}}")
-
-        # Start all actors
-        ray.get([actor.start.remote() for actor in self.actors])
-        print(f"📊 GPU monitoring started on {{len(self.actors)}} nodes")
+                print(f"   ✗ Failed to start monitor on node{{idx}}: {{e}}")
+                import traceback
+                traceback.print_exc()
+                # Continue with other actors
+        
+        if started_count > 0:
+            print(f"📊 GPU monitoring started on {{started_count}}/{{len(self.actors)}} nodes")
+        else:
+            print(f"⚠️  Warning: No actors started successfully. Falling back to local monitoring.")
+            raise Exception("Failed to start any distributed GPU monitors")
 
     def stop(self):
         """Stop all monitor actors."""
@@ -930,7 +1017,7 @@ GPUS_PER_NODE = {gpus_per_node}
 
 
 def get_vllm_config_info(llm):
-    """Extract configuration info from vLLM engine."""
+    """Extract all configuration info from vLLM engine."""
     config_info = {{}}
     try:
         # Access the LLM engine's configuration
@@ -943,6 +1030,9 @@ def get_vllm_config_info(llm):
             config_info['gpu_memory_utilization'] = getattr(cache_cfg, 'gpu_memory_utilization', None)
             config_info['num_gpu_blocks'] = getattr(cache_cfg, 'num_gpu_blocks', None)
             config_info['num_cpu_blocks'] = getattr(cache_cfg, 'num_cpu_blocks', None)
+            config_info['swap_space'] = getattr(cache_cfg, 'swap_space', None)
+            config_info['cache_dtype'] = getattr(cache_cfg, 'cache_dtype', None)
+            config_info['kv_cache_dtype'] = getattr(cache_cfg, 'kv_cache_dtype', None)
 
         # Scheduler config (concurrency settings)
         if hasattr(engine, 'scheduler_config'):
@@ -951,14 +1041,87 @@ def get_vllm_config_info(llm):
             config_info['max_num_batched_tokens'] = getattr(sched_cfg, 'max_num_batched_tokens', None)
             config_info['max_model_len'] = getattr(sched_cfg, 'max_model_len', None)
             config_info['chunked_prefill_enabled'] = getattr(sched_cfg, 'chunked_prefill_enabled', None)
+            config_info['max_paddings'] = getattr(sched_cfg, 'max_paddings', None)
+            config_info['delay_factor'] = getattr(sched_cfg, 'delay_factor', None)
+            config_info['enable_chunked_prefill'] = getattr(sched_cfg, 'enable_chunked_prefill', None)
+            config_info['chunked_prefill_size'] = getattr(sched_cfg, 'chunked_prefill_size', None)
+            config_info['max_seq_len'] = getattr(sched_cfg, 'max_seq_len', None)
 
         # Model config
         if hasattr(engine, 'model_config'):
             model_cfg = engine.model_config
             config_info['dtype'] = str(getattr(model_cfg, 'dtype', None))
+            config_info['max_model_len'] = getattr(model_cfg, 'max_model_len', None)
+            config_info['quantization'] = getattr(model_cfg, 'quantization', None)
+            config_info['quantization_param_path'] = getattr(model_cfg, 'quantization_param_path', None)
+            config_info['enforce_eager'] = getattr(model_cfg, 'enforce_eager', None)
+            config_info['max_seq_len_to_capture'] = getattr(model_cfg, 'max_seq_len_to_capture', None)
+
+        # Parallel config
+        if hasattr(engine, 'parallel_config'):
+            parallel_cfg = engine.parallel_config
+            config_info['tensor_parallel_size'] = getattr(parallel_cfg, 'tensor_parallel_size', None)
+            config_info['pipeline_parallel_size'] = getattr(parallel_cfg, 'pipeline_parallel_size', None)
+            config_info['world_size'] = getattr(parallel_cfg, 'world_size', None)
+            config_info['rank'] = getattr(parallel_cfg, 'rank', None)
+
+        # Decoding config
+        if hasattr(engine, 'decoding_config'):
+            decoding_cfg = engine.decoding_config
+            config_info['use_chunked_prefill'] = getattr(decoding_cfg, 'use_chunked_prefill', None)
+            config_info['max_num_batched_tokens'] = getattr(decoding_cfg, 'max_num_batched_tokens', None)
+
+        # Check for LMCache configuration
+        try:
+            from lmcache.integration.vllm.utils import ENGINE_NAME
+            from lmcache.v1.cache_engine import LMCacheEngineBuilder
+            if hasattr(LMCacheEngineBuilder, 'get_engine'):
+                lmcache_engine = LMCacheEngineBuilder.get_engine(ENGINE_NAME)
+                if lmcache_engine:
+                    config_info['lmcache_enabled'] = True
+                    # Try to get LMCache config
+                    if hasattr(lmcache_engine, 'config'):
+                        lmcache_cfg = lmcache_engine.config
+                        config_info['lmcache_chunk_size'] = getattr(lmcache_cfg, 'chunk_size', None)
+                        config_info['lmcache_local_cpu'] = getattr(lmcache_cfg, 'local_cpu', None)
+                        config_info['lmcache_max_local_cpu_size'] = getattr(lmcache_cfg, 'max_local_cpu_size', None)
+                        config_info['lmcache_use_layerwise'] = getattr(lmcache_cfg, 'use_layerwise', None)
+                        config_info['lmcache_enable_lazy_memory_allocator'] = getattr(lmcache_cfg, 'enable_lazy_memory_allocator', None)
+                    # Check environment variables
+                    import os
+                    config_info['lmcache_use_experimental'] = os.environ.get('LMCACHE_USE_EXPERIMENTAL', None)
+                    config_info['lmcache_enable_async_loading'] = os.environ.get('LMCACHE_ENABLE_ASYNC_LOADING', None)
+                    config_info['lmcache_remote_serde'] = os.environ.get('LMCACHE_REMOTE_SERDE', None)
+                else:
+                    config_info['lmcache_enabled'] = False
+            else:
+                config_info['lmcache_enabled'] = False
+        except Exception:
+            config_info['lmcache_enabled'] = False
+
+        # Check for KV transfer config (LMCache connector)
+        if hasattr(llm, 'llm_engine') and hasattr(engine, 'cache_config'):
+            cache_cfg = engine.cache_config
+            if hasattr(cache_cfg, 'kv_transfer_config') and cache_cfg.kv_transfer_config:
+                ktc = cache_cfg.kv_transfer_config
+                config_info['kv_transfer_config_enabled'] = True
+                config_info['kv_connector'] = getattr(ktc, 'kv_connector', None)
+                config_info['kv_role'] = getattr(ktc, 'kv_role', None)
+                config_info['kv_buffer_device'] = getattr(ktc, 'kv_buffer_device', None)
+                if hasattr(ktc, 'kv_connector_extra_config'):
+                    config_info['kv_connector_extra_config'] = ktc.kv_connector_extra_config
+            else:
+                config_info['kv_transfer_config_enabled'] = False
+
+        # LLM initialization parameters (from the LLM object)
+        config_info['enable_prefix_caching'] = getattr(llm, 'enable_prefix_caching', None)
+        config_info['enable_chunked_prefill'] = getattr(llm, 'enable_chunked_prefill', None)
+        config_info['trust_remote_code'] = getattr(llm, 'trust_remote_code', None)
 
     except Exception as e:
         print(f"⚠️  Could not extract vLLM config: {{e}}")
+        import traceback
+        traceback.print_exc()
 
     return config_info
 
@@ -1006,12 +1169,54 @@ def run_benchmark(exp):
         )
 
         # Initialize GPU monitor AFTER LLM creation (Ray is now initialized)
-        use_distributed = backend == "ray" and ray.is_initialized()
-        if use_distributed:
-            print("📡 Using distributed GPU monitoring across Ray cluster")
-            gpu_monitor = DistributedGPUMonitor(sample_interval=0.5)
+        # For PP > 1, we should use distributed monitoring. vLLM initializes Ray internally,
+        # but we need to explicitly connect to it using RAY_ADDRESS.
+        use_distributed = False
+        if backend == "ray":
+            print("📡 Attempting distributed GPU monitoring across Ray cluster...")
+            try:
+                # vLLM initializes Ray internally, but we need to connect to it explicitly
+                # Get Ray address from environment (set at the top of the script)
+                ray_address = os.environ.get("RAY_ADDRESS", "127.0.0.1:6379")
+                
+                # Try to connect to Ray cluster explicitly
+                ray_available = False
+                try:
+                    # If Ray is not initialized, try to connect to the existing cluster
+                    if not ray.is_initialized():
+                        print(f"   Connecting to Ray cluster at {{ray_address}}...")
+                        ray.init(address=ray_address, ignore_reinit_error=True, log_to_driver=False)
+                        print(f"   ✅ Connected to Ray cluster")
+                    
+                    # Now check if we can access nodes
+                    nodes = ray.nodes()
+                    alive_nodes = [n for n in nodes if n.get('Alive', False)]
+                    ray_available = len(alive_nodes) > 0
+                    print(f"   Ray cluster detected: {{len(alive_nodes)}} alive nodes")
+                    for idx, node in enumerate(alive_nodes):
+                        node_id = node.get('NodeID', 'unknown')
+                        print(f"      Node {{idx}}: {{node_id}}")
+                except Exception as ray_check_error:
+                    print(f"   Could not access Ray cluster: {{ray_check_error}}")
+                    print(f"   Ray.is_initialized(): {{ray.is_initialized() if hasattr(ray, 'is_initialized') else 'N/A'}}")
+                    print(f"   RAY_ADDRESS: {{ray_address}}")
+                
+                if ray_available:
+                    # Try to initialize distributed monitor
+                    gpu_monitor = DistributedGPUMonitor(sample_interval=0.5)
+                    use_distributed = True
+                    print("✅ Distributed GPU monitoring initialized successfully")
+                else:
+                    raise Exception("Ray cluster not accessible")
+            except Exception as e:
+                print(f"⚠️  Failed to initialize distributed GPU monitor: {{e}}")
+                import traceback
+                traceback.print_exc()
+                print("📊 Falling back to local GPU monitoring")
+                gpu_monitor = GPUMonitor(sample_interval=0.5)
+                use_distributed = False
         else:
-            print("📊 Using local GPU monitoring")
+            print("📊 Using local GPU monitoring (single node, no Ray)")
             gpu_monitor = GPUMonitor(sample_interval=0.5)
 
         # Extract vLLM configuration info (KV cache, scheduler settings)
@@ -1059,6 +1264,14 @@ def run_benchmark(exp):
         scheduler_monitor.stop()
         gpu_metrics = gpu_monitor.get_summary()
         scheduler_metrics = scheduler_monitor.get_summary()
+        
+        # Log monitoring info for debugging
+        if use_distributed and hasattr(gpu_monitor, 'actors'):
+            print(f"📊 GPU monitoring: {{len(gpu_monitor.actors)}} nodes monitored")
+            if 'num_nodes_monitored' in gpu_metrics:
+                print(f"📊 GPU monitoring: {{gpu_metrics['num_nodes_monitored']}} nodes reported in summary")
+        else:
+            print(f"📊 GPU monitoring: local (single node)")
 
         # Count tokens (vLLM native way)
         total_prompt_tokens = sum(len(o.prompt_token_ids or []) for o in outputs)
@@ -1109,6 +1322,37 @@ def run_benchmark(exp):
         input_tokens_per_dollar = round(total_prompt_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
         output_tokens_per_dollar = round(total_output_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
 
+        # Collect all configuration
+        benchmark_config = {{
+            # LLM initialization parameters
+            'llm_model': exp['model'],
+            'llm_tensor_parallel_size': exp['tp'],
+            'llm_pipeline_parallel_size': exp['pp'],
+            'llm_max_model_len': min(exp['max_input_length'] + exp['max_output_length'] - 1, 32768),
+            'llm_trust_remote_code': True,
+            'llm_distributed_executor_backend': backend,
+            'llm_gpu_memory_utilization': 0.85,
+            'llm_enforce_eager': True,
+            'llm_enable_chunked_prefill': False,
+            'llm_enable_prefix_caching': False,
+            'llm_kv_transfer_config': None,  # Currently commented out
+            # Sampling parameters
+            'sampling_temperature': 0.8,
+            'sampling_max_tokens': exp['max_output_length'],
+            'sampling_min_tokens': exp['max_output_length'],
+            'sampling_ignore_eos': True,
+            # Benchmark configuration
+            'benchmark_num_samples': NUM_SAMPLES,
+            'benchmark_dataset': 'emozilla/pg19-test',
+            'benchmark_prompt_prefix': 'Please summarize the following text: ',
+            'benchmark_warmup_samples': min(5, NUM_SAMPLES),
+            # GPU monitoring configuration
+            'gpu_monitor_sample_interval': 0.5,
+            'gpu_monitor_type': 'distributed' if use_distributed else 'local',
+            # Scheduler monitoring configuration
+            'scheduler_monitor_sample_interval': 0.25,
+        }}
+
         # Build result with all metrics (summary only, timeseries in separate file)
         result = {{
             **exp,
@@ -1133,7 +1377,13 @@ def run_benchmark(exp):
             'tokens_per_dollar': tokens_per_dollar,
             'input_tokens_per_dollar': input_tokens_per_dollar,
             'output_tokens_per_dollar': output_tokens_per_dollar,
-            # vLLM config info
+            # Benchmark configuration
+            **benchmark_config,
+            # GPU monitoring details (added after metrics are collected)
+            'gpu_monitor_num_nodes': len(gpu_monitor.actors) if (use_distributed and hasattr(gpu_monitor, 'actors')) else 1,
+            'gpu_monitor_num_gpus_monitored': len([k for k in gpu_metrics.keys() if '_sm_pct_avg' in k or (k.endswith('_sm_pct_avg') and not k.startswith('avg_'))]),
+            'gpu_monitor_num_nodes_reported': gpu_metrics.get('num_nodes_monitored', 1),
+            # vLLM config info (extracted from engine)
             **{{f'config_{{k}}': v for k, v in vllm_config.items()}},
             # GPU utilization metrics (summary)
             **gpu_metrics,
@@ -1153,7 +1403,51 @@ def run_benchmark(exp):
         send_discord_message(f"❌ Cluster {{exp['tp']}}-{{exp['pp']}} FAILED: {{error_msg}}")
         # if backend == "ray":
         #     restart_ray_cluster()
-        result = {{**exp, 'status': 'error', 'error': error_msg}}
+        
+        # Collect configuration even for error case
+        benchmark_config = {{
+            # LLM initialization parameters
+            'llm_model': exp['model'],
+            'llm_tensor_parallel_size': exp['tp'],
+            'llm_pipeline_parallel_size': exp['pp'],
+            'llm_max_model_len': min(exp['max_input_length'] + exp['max_output_length'] - 1, 32768),
+            'llm_trust_remote_code': True,
+            'llm_distributed_executor_backend': backend,
+            'llm_gpu_memory_utilization': 0.85,
+            'llm_enforce_eager': True,
+            'llm_enable_chunked_prefill': False,
+            'llm_enable_prefix_caching': False,
+            'llm_kv_transfer_config': None,  # Currently commented out
+            # Sampling parameters
+            'sampling_temperature': 0.8,
+            'sampling_max_tokens': exp['max_output_length'],
+            'sampling_min_tokens': exp['max_output_length'],
+            'sampling_ignore_eos': True,
+            # Benchmark configuration
+            'benchmark_num_samples': NUM_SAMPLES,
+            'benchmark_dataset': 'emozilla/pg19-test',
+            'benchmark_prompt_prefix': 'Please summarize the following text: ',
+            'benchmark_warmup_samples': min(5, NUM_SAMPLES),
+            # GPU monitoring configuration
+            'gpu_monitor_sample_interval': 0.5,
+            'gpu_monitor_type': 'distributed' if backend == "ray" else 'local',
+            # Scheduler monitoring configuration
+            'scheduler_monitor_sample_interval': 0.25,
+        }}
+        
+        result = {{
+            **exp,
+            'status': 'error',
+            'error': error_msg,
+            # Infrastructure info
+            'instance_type': INSTANCE_TYPE,
+            'price_per_hour': PRICE_PER_HOUR,
+            'num_nodes': NUM_NODES,
+            'gpus_per_node': GPUS_PER_NODE,
+            'total_gpus': NUM_NODES * GPUS_PER_NODE,
+            # Benchmark configuration
+            **benchmark_config,
+        }}
         
         # Force GPU cleanup on error
         try:
@@ -1303,6 +1597,21 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
         with open(local_results) as f:
             results = json.load(f)
 
+        # Check if all experiments succeeded or any failed
+        all_succeeded = all(r.get('status') == 'success' for r in results)
+        status_suffix = 'success' if all_succeeded else 'fail'
+        
+        # Rename directory to include status suffix
+        new_subdir_name = f"tp{tp}-pp{pp}-{timestamp}-{status_suffix}"
+        new_result_dir = instance_path / new_subdir_name
+        
+        if result_dir != new_result_dir:
+            logger.info(f"📁 Renaming directory: {result_dir.name} -> {new_result_dir.name}")
+            result_dir.rename(new_result_dir)
+            result_dir = new_result_dir
+            # Update local_results path (files inside directory move automatically with rename)
+            local_results = result_dir / "results.json"
+
         for result in results:
             if 'timeseries_file' in result and result.get('status') == 'success':
                 # Update path to local location
@@ -1313,6 +1622,11 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
         # Save updated results
         with open(local_results, 'w') as f:
             json.dump(results, f, indent=2)
+
+        # Save CSV in the same result directory with timestamp
+        csv_filename = f"benchmark_results-{timestamp}.csv"
+        csv_path = result_dir / csv_filename
+        save_results_csv(results, str(csv_path))
 
         logger.info(f"✅ Results saved to {result_dir}/")
         send_discord_message(f"✅ Results saved to {result_dir}")
@@ -1333,8 +1647,26 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
         except:
             pass
         failed_results = [{**exp, 'status': 'cluster_error', 'error': str(e)} for exp in experiments]
+        
+        # Rename directory to include -fail suffix for cluster errors
+        new_subdir_name = f"tp{tp}-pp{pp}-{timestamp}-fail"
+        new_result_dir = instance_path / new_subdir_name
+        
+        if result_dir != new_result_dir:
+            logger.info(f"📁 Renaming directory: {result_dir.name} -> {new_result_dir.name}")
+            result_dir.rename(new_result_dir)
+            result_dir = new_result_dir
+            # Update local_results path
+            local_results = result_dir / "results.json"
+        
         with open(local_results, 'w') as f:
             json.dump(failed_results, f, indent=2)
+        
+        # Save CSV in the same result directory even for failed results (with timestamp)
+        csv_filename = f"benchmark_results-{timestamp}.csv"
+        csv_path = result_dir / csv_filename
+        save_results_csv(failed_results, str(csv_path))
+        
         return failed_results
 
     finally:
@@ -1429,16 +1761,28 @@ Examples:
             # Create parent directory for this input/output length
             parent_dir = f"result-{input_len}in_{output_len}out"
             
+            # Collect results for this IO group
+            io_group_results = []
+            
             for cluster_config, exps in sorted(cluster_groups.items(), key=cluster_sort_key):
                 results = run_cluster_benchmarks(cluster_config, exps, parent_dir=parent_dir, dry_run=dry_run, gpu_type=gpu_type)
                 if results:
+                    io_group_results.extend(results)
                     all_results.extend(results)
-
-        # Save combined results to CSV with datetime
-        if all_results:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            csv_output = f"benchmark_results-{timestamp}.csv"
-            save_results_csv(all_results, csv_output)
+            
+            # Save combined CSV for this IO group in the parent directory
+            if io_group_results:
+                gpu_config = GPU_CONFIGS[gpu_type]
+                instance_family = gpu_config["instance_family"]
+                gpu_name = gpu_type
+                instance_dir = f"aws-{instance_family}-{gpu_name}"
+                parent_path = Path(parent_dir)
+                instance_path = parent_path / instance_dir
+                instance_path.mkdir(exist_ok=True)
+                
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                csv_path = instance_path / f"benchmark_results-{timestamp}.csv"
+                save_results_csv(io_group_results, str(csv_path))
     except Exception as e:
         print(f"\n❌ Unexpected error in main: {e}")
         print("   Cleanup will be triggered automatically...")
