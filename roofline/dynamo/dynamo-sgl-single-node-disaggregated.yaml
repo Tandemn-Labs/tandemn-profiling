@@ -1,0 +1,97 @@
+name: dynamo-sgl-disagg
+
+resources:
+  cloud: aws
+  accelerators: L40S:1
+  region: ap-northeast-1
+  use_spot: true
+
+setup: |
+  # Set CUDA environment BEFORE installing anything
+  export CUDA_HOME=/usr/local/cuda-12.4
+  export PATH=/usr/local/cuda-12.4/bin:$PATH
+  
+  # Verify CUDA
+  nvcc --version
+  
+  # Install with system CUDA active
+  pip install cupy-cuda12x
+  pip install ai-dynamo[sglang]
+  
+  # Clear any old flashinfer cache
+  rm -rf ~/.cache/flashinfer/
+  
+  # Make CUDA env permanent
+  # echo 'export PATH=/usr/local/cuda-12.4/bin:$PATH' >> ~/.bashrc
+
+  curl -fsSL -o docker-compose.yml \
+    https://raw.githubusercontent.com/ai-dynamo/dynamo/main/deploy/docker-compose.yml
+
+  # Start infra services (exposes 2379/4222 to the VPC)  
+  docker compose -f docker-compose.yml up -d
+
+run: |
+  # Ensure CUDA environment is set
+  # export PATH=/usr/local/cuda-12.4/bin:$PATH
+  
+  export CUDA_HOME=/usr/local/cuda-12.4
+  export PATH=$CUDA_HOME/bin:$PATH
+  NVIDIA_SITE="$(python3 -c 'import site; print(site.getsitepackages()[0])')"
+  export LD_LIBRARY_PATH="${NVIDIA_SITE}/nvidia/cuda_runtime/lib:${NVIDIA_SITE}/nvidia/cublas/lib:${NVIDIA_SITE}/nvidia/cudnn/lib:${NVIDIA_SITE}/nvidia/cusparse/lib:${NVIDIA_SITE}/nvidia/cusparselt/lib:${NVIDIA_SITE}/nvidia/nvjitlink/lib:${NVIDIA_SITE}/nvidia/nvrtc/lib:${LD_LIBRARY_PATH:-}"
+  
+  # Sanity checks
+  python3 -c "import torch; print(torch.__version__, torch.version.cuda)"
+  nvcc --version
+  ldd $(python3 -c "import os, nvidia.cusparse; print(os.path.join(os.path.dirname(nvidia.cusparse.__file__), 'lib', 'libcusparse.so.12'))") | grep -i nvjitlink || true
+
+
+  # Memory fraction per worker (45% each = 90% total)
+  GPU_MEM_FRACTION=0.45
+  
+  # Launch frontend (router)
+  python3 -m dynamo.frontend --router-mode kv &
+  DYNAMO_PID=$!
+  echo "Frontend started (PID: $DYNAMO_PID)"
+  sleep 3
+  
+  # Launch prefill worker
+  python3 -m dynamo.sglang \
+    --model-path Qwen/Qwen3-0.6B \
+    --served-model-name Qwen/Qwen3-0.6B \
+    --page-size 16 \
+    --tp 1 \
+    --trust-remote-code \
+    --disaggregation-mode prefill \
+    --disaggregation-bootstrap-port 12345 \
+    --host 0.0.0.0 \
+    --disaggregation-transfer-backend nixl \
+    --mem-fraction-static ${GPU_MEM_FRACTION} \
+    --chunked-prefill-size 4096 \
+    --max-prefill-tokens 4096 \
+    --enable-memory-saver \
+    --delete-ckpt-after-loading \
+    --max-running-requests 2 \
+    --enable-metrics &
+  PREFILL_PID=$!
+  echo "Prefill worker started (PID: $PREFILL_PID)"
+  echo "Waiting for prefill to initialize..."
+  sleep 60
+  
+  # Launch decode worker (foreground - keeps the job alive)
+  python3 -m dynamo.sglang \
+    --model-path Qwen/Qwen3-0.6B \
+    --served-model-name Qwen/Qwen3-0.6B \
+    --page-size 16 \
+    --tp 1 \
+    --trust-remote-code \
+    --disaggregation-mode decode \
+    --disaggregation-bootstrap-port 12345 \
+    --host 0.0.0.0 \
+    --disaggregation-transfer-backend nixl \
+    --mem-fraction-static ${GPU_MEM_FRACTION} \
+    --chunked-prefill-size 4096 \
+    --max-prefill-tokens 4096 \
+    --enable-memory-saver \
+    --delete-ckpt-after-loading \
+    --max-running-requests 2 \
+    --enable-metrics
