@@ -46,7 +46,7 @@ FAMILY_QUOTA_CODES = {
 
 def get_quota_code(instance_type: str, use_spot: bool) -> Optional[str]:
     """
-    THis tries to get the quota code for the instance type, using skypilot,
+    This tries to get the quota code for the instance type, using skypilot,
     but then using these hardcoded values, it falls back to them.
     """
     quota_code = aws_catalog.get_quota_code(instance_type, use_spot)
