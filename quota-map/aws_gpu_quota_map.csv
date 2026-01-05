@@ -1,69 +1,169 @@
-InstanceType,Region,Quota_vCPUs,Status,Mode
-p4d.24xlarge,eu-west-2,8.0,✅ Available,on-demand
-p4d.24xlarge,us-east-1,128.0,✅ Available,on-demand
-p4d.24xlarge,us-east-2,64.0,✅ Available,on-demand
-p4de.24xlarge,us-east-1,128.0,✅ Available,on-demand
-g5.16xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5.16xlarge,us-west-2,96.0,✅ Available,on-demand
-g5.2xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5.2xlarge,us-west-2,96.0,✅ Available,on-demand
-g5.4xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5.4xlarge,us-west-2,96.0,✅ Available,on-demand
-g5.8xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5.8xlarge,us-west-2,96.0,✅ Available,on-demand
-g5.xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5.xlarge,us-west-2,96.0,✅ Available,on-demand
-g5.12xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5.12xlarge,us-west-2,96.0,✅ Available,on-demand
-g5.24xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5.24xlarge,us-west-2,96.0,✅ Available,on-demand
-g5.48xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5.48xlarge,us-west-2,96.0,✅ Available,on-demand
-dl1.24xlarge,us-east-1,96.0,✅ Available,on-demand
-dl1.24xlarge,us-west-2,96.0,✅ Available,on-demand
-g4ad.2xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4ad.2xlarge,us-west-2,96.0,✅ Available,on-demand
-g4ad.4xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4ad.4xlarge,us-west-2,96.0,✅ Available,on-demand
-g4ad.xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4ad.xlarge,us-west-2,96.0,✅ Available,on-demand
-g4ad.8xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4ad.8xlarge,us-west-2,96.0,✅ Available,on-demand
-g4ad.16xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4ad.16xlarge,us-west-2,96.0,✅ Available,on-demand
-g4dn.16xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4dn.16xlarge,us-west-2,96.0,✅ Available,on-demand
-g4dn.2xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4dn.2xlarge,us-west-2,96.0,✅ Available,on-demand
-g4dn.4xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4dn.4xlarge,us-west-2,96.0,✅ Available,on-demand
-g4dn.8xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4dn.8xlarge,us-west-2,96.0,✅ Available,on-demand
-g4dn.xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4dn.xlarge,us-west-2,96.0,✅ Available,on-demand
-g4dn.12xlarge,us-east-1,1000.0,✅ Available,on-demand
-g4dn.12xlarge,us-west-2,96.0,✅ Available,on-demand
-g4dn.metal,us-east-1,1000.0,✅ Available,on-demand
-g4dn.metal,us-west-2,96.0,✅ Available,on-demand
-g5g.2xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5g.2xlarge,us-west-2,96.0,✅ Available,on-demand
-g5g.4xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5g.4xlarge,us-west-2,96.0,✅ Available,on-demand
-g5g.8xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5g.8xlarge,us-west-2,96.0,✅ Available,on-demand
-g5g.xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5g.xlarge,us-west-2,96.0,✅ Available,on-demand
-g5g.16xlarge,us-east-1,1000.0,✅ Available,on-demand
-g5g.16xlarge,us-west-2,96.0,✅ Available,on-demand
-g5g.metal,us-east-1,1000.0,✅ Available,on-demand
-g5g.metal,us-west-2,96.0,✅ Available,on-demand
-p3.2xlarge,eu-west-2,8.0,✅ Available,on-demand
-p3.2xlarge,us-east-1,128.0,✅ Available,on-demand
-p3.2xlarge,us-east-2,64.0,✅ Available,on-demand
-p3.8xlarge,eu-west-2,8.0,✅ Available,on-demand
-p3.8xlarge,us-east-1,128.0,✅ Available,on-demand
-p3.8xlarge,us-east-2,64.0,✅ Available,on-demand
-p3.16xlarge,eu-west-2,8.0,✅ Available,on-demand
-p3.16xlarge,us-east-1,128.0,✅ Available,on-demand
-p3.16xlarge,us-east-2,64.0,✅ Available,on-demand
-p3dn.24xlarge,us-east-1,128.0,✅ Available,on-demand
+InstanceType,Family,Region,QuotaCode,Quota_vCPUs,Status,Mode
+p4d.24xlarge,p4d,eu-west-2,L-417A185B,8.0,Available,on-demand
+p4d.24xlarge,p4d,us-east-1,L-417A185B,128.0,Available,on-demand
+p4d.24xlarge,p4d,us-east-2,L-417A185B,64.0,Available,on-demand
+p4de.24xlarge,p4de,us-east-1,L-417A185B,128.0,Available,on-demand
+g5.16xlarge,g5,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5.16xlarge,g5,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5.2xlarge,g5,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5.2xlarge,g5,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5.4xlarge,g5,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5.4xlarge,g5,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5.8xlarge,g5,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5.8xlarge,g5,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5.xlarge,g5,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5.xlarge,g5,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5.12xlarge,g5,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5.12xlarge,g5,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5.24xlarge,g5,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5.24xlarge,g5,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5.48xlarge,g5,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5.48xlarge,g5,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+p6-b200.48xlarge,p6-b200,us-east-1,L-417A185B,128.0,Available,on-demand
+p6-b200.48xlarge,p6-b200,us-east-2,L-417A185B,64.0,Available,on-demand
+dl1.24xlarge,dl1,us-east-1,L-6E869C2A,96.0,Available,on-demand
+dl1.24xlarge,dl1,us-west-2,L-6E869C2A,96.0,Available,on-demand
+p5.4xlarge,p5,eu-west-2,L-417A185B,8.0,Available,on-demand
+p5.4xlarge,p5,us-east-1,L-417A185B,128.0,Available,on-demand
+p5.4xlarge,p5,us-east-2,L-417A185B,64.0,Available,on-demand
+p5.48xlarge,p5,eu-west-2,L-417A185B,8.0,Available,on-demand
+p5.48xlarge,p5,us-east-1,L-417A185B,128.0,Available,on-demand
+p5.48xlarge,p5,us-east-2,L-417A185B,64.0,Available,on-demand
+p5e.48xlarge,p5e,eu-west-2,L-417A185B,8.0,Available,on-demand
+p5e.48xlarge,p5e,us-east-2,L-417A185B,64.0,Available,on-demand
+p5en.48xlarge,p5en,us-east-1,L-417A185B,128.0,Available,on-demand
+p5en.48xlarge,p5en,us-east-2,L-417A185B,64.0,Available,on-demand
+inf1.2xlarge,inf1,ca-central-1,L-1945791B,8.0,Available,on-demand
+inf1.2xlarge,inf1,us-east-1,L-1945791B,8.0,Available,on-demand
+inf1.2xlarge,inf1,us-east-2,L-1945791B,8.0,Available,on-demand
+inf1.2xlarge,inf1,us-west-1,L-1945791B,8.0,Available,on-demand
+inf1.2xlarge,inf1,us-west-2,L-1945791B,8.0,Available,on-demand
+inf1.xlarge,inf1,ca-central-1,L-1945791B,8.0,Available,on-demand
+inf1.xlarge,inf1,us-east-1,L-1945791B,8.0,Available,on-demand
+inf1.xlarge,inf1,us-east-2,L-1945791B,8.0,Available,on-demand
+inf1.xlarge,inf1,us-west-1,L-1945791B,8.0,Available,on-demand
+inf1.xlarge,inf1,us-west-2,L-1945791B,8.0,Available,on-demand
+inf1.6xlarge,inf1,ca-central-1,L-1945791B,8.0,Available,on-demand
+inf1.6xlarge,inf1,us-east-1,L-1945791B,8.0,Available,on-demand
+inf1.6xlarge,inf1,us-east-2,L-1945791B,8.0,Available,on-demand
+inf1.6xlarge,inf1,us-west-1,L-1945791B,8.0,Available,on-demand
+inf1.6xlarge,inf1,us-west-2,L-1945791B,8.0,Available,on-demand
+inf1.24xlarge,inf1,ca-central-1,L-1945791B,8.0,Available,on-demand
+inf1.24xlarge,inf1,us-east-1,L-1945791B,8.0,Available,on-demand
+inf1.24xlarge,inf1,us-east-2,L-1945791B,8.0,Available,on-demand
+inf1.24xlarge,inf1,us-west-1,L-1945791B,8.0,Available,on-demand
+inf1.24xlarge,inf1,us-west-2,L-1945791B,8.0,Available,on-demand
+inf2.8xlarge,inf2,us-east-1,L-1945791B,8.0,Available,on-demand
+inf2.8xlarge,inf2,us-east-2,L-1945791B,8.0,Available,on-demand
+inf2.8xlarge,inf2,us-west-2,L-1945791B,8.0,Available,on-demand
+inf2.xlarge,inf2,us-east-1,L-1945791B,8.0,Available,on-demand
+inf2.xlarge,inf2,us-east-2,L-1945791B,8.0,Available,on-demand
+inf2.xlarge,inf2,us-west-2,L-1945791B,8.0,Available,on-demand
+inf2.24xlarge,inf2,us-east-1,L-1945791B,8.0,Available,on-demand
+inf2.24xlarge,inf2,us-east-2,L-1945791B,8.0,Available,on-demand
+inf2.24xlarge,inf2,us-west-2,L-1945791B,8.0,Available,on-demand
+inf2.48xlarge,inf2,us-east-1,L-1945791B,8.0,Available,on-demand
+inf2.48xlarge,inf2,us-east-2,L-1945791B,8.0,Available,on-demand
+inf2.48xlarge,inf2,us-west-2,L-1945791B,8.0,Available,on-demand
+g6f.large,g6f,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6f.large,g6f,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6f.xlarge,g6f,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6f.xlarge,g6f,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6f.2xlarge,g6f,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6f.2xlarge,g6f,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6f.4xlarge,g6f,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6f.4xlarge,g6f,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+gr6f.4xlarge,gr6f,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+gr6f.4xlarge,gr6f,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6.16xlarge,g6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6.16xlarge,g6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6.2xlarge,g6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6.2xlarge,g6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6.4xlarge,g6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6.4xlarge,g6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6.8xlarge,g6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6.8xlarge,g6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6.xlarge,g6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6.xlarge,g6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+gr6.4xlarge,gr6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+gr6.4xlarge,gr6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+gr6.8xlarge,gr6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+gr6.8xlarge,gr6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6.12xlarge,g6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6.12xlarge,g6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6.24xlarge,g6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6.24xlarge,g6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6.48xlarge,g6,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6.48xlarge,g6,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6e.16xlarge,g6e,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6e.16xlarge,g6e,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6e.2xlarge,g6e,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6e.2xlarge,g6e,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6e.4xlarge,g6e,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6e.4xlarge,g6e,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6e.8xlarge,g6e,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6e.8xlarge,g6e,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6e.xlarge,g6e,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6e.xlarge,g6e,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6e.12xlarge,g6e,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6e.12xlarge,g6e,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6e.24xlarge,g6e,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6e.24xlarge,g6e,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g6e.48xlarge,g6e,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g6e.48xlarge,g6e,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4ad.2xlarge,g4ad,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4ad.2xlarge,g4ad,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4ad.4xlarge,g4ad,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4ad.4xlarge,g4ad,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4ad.xlarge,g4ad,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4ad.xlarge,g4ad,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4ad.8xlarge,g4ad,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4ad.8xlarge,g4ad,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4ad.16xlarge,g4ad,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4ad.16xlarge,g4ad,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4dn.16xlarge,g4dn,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4dn.16xlarge,g4dn,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4dn.2xlarge,g4dn,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4dn.2xlarge,g4dn,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4dn.4xlarge,g4dn,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4dn.4xlarge,g4dn,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4dn.8xlarge,g4dn,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4dn.8xlarge,g4dn,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4dn.xlarge,g4dn,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4dn.xlarge,g4dn,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4dn.12xlarge,g4dn,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4dn.12xlarge,g4dn,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g4dn.metal,g4dn,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g4dn.metal,g4dn,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5g.2xlarge,g5g,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5g.2xlarge,g5g,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5g.4xlarge,g5g,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5g.4xlarge,g5g,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5g.8xlarge,g5g,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5g.8xlarge,g5g,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5g.xlarge,g5g,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5g.xlarge,g5g,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5g.16xlarge,g5g,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5g.16xlarge,g5g,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+g5g.metal,g5g,us-east-1,L-DB2E81BA,1000.0,Available,on-demand
+g5g.metal,g5g,us-west-2,L-DB2E81BA,96.0,Available,on-demand
+trn1.2xlarge,trn1,us-east-1,L-2C3B7624,8.0,Available,on-demand
+trn1.2xlarge,trn1,us-east-2,L-2C3B7624,8.0,Available,on-demand
+trn1.2xlarge,trn1,us-west-2,L-2C3B7624,8.0,Available,on-demand
+trn1.32xlarge,trn1,us-east-1,L-2C3B7624,8.0,Available,on-demand
+trn1.32xlarge,trn1,us-east-2,L-2C3B7624,8.0,Available,on-demand
+trn1.32xlarge,trn1,us-west-2,L-2C3B7624,8.0,Available,on-demand
+trn1n.32xlarge,trn1n,us-east-1,L-2C3B7624,8.0,Available,on-demand
+trn1n.32xlarge,trn1n,us-east-2,L-2C3B7624,8.0,Available,on-demand
+trn1n.32xlarge,trn1n,us-west-2,L-2C3B7624,8.0,Available,on-demand
+trn2.48xlarge,trn2,us-east-2,L-2C3B7624,8.0,Available,on-demand
+p3.2xlarge,p3,eu-west-2,L-417A185B,8.0,Available,on-demand
+p3.2xlarge,p3,us-east-1,L-417A185B,128.0,Available,on-demand
+p3.2xlarge,p3,us-east-2,L-417A185B,64.0,Available,on-demand
+p3.8xlarge,p3,eu-west-2,L-417A185B,8.0,Available,on-demand
+p3.8xlarge,p3,us-east-1,L-417A185B,128.0,Available,on-demand
+p3.8xlarge,p3,us-east-2,L-417A185B,64.0,Available,on-demand
+p3.16xlarge,p3,eu-west-2,L-417A185B,8.0,Available,on-demand
+p3.16xlarge,p3,us-east-1,L-417A185B,128.0,Available,on-demand
+p3.16xlarge,p3,us-east-2,L-417A185B,64.0,Available,on-demand
+p3dn.24xlarge,p3dn,us-east-1,L-417A185B,128.0,Available,on-demand
