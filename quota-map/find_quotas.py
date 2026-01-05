@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Complete AWS GPU Compute Space Mapper using SkyPilot
-Discovers all GPU accelerators, instance types, and checks quotas across regions.
-"""
 import pandas as pd
 from typing import Dict, List, Optional, Set
 from sky.catalog import aws_catalog
@@ -10,16 +6,64 @@ from sky.adaptors import aws as aws_adaptor
 from collections import defaultdict
 
 
-def get_all_aws_gpu_accelerators() -> Dict[str, List]:
-    """
-    Get all GPU accelerators available on AWS using SkyPilot's catalog.
+# AWS Family-level quota codes (fallback mapping)
+# These are standard AWS quota codes for EC2 instance families
+FAMILY_QUOTA_CODES = {
+    # GPU Graphics families - G instances
+    'g4dn': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},  
+    'g4ad': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
+    'g5': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
+    'g5g': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
+    'g6': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
+    'g6e': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
+    'g6f': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
+    'gr6': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
+    'gr6f': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
     
-    Returns:
-        Dict mapping accelerator names to list of instance type info
+    # GPU Compute families - P instances
+    'p2': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},  
+    'p3': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
+    'p3dn': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
+    'p4d': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
+    'p4de': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
+    'p5': {'on-demand': 'L-417A185B', 'spot': 'L-C4BD4855'},
+    'p5e': {'on-demand': 'L-417A185B', 'spot': 'L-C4BD4855'},
+    'p5en': {'on-demand': 'L-417A185B', 'spot': 'L-C4BD4855'},
+    'p6-b200': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
+    'p6-b300': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
+    
+    # Inferentia families
+    'inf1': {'on-demand': 'L-1945791B', 'spot': 'L-B5D1601B'},  
+    'inf2': {'on-demand': 'L-1945791B', 'spot': 'L-B5D1601B'},
+    
+    # Trainium families
+    'trn1': {'on-demand': 'L-2C3B7624', 'spot': 'L-6B0D517C'},  
+    'trn1n': {'on-demand': 'L-2C3B7624', 'spot': 'L-6B0D517C'},
+    'trn2': {'on-demand': 'L-2C3B7624', 'spot': 'L-6B0D517C'},
+    
+    # Gaudi (DL1)
+    'dl1': {'on-demand': 'L-6E869C2A', 'spot': 'L-7212CCBC'}, }
+
+def get_quota_code(instance_type: str, use_spot: bool) -> Optional[str]:
     """
-    # gpus_only=True filters to only GPU accelerators
-    # name_filter=None means get all
-    # all_regions=True shows all regional availability
+    THis tries to get the quota code for the instance type, using skypilot,
+    but then using these hardcoded values, it falls back to them.
+    """
+    quota_code = aws_catalog.get_quota_code(instance_type, use_spot)
+    if quota_code:
+        return quota_code
+    
+    # Fallback: use family-level quota codes
+    print("Using Fallback, as I did not find any quota code for the instance type: ", instance_type)
+    family = instance_type.split('.')[0]  #(e.g., 'g6e' from 'g6e.xlarge')
+    mode = 'spot' if use_spot else 'on-demand'
+    
+    if family in FAMILY_QUOTA_CODES:
+        return FAMILY_QUOTA_CODES[family][mode]
+    
+    return None
+
+def get_all_aws_gpu_accelerators():
     accelerators = aws_catalog.list_accelerators(
         gpus_only=True,
         name_filter=None,
@@ -33,9 +77,6 @@ def get_all_aws_gpu_accelerators() -> Dict[str, List]:
 def get_all_gpu_instance_types() -> Set[str]:
     """
     Get all unique GPU instance types (e.g., 'g6e.xlarge', 'p4d.24xlarge').
-    
-    Returns:
-        Set of instance type strings
     """
     accelerators = get_all_aws_gpu_accelerators()
     instance_types = set()
@@ -48,60 +89,18 @@ def get_all_gpu_instance_types() -> Set[str]:
     return instance_types
 
 
-def get_instance_types_by_gpu_family() -> Dict[str, Set[str]]:
+def get_instance_types_by_gpu_family():
     """
     Group instance types by family (g5, g6, p3, p4, etc.).
-    
-    Returns:
-        Dict mapping family name to set of instance types
     """
     instance_types = get_all_gpu_instance_types()
     families = defaultdict(set)
     
     for instance in instance_types:
-        # Extract family (e.g., 'g6e' from 'g6e.xlarge')
-        family = instance.split('.')[0]
+        family = instance.split('.')[0] 
         families[family].add(instance)
     
-    return dict(families)
-
-
-def get_detailed_gpu_info(accelerator_name: Optional[str] = None) -> pd.DataFrame:
-    """
-    Get detailed information about GPU accelerators and their instances.
-    
-    Args:
-        accelerator_name: Filter by specific GPU (e.g., 'L40S', 'H100')
-                         None = get all GPUs
-    
-    Returns:
-        DataFrame with columns: GPU, InstanceType, Count, vCPUs, DeviceMem, 
-                               HostMem, OnDemandPrice, SpotPrice, Region
-    """
-    accelerators = aws_catalog.list_accelerators(
-        gpus_only=True,
-        name_filter=accelerator_name,
-        region_filter=None,
-        quantity_filter=None,
-        all_regions=True
-    )
-    
-    rows = []
-    for gpu_name, instance_list in accelerators.items():
-        for info in instance_list:
-            rows.append({
-                'GPU': gpu_name,
-                'InstanceType': info.instance_type,
-                'GPUCount': info.accelerator_count,
-                'vCPUs': info.cpu_count,
-                'DeviceMemGB': info.device_memory,
-                'HostMemGB': info.memory,
-                'OnDemandPrice': info.price,
-                'SpotPrice': info.spot_price,
-                'Region': info.region,
-            })
-    
-    return pd.DataFrame(rows)
+    return families
 
 
 def create_complete_quota_map(
@@ -110,25 +109,9 @@ def create_complete_quota_map(
 ) -> pd.DataFrame:
     """
     Create a complete map of GPU quotas across all AWS regions.
-    
-    Args:
-        use_spot: Check spot quotas (default: on-demand)
-        gpu_filter: Filter to specific GPU (e.g., 'L40S', 'A100')
-    
-    Returns:
-        DataFrame with quota information for all GPU instance types
     """
     print(f"🔍 Discovering all AWS GPU instance types...")
-    
-    # Get all accelerators
-    accelerators = aws_catalog.list_accelerators(
-        gpus_only=True,
-        name_filter=gpu_filter,
-        region_filter=None,
-        quantity_filter=None,
-        all_regions=False  # Get cheapest region per instance
-    )
-    
+
     # Get all unique instance types and regions
     instance_to_regions = defaultdict(set)
     
@@ -141,7 +124,7 @@ def create_complete_quota_map(
         all_regions=True
     )
     
-    for gpu_name, instance_list in accelerators_all_regions.items():
+    for _, instance_list in accelerators_all_regions.items():
         for info in instance_list:
             instance_to_regions[info.instance_type].add(info.region)
     
@@ -150,9 +133,10 @@ def create_complete_quota_map(
     # Check quotas
     results = []
     for instance_type, regions in instance_to_regions.items():
-        print(f"\n📊 Checking {instance_type} ({'spot' if use_spot else 'on-demand'})...")
+        family = instance_type.split('.')[0] 
+        print(f"\n📊 Checking {instance_type} (family: {family}, {'spot' if use_spot else 'on-demand'})...")
         
-        quota_code = aws_catalog.get_quota_code(instance_type, use_spot)
+        quota_code = get_quota_code(instance_type, use_spot)
         
         for region in sorted(regions):
             quota = None
@@ -166,17 +150,21 @@ def create_complete_quota_map(
                         QuotaCode=quota_code
                     )
                     quota = response['Quota']['Value']
-                    status = "✅ Available" if quota > 0 else "❌ Zero Quota"
-                    print(f"  {region}: {quota} vCPUs")
+                    status = "Available" if quota > 0 else "Zero Quota"
+                    if quota > 0:
+                        print(f"  {region}: {quota} vCPUs")
                 except Exception as e:
-                    status = "⚠️ Check Failed"
-                    print(f"  {region}: Error - {str(e)[:40]}")
+                    status = "Error"
+                    error_msg = str(e)
+                    print(f"  {region}: Error - {error_msg[:40]}")
             else:
-                status = "⚠️ No Quota Code"
+                status = "No Quota Code"
             
             results.append({
                 'InstanceType': instance_type,
+                'Family': family,
                 'Region': region,
+                'QuotaCode': quota_code if quota_code else 'N/A',
                 'Quota_vCPUs': quota if quota is not None else -1,
                 'Status': status,
                 'Mode': 'spot' if use_spot else 'on-demand'
@@ -216,11 +204,9 @@ def print_gpu_summary():
 # Example Usage
 if __name__ == '__main__':
     import sys
-    
-    # 1. Print summary of all GPUs
+
     print_gpu_summary()
     
-    # 2. List all AWS GPU types
     print("\n" + "="*80)
     print("ALL AWS GPU TYPES")
     print("="*80)
@@ -241,31 +227,35 @@ if __name__ == '__main__':
         if matching:
             print(f"{family}: {', '.join(matching)}")
     
-    # 4. Detailed info for specific GPU
-    print("\n" + "="*80)
-    print("DETAILED INFO: L40S GPU")
-    print("="*80)
-    l40s_df = get_detailed_gpu_info('L40S')
-    if not l40s_df.empty:
-        print(l40s_df.to_string(index=False))
-    
-    # 5. Optional: Create full quota map (uncomment to run)
-    # WARNING: This will make many API calls and take a while!
     if '--check-quotas' in sys.argv:
+        # Determine if we want spot or on-demand quotas
+        use_spot = '--spot' in sys.argv
+
         print("\n" + "="*80)
-        print("CHECKING QUOTAS (This may take several minutes...)")
+        mode_str = "SPOT" if use_spot else "ON-DEMAND"
+        print(f"CHECKING QUOTAS ({mode_str} | This may take several minutes...)")
         print("="*80)
         
-        # Check quotas for L40S instances only (as example)
         quota_df = create_complete_quota_map(
-            use_spot=False,
-            gpu_filter=None
+            use_spot=use_spot,  # use_spot True if --spot, False otherwise
+            gpu_filter=None  # None = all GPUs
         )
         
-        print("\n📊 Quota Map:")
+        print("\n📊 Quota Map (showing all results):")
         print(quota_df.to_string(index=False))
         
-        # Save to CSV
-        quota_df = quota_df[quota_df['Quota_vCPUs'] > 0.0]
-        quota_df.to_csv('aws_gpu_quota_map.csv', index=False)
-        print("\n✅ Saved to aws_gpu_quota_map.csv")
+        # Filter to only save non-zero quotas
+        quota_df_filtered = quota_df[quota_df['Quota_vCPUs'] > 0]
+        
+        print(f"\n📊 Summary:")
+        print(f"  Total entries: {len(quota_df)}")
+        print(f"  Available quotas (>0): {len(quota_df_filtered)}")
+        print(f"  Zero quotas: {len(quota_df[quota_df['Quota_vCPUs'] == 0])}")
+        print(f"  Failed checks: {len(quota_df[quota_df['Quota_vCPUs'] < 0])}")
+        
+        # Save only non-zero quotas
+        output_filename = (
+            'aws_gpu_quota_map_spot.csv' if use_spot else 'aws_gpu_quota_map.csv'
+        )
+        quota_df_filtered.to_csv(output_filename, index=False)
+        print(f"\n✅ Saved available quotas to {output_filename}")
