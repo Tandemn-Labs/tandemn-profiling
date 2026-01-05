@@ -81,7 +81,7 @@ def get_all_gpu_instance_types() -> Set[str]:
     accelerators = get_all_aws_gpu_accelerators()
     instance_types = set()
     
-    for gpu_name, instance_list in accelerators.items():
+    for _, instance_list in accelerators.items():
         for instance_info in instance_list:
             if instance_info.instance_type:
                 instance_types.add(instance_info.instance_type)
