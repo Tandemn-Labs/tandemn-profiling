@@ -222,7 +222,7 @@ if __name__ == '__main__':
     print(f"Total: {len(instance_types)} instance types\n")
     
     # Show by family
-    for family in ['g4dn', 'g5', 'g6', 'g6e', 'p3', 'p4d', 'p4de', 'p5']:
+    for family in sorted(FAMILY_QUOTA_CODES.keys()):
         matching = [it for it in instance_types if it.startswith(family + '.')]
         if matching:
             print(f"{family}: {', '.join(matching)}")
