@@ -1,0 +1,117 @@
+name: dynamo-sgl-disagg-2nodes
+
+resources:
+  cloud: aws
+  region: ap-northeast-1
+  accelerators: L40S:1
+  use_spot: true
+  # Expose endpoints (simple + workable; not “secure/production”)
+  # - 8000: OpenAI-compatible API on node0
+  # - 4222: NATS
+  # - 2379: etcd
+  ports:
+    - 8000
+    - 4222
+    - 2379
+
+# 2 nodes: node0 = frontend+prefill (+ nats/etcd), node1 = decode
+num_nodes: 2
+
+
+setup: |
+  # Set CUDA environment BEFORE installing anything
+  export CUDA_HOME=/usr/local/cuda-12.4
+  export PATH=/usr/local/cuda-12.4/bin:$PATH
+  
+  # Verify CUDA
+  nvcc --version
+  
+  # Install with system CUDA active
+  pip install cupy-cuda12x
+  pip install ai-dynamo[sglang]
+  
+  # Clear any old flashinfer cache
+  rm -rf ~/.cache/flashinfer/
+  
+  # Make CUDA env permanent
+  # echo 'export PATH=/usr/local/cuda-12.4/bin:$PATH' >> ~/.bashrc
+
+  curl -fsSL -o docker-compose.yml \
+    https://raw.githubusercontent.com/ai-dynamo/dynamo/main/deploy/docker-compose.yml
+
+  # Start infra services (exposes 2379/4222 to the VPC)  
+  docker compose -f docker-compose.yml up -d
+
+
+run: |
+  set -euxo pipefail
+
+  # Use CUDA 12.4 toolchain for JIT compilation
+  export CUDA_HOME=/usr/local/cuda-12.4
+  export PATH=$CUDA_HOME/bin:$PATH
+
+  # Runtime: prefer torch cu128 CUDA user-space libs (12.8) over system CUDA 12.4 libs
+  NVIDIA_SITE="$(python3 -c 'import site; print(site.getsitepackages()[0])')"
+  export LD_LIBRARY_PATH="${NVIDIA_SITE}/nvidia/cuda_runtime/lib:${NVIDIA_SITE}/nvidia/cublas/lib:${NVIDIA_SITE}/nvidia/cudnn/lib:${NVIDIA_SITE}/nvidia/cusparse/lib:${NVIDIA_SITE}/nvidia/cusparselt/lib:${NVIDIA_SITE}/nvidia/nvjitlink/lib:${NVIDIA_SITE}/nvidia/nvrtc/lib:${LD_LIBRARY_PATH:-}"
+
+  HEAD_IP="$(echo "$SKYPILOT_NODE_IPS" | head -n1)"
+  BOOTSTRAP_PORT=12345
+  GPU_MEM_FRACTION="${GPU_MEM_FRACTION:-0.70}"
+
+  # Point ALL nodes to Node 0 for NATS + etcd
+  export NATS_SERVER="nats://${HEAD_IP}:4222"
+  export ETCD_ENDPOINTS="http://${HEAD_IP}:2379"
+
+  python3 -c "import torch; print(torch.__version__, torch.version.cuda)"
+  nvcc --version
+
+  if [ "$SKYPILOT_NODE_RANK" = "0" ]; then
+    # Node 0: infra + frontend + prefill
+    docker compose -f docker-compose.yml up -d
+
+    python3 -m dynamo.frontend --router-mode kv &
+    sleep 3
+
+    # Prefill worker lives on node0
+    DYN_SYSTEM_PORT=${DYN_SYSTEM_PORT1:-8081} \
+    python3 -m dynamo.sglang \
+      --model-path Qwen/Qwen3-0.6B \
+      --served-model-name Qwen/Qwen3-0.6B \
+      --page-size 16 \
+      --tp 1 \
+      --trust-remote-code \
+      --disaggregation-mode prefill \
+      --disaggregation-bootstrap-port ${BOOTSTRAP_PORT} \
+      --host 0.0.0.0 \
+      --disaggregation-transfer-backend nixl \
+      --mem-fraction-static ${GPU_MEM_FRACTION} \
+      --chunked-prefill-size 4096 \
+      --max-prefill-tokens 4096 \
+      --enable-memory-saver \
+      --delete-ckpt-after-loading \
+      --max-running-requests 2 \
+      --enable-metrics
+
+  else
+    # Node 1: decode only (wait a bit for node0 to bring up infra + prefill)
+    sleep 60
+
+    DYN_SYSTEM_PORT=${DYN_SYSTEM_PORT2:-8082} \
+    python3 -m dynamo.sglang \
+      --model-path Qwen/Qwen3-0.6B \
+      --served-model-name Qwen/Qwen3-0.6B \
+      --page-size 16 \
+      --tp 1 \
+      --trust-remote-code \
+      --disaggregation-mode decode \
+      --disaggregation-bootstrap-port ${BOOTSTRAP_PORT} \
+      --host 0.0.0.0 \
+      --disaggregation-transfer-backend nixl \
+      --mem-fraction-static ${GPU_MEM_FRACTION} \
+      --chunked-prefill-size 4096 \
+      --max-prefill-tokens 4096 \
+      --enable-memory-saver \
+      --delete-ckpt-after-loading \
+      --max-running-requests 2 \
+      --enable-metrics
+  fi
