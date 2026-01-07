@@ -1,0 +1,177 @@
+
+name: roofline-tp4-pp1-4096in-1024out-A100-80gb
+resources:
+  cloud: aws
+  accelerators: A100-80GB:4
+  use_spot: false
+  disk_size: 500GB
+  memory: "64GB+"
+  # No region constraint - SkyPilot will try all available AWS regions
+  # This helps find capacity when us-east-1 is full (especially during US business hours)
+num_nodes: 1
+workdir: .
+setup: | 
+  export PYTHONHASHSEED=0
+  set -euxo pipefail
+  
+  # Diagnostics: Check NVIDIA driver and CUDA availability BEFORE any setup
+  echo "=== Initial System Diagnostics ==="
+  echo "Checking for NVIDIA driver..."
+  nvidia-smi || echo "WARNING: nvidia-smi not found - drivers may need installation!"
+  echo "Checking CUDA libraries..."
+  ldconfig -p | grep cuda || echo "INFO: No CUDA libraries in ldconfig yet"
+  echo "CUDA toolkit path:"
+  ls -la /usr/local/cuda* 2>/dev/null || echo "INFO: No /usr/local/cuda* found yet"
+  echo "==================================="
+  
+  # Check if nvidia-smi exists; if not, we might need to install drivers
+  # However, on AWS GPU instances, drivers should already be installed via the AMI
+  # SkyPilot should handle this automatically when accelerators are specified
+  if ! command -v nvidia-smi &> /dev/null; then
+    echo "⚠️  NVIDIA drivers not found! This should not happen with GPU instances."
+    echo "⚠️  SkyPilot should have installed drivers. Checking if this is p4de/p4d instance..."
+    # On AWS p4d/p4de, drivers are usually pre-installed in the AMI
+    # If they're missing, SkyPilot setup might have failed
+  fi
+  
+  python3 -m pip install -U pip
+  python3 -m pip install -U uv
+
+  uv venv --python 3.12 --seed
+  source .venv/bin/activate
+
+  # Install dependencies
+  uv pip install "datasets" "requests" "pynvml"
+
+  # ========================================================================
+  # CRITICAL: vLLM + PyTorch + CUDA compatibility chain
+  # ========================================================================
+  # Problem: AWS A100 (p4de) has driver 535.216.01 which only supports CUDA 12.2!
+  #          PyTorch cu124 wheels require CUDA 12.4+ driver (550.x+)
+  #          PyTorch cu121 wheels work with CUDA 12.1+ driver (525.x+)
+  #
+  # Solution: Use torch 2.5.1+cu121 for A100 (driver 535.x)
+  #   - torch 2.6.0 does NOT have cu121 wheels (only cu124/cu126)
+  #   - torch 2.5.1 HAS cu121 wheels that work with driver 535.x
+  #   - vLLM 0.7.3 works with torch 2.5.x
+  #
+  # CUDA Toolkit vs Driver compatibility:
+  #   - cu121 (CUDA 12.1 toolkit) -> requires driver >= 525.60.13
+  #   - cu124 (CUDA 12.4 toolkit) -> requires driver >= 550.54.14
+  #   - A100 p4de has driver 535.216.01 -> supports cu121, NOT cu124!
+  # ========================================================================
+
+  # Install PyTorch 2.5.1 with CUDA 12.1 (works with driver 535.x on A100)
+  echo "=== Installing PyTorch 2.5.1 with CUDA 12.1 support (for A100 driver 535.x) ==="
+  uv pip install --index-url https://download.pytorch.org/whl/cu121     "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+
+  # Verify PyTorch has CUDA support
+  echo "=== PyTorch CUDA Check (after install) ==="
+  python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.version.cuda:', torch.version.cuda); print('torch.__version__:', torch.__version__)"
+  echo "=============================================="
+
+  # Install vLLM 0.7.3 (works with torch 2.5.x)
+  # Use --index-strategy unsafe-best-match to allow mixing PyPI and PyTorch indexes
+  # Use cu121 extra-index to match our torch installation
+  echo "=== Installing vLLM 0.7.3 ==="
+  uv pip install --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu121 "vllm==0.7.3"
+
+  # Final PyTorch CUDA verification
+  echo "=== Final PyTorch CUDA Check ==="
+  python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.version.cuda:', torch.version.cuda); print('torch.__version__:', torch.__version__); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A')" || echo "PyTorch CUDA check failed!"
+  echo "================================="
+  
+  # Install LMCache v0.2.1 (compatible with vLLM 0.7.x)
+  # See: https://docs.lmcache.ai/getting_started/installation.html
+  # Note: v0.2.2 doesn't exist! Available v0.2.x tags: v0.2.0, v0.2.1
+  # Using --no-build-isolation to ensure torch version compatibility
+  rm -rf lmcache
+  git clone https://github.com/lmcache/lmcache.git
+  cd lmcache
+  git checkout v0.2.1
+  # Set CUDA architecture explicitly to avoid auto-detection (which may fail during setup)
+  # A100 = 8.0, L40S = 8.9, L4 = 7.5, H100 = 9.0
+  export TORCH_CUDA_ARCH_LIST="8.0;8.9;7.5;9.0"
+  export FORCE_CUDA="1"
+  uv pip install . --no-build-isolation || {
+    # Fallback: try with just A100 arch (most common)
+    export TORCH_CUDA_ARCH_LIST="8.0"
+    uv pip install . --no-build-isolation
+  }
+  cd ..
+
+  # ========================================================================
+  # CRITICAL FIX: LMCache dependencies overwrite torch with CPU-only version!
+  # The log showed: - torch==2.5.1+cu121  ->  + torch==2.7.0 (CPU-only)
+  # We MUST force reinstall CUDA-enabled torch AFTER LMCache installation
+  # Using cu121 for A100 driver 535.x compatibility
+  # ========================================================================
+  echo "=== CRITICAL: Reinstalling PyTorch with CUDA 12.1 (after LMCache) ==="
+  uv pip install --force-reinstall --index-url https://download.pytorch.org/whl/cu121     "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+
+  # Verify torch is now CUDA-enabled
+  echo "=== Verifying torch CUDA after reinstall ==="
+  python3 -c "import torch; print('torch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('CUDA version:', torch.version.cuda)"
+
+  mkdir -p /tmp/lmcache_disk
+
+run: |
+  set -euxo pipefail
+  
+  # Diagnostics before running benchmark
+  echo "=== Pre-run Diagnostics ==="
+  nvidia-smi || echo "WARNING: nvidia-smi not available in run phase!"
+  echo "==========================="
+
+  source .venv/bin/activate
+
+  # Critical: Detailed PyTorch CUDA diagnostics before running benchmark
+  echo "=== DETAILED PyTorch CUDA Diagnostics (in run phase) ==="
+  echo "--- Environment ---"
+  echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+  echo "CUDA_HOME: $CUDA_HOME"
+  which python3
+  echo "--- Torch info ---"
+  python3 -c "import torch; print('torch.__version__:', torch.__version__); print('torch.__file__:', torch.__file__); print('torch.version.cuda:', torch.version.cuda); print('torch.backends.cuda.is_built():', torch.backends.cuda.is_built())"
+  echo "--- CUDA check ---"
+  python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A - checking why...')"
+  echo "--- Loading CUDA libs directly ---"
+  python3 -c "import ctypes; libs=['libcuda.so.1','libcudart.so.12','libnvidia-ml.so.1']; [print(l+': OK') if ctypes.CDLL(l) else None for l in libs]" 2>&1 || echo "Some libs failed"
+  echo "--- Manual CUDA init attempt ---"
+  python3 -c "import torch; torch.cuda.init(); print('torch.cuda.init() OK, device_count:', torch.cuda.device_count())" 2>&1 || echo "CUDA init failed"
+  echo "--- Installed torch packages ---"
+  pip list | grep -i -E "torch|nvidia|cuda|triton"
+  echo "========================================="
+
+  # Ensure CUDA libraries are in LD_LIBRARY_PATH for PyTorch
+  export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
+  
+  # LMCache environment variables (must be set before Ray workers start)
+  export LMCACHE_USE_EXPERIMENTAL="True"
+  export LMCACHE_CHUNK_SIZE="256"
+  export LMCACHE_LOCAL_CPU="True"
+  export LMCACHE_MAX_LOCAL_CPU_SIZE="40.0"
+  export LMCACHE_SAVE_UNFULL_CHUNK="True"
+  # export VLLM_USE_RAY_COMPILED_DAG_CHANNEL_TYPE="shm"
+  # export VLLM_USE_RAY_WRAPPED_PP_COMM=1
+  export LMCACHE_ENABLE_ASYNC_LOADING="False"
+  export LMCACHE_REMOTE_SERDE="cachegen"
+  export LMCACHE_USE_LAYERWISE="True"
+  export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR="True"
+  export NCCL_P2P_DISABLE=1
+  export NCCL_TIMEOUT=3600
+  export TORCH_NCCL_BLOCKING_WAIT=1
+  export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+  export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+  export TORCH_DISTRIBUTED_DEBUG=DETAIL
+  export NCCL_DEBUG=INFO
+  # export LMCACHE_LOOKUP_TIMEOUT_MS="12000"
+  # export LMCACHE_LOCAL_DISK="/tmp/lmcache_disk"
+  # export LMCACHE_MAX_LOCAL_DISK_SIZE="100"
+  # export LMCACHE_DISK_PERSISTENCE="True"
+  # export LMCACHE_LOG_LEVEL="INFO"
+
+  python roofline_benchmarks/benchmark_roofline-tp4-pp1-4096in-1024out-A100-80gb.py
+    
+
+  echo "Cluster ready for benchmarking"
