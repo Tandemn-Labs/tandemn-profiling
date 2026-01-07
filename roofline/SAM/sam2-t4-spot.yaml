@@ -1,0 +1,28 @@
+name: sam2-benchmark
+
+resources:
+  accelerators: T4:1
+  use_spot: true
+  disk_size: 100
+  memory: "16GB+"
+  job_recovery:
+    strategy: EAGER_NEXT_REGION  # Move to new region on preemption
+
+workdir: .
+
+setup: |
+  set -euxo pipefail
+  
+  # Install SAM2
+  pip install torch torchvision
+  pip install git+https://github.com/facebookresearch/sam2.git
+  
+  # Download model checkpoint (using tiny for T4 - fits in memory nicely)
+  mkdir -p checkpoints
+  cd checkpoints
+  wget -q https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt
+  cd ..
+
+run: |
+  set -euxo pipefail
+  python benchmark_sam2.py
