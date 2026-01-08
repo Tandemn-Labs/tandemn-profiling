@@ -144,7 +144,7 @@ def create_performance_plot(df, save_path=None):
                 ax1.text(bar.get_x() + bar.get_width()/2., height + max_value*0.03,
                         label_text, ha='center', va='bottom',
                         fontsize=9, fontweight='bold', color='#1a1a1a',
-                        rotation=45,  # Rotate 45 degrees as requested
+                        rotation=90,  # Rotate 45 degrees as requested
                         bbox=dict(boxstyle="round,pad=0.2", facecolor='white',
                                 edgecolor='none', alpha=0.9))
 
@@ -193,7 +193,7 @@ def create_performance_plot(df, save_path=None):
             ax1_right.text(bar.get_x() + bar.get_width()/2., height + max_cost*0.03,
                          label_text, ha='center', va='bottom',
                          fontsize=9, fontweight='bold', color='#1a1a1a',
-                         rotation=45,
+                         rotation=90,
                          bbox=dict(boxstyle="round,pad=0.2", facecolor='white',
                                  edgecolor='none', alpha=0.9))
 
@@ -250,7 +250,7 @@ def create_performance_plot(df, save_path=None):
             ax1_right_time.text(bar.get_x() + bar.get_width()/2., height + max_time*0.03,
                               label_text, ha='center', va='bottom',
                               fontsize=9, fontweight='bold', color='#1a1a1a',
-                              rotation=45,
+                              rotation=90,
                               bbox=dict(boxstyle="round,pad=0.2", facecolor='white',
                                       edgecolor='none', alpha=0.9))
 
@@ -394,7 +394,7 @@ def create_performance_plot(df, save_path=None):
         ax2.text(bar.get_x() + bar.get_width()/2., height + 2,
                 f'{eff:.1f}%', ha='center', va='bottom',
                 fontsize=9, fontweight='bold', color='#1a1a1a',
-                rotation=45,
+                rotation=90,
                 bbox=dict(boxstyle="round,pad=0.2", facecolor='white',
                          edgecolor='none', alpha=0.8))
 
@@ -414,7 +414,7 @@ def create_performance_plot(df, save_path=None):
             ax2_right.text(bar.get_x() + bar.get_width()/2., height + 2,
                           f'{ceff:.1f}%', ha='center', va='bottom',
                           fontsize=9, fontweight='bold', color='#1a1a1a',
-                          rotation=45,
+                          rotation=90,
                           bbox=dict(boxstyle="round,pad=0.2", facecolor='white',
                                    edgecolor='none', alpha=0.8))
 
@@ -527,7 +527,7 @@ def create_performance_plot(df, save_path=None):
             ax3.text(bar.get_x() + bar.get_width()/2., height + 2,
                     f'{sm_val:.1f}%', ha='center', va='bottom',
                     fontsize=9, fontweight='bold', color='#1a1a1a',
-                    rotation=45,
+                    rotation=90,
                     bbox=dict(boxstyle="round,pad=0.2", facecolor='white',
                              edgecolor='none', alpha=0.8))
     
@@ -555,7 +555,7 @@ def create_performance_plot(df, save_path=None):
             ax3_right.text(bar.get_x() + bar.get_width()/2., height + 2,
                           f'{membw_val:.1f}%', ha='center', va='bottom',
                           fontsize=9, fontweight='bold', color='#1a1a1a',
-                          rotation=45,
+                          rotation=90,
                           bbox=dict(boxstyle="round,pad=0.2", facecolor='white',
                                    edgecolor='none', alpha=0.8))
     

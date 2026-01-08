@@ -6,21 +6,13 @@ os.environ["LMCACHE_LOG_LEVEL"] = "INFO"
 import requests
 import json
 import time
-import torch
 import gc
 
-# Verify CUDA is available before importing vLLM
-# Note: Fabric Manager must be running for multi-GPU A100 systems (handled in setup_commands)
-# We do minimal CUDA checking here to avoid creating tensors that conflict with vLLM's InferenceMode
-print("🔧 Verifying CUDA availability before vLLM import...")
-if torch.cuda.is_available():
-    device_count = torch.cuda.device_count()
-    if device_count > 0:
-        print(f"   ✅ CUDA available: {device_count} GPU(s) detected")
-    else:
-        raise RuntimeError("CUDA reports available but no devices found")
-else:
-    raise RuntimeError("CUDA is not available! Check if Fabric Manager is running for A100 systems.")
+# DO NOT import torch or call any CUDA functions before vLLM!
+# vLLM 0.10.0's V1 engine uses multiprocessing with fork.
+# If CUDA is initialized before fork, workers fail with:
+#   "Cannot re-initialize CUDA in forked subprocess"
+# Let vLLM handle CUDA initialization internally.
 
 import ray
 from datasets import load_dataset

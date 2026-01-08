@@ -1,0 +1,303 @@
+
+name: roofline-tp4-pp1-2048in-512out-L40S
+resources:
+  cloud: aws
+  accelerators: L40S:4
+  use_spot: false
+  disk_size: 500GB
+  memory: "64GB+"
+  # No region constraint - SkyPilot will try all available AWS regions
+  # This helps find capacity when us-east-1 is full (especially during US business hours)
+num_nodes: 1
+workdir: .
+setup: |
+  export PYTHONHASHSEED=0
+  set -euxo pipefail
+
+  # GPU type for conditional setup (A100 requires special handling)
+  GPU_TYPE="L40S"
+  IS_A100=false
+  echo "GPU Type: $GPU_TYPE, Is A100: $IS_A100"
+
+  # Diagnostics: Check NVIDIA driver and CUDA availability BEFORE any setup
+  echo "=== Initial System Diagnostics ==="
+  echo "Checking for NVIDIA driver..."
+  nvidia-smi || echo "WARNING: nvidia-smi not found - drivers may need installation!"
+  echo "Checking CUDA libraries..."
+  ldconfig -p | grep cuda || echo "INFO: No CUDA libraries in ldconfig yet"
+  echo "CUDA toolkit path:"
+  ls -la /usr/local/cuda* 2>/dev/null || echo "INFO: No /usr/local/cuda* found yet"
+  echo "==================================="
+
+  # Check if nvidia-smi exists; if not, we might need to install drivers
+  # However, on AWS GPU instances, drivers should already be installed via the AMI
+  # SkyPilot should handle this automatically when accelerators are specified
+  if ! command -v nvidia-smi &> /dev/null; then
+    echo "⚠️  NVIDIA drivers not found! This should not happen with GPU instances."
+    echo "⚠️  SkyPilot should have installed drivers. Checking if this is p4de/p4d instance..."
+    # On AWS p4d/p4de, drivers are usually pre-installed in the AMI
+    # If they're missing, SkyPilot setup might have failed
+  fi
+
+  # ========================================================================
+  # NVIDIA Fabric Manager - ONLY for A100-SXM4 (NVSwitch) systems
+  # ========================================================================
+  if [ "$IS_A100" = "true" ]; then
+  # On p4d/p4de instances with A100-SXM4 GPUs connected via NVSwitch:
+  #   - CUDA Error 802 ("system not yet initialized") occurs without Fabric Manager
+  #   - nvidia-smi shows GPUs but CUDA runtime cannot access them
+  #   - NVLink topology shows only PCIe (PHB/NODE/SYS) instead of NV#
+  #
+  # The Fabric Manager service is REQUIRED to:
+  #   - Initialize the NVSwitch fabric topology
+  #   - Enable peer-to-peer GPU communication via NVLink
+  #   - Allow CUDA runtime to properly enumerate and access GPUs
+  # ========================================================================
+  echo "=== Installing NVIDIA Fabric Manager for A100-SXM4 NVSwitch support ==="
+
+  # Get the FULL driver version (e.g., 535.216.01) to install EXACT matching Fabric Manager
+  # The Fabric Manager MUST match the driver version EXACTLY or it will fail to start
+  # Note: Use --id=0 to query single GPU instead of piping to head (avoids SIGPIPE with set -e)
+  DRIVER_VERSION_FULL=$(nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader)
+  DRIVER_VERSION_MAJOR=$(echo "$DRIVER_VERSION_FULL" | cut -d. -f1)
+  echo "Detected NVIDIA driver version: $DRIVER_VERSION_FULL (major: $DRIVER_VERSION_MAJOR)"
+
+  # Check if Fabric Manager is already installed and running
+  if systemctl is-active --quiet nvidia-fabricmanager 2>/dev/null; then
+    echo "✅ NVIDIA Fabric Manager is already running"
+  else
+    echo "Installing NVIDIA Fabric Manager..."
+    sudo apt-get update
+
+    # Check available Fabric Manager versions
+    echo "Available Fabric Manager versions:"
+    apt-cache madison nvidia-fabricmanager-${DRIVER_VERSION_MAJOR} 2>/dev/null | awk 'NR<=5' || true
+
+    # Try to install the EXACT version matching the driver
+    # Format: nvidia-fabricmanager-535=535.216.01-1
+    FM_INSTALLED=false
+    echo "Attempting to install exact version: nvidia-fabricmanager-${DRIVER_VERSION_MAJOR}=${DRIVER_VERSION_FULL}-1"
+    if sudo apt-get install -y "nvidia-fabricmanager-${DRIVER_VERSION_MAJOR}=${DRIVER_VERSION_FULL}-1" 2>/dev/null; then
+      echo "✅ Installed exact Fabric Manager version ${DRIVER_VERSION_FULL}"
+      FM_INSTALLED=true
+    fi
+
+    # If exact version failed, we need to UPDATE the driver to match available Fabric Manager
+    if [ "$FM_INSTALLED" = "false" ]; then
+      echo "⚠️  Exact Fabric Manager version ${DRIVER_VERSION_FULL} not available in apt repository"
+      echo "The AWS AMI has driver ${DRIVER_VERSION_FULL} but NVIDIA repo has newer Fabric Manager"
+      echo ""
+      echo "Solution: Update NVIDIA driver to match the available Fabric Manager version"
+
+      # Get the latest available Fabric Manager version for this major
+      # Note: Use awk 'NR==1' instead of head -1 to avoid SIGPIPE with set -e
+      FM_LATEST=$(apt-cache madison nvidia-fabricmanager-${DRIVER_VERSION_MAJOR} 2>/dev/null | awk 'NR==1 {print $3}' | sed 's/-1$//')
+      echo "Latest available Fabric Manager: $FM_LATEST"
+
+      if [ -n "$FM_LATEST" ]; then
+        echo "Updating NVIDIA driver to version $FM_LATEST to match Fabric Manager..."
+
+        # Install matching driver version
+        # The driver package is nvidia-driver-535 or similar
+        sudo apt-get install -y --allow-downgrades           nvidia-driver-${DRIVER_VERSION_MAJOR}=${FM_LATEST}-1           nvidia-dkms-${DRIVER_VERSION_MAJOR}=${FM_LATEST}-1           nvidia-kernel-source-${DRIVER_VERSION_MAJOR}=${FM_LATEST}-1           2>/dev/null || {
+            echo "Could not update driver, trying alternative approach..."
+            # Try installing just the Fabric Manager - sometimes the versions are close enough
+            sudo apt-get install -y nvidia-fabricmanager-${DRIVER_VERSION_MAJOR} || true
+          }
+
+        # Now install Fabric Manager
+        sudo apt-get install -y nvidia-fabricmanager-${DRIVER_VERSION_MAJOR} || true
+        FM_INSTALLED=true
+      fi
+    fi
+
+    # Start and enable the Fabric Manager service
+    echo "Starting NVIDIA Fabric Manager service..."
+    sudo systemctl start nvidia-fabricmanager || echo "Warning: Failed to start Fabric Manager"
+    sudo systemctl enable nvidia-fabricmanager || echo "Warning: Failed to enable Fabric Manager"
+
+    # Give Fabric Manager time to initialize the NVSwitch fabric
+    echo "Waiting for Fabric Manager to initialize NVSwitch fabric..."
+    sleep 5
+
+    # Verify Fabric Manager is running
+    if systemctl is-active --quiet nvidia-fabricmanager; then
+      echo "✅ NVIDIA Fabric Manager started successfully"
+      # Verify new driver version (use --id=0 to avoid SIGPIPE)
+      nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader
+    else
+      echo "⚠️  NVIDIA Fabric Manager failed to start"
+      echo "This usually means version mismatch between driver and Fabric Manager"
+      echo "Driver version: $(nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader)"
+      echo "Installed Fabric Manager:"
+      dpkg -l | grep nvidia-fabricmanager || true
+      systemctl status nvidia-fabricmanager 2>&1 || true
+      echo ""
+      echo "⚠️  CUDA will NOT work on this A100-SXM4 instance without Fabric Manager!"
+      echo "⚠️  Consider using a different AMI with matching driver/Fabric Manager versions"
+    fi
+  fi
+
+  # Verify NVLink topology after Fabric Manager
+  echo "=== Verifying NVLink topology ==="
+  nvidia-smi topo -m 2>&1 | awk 'NR<=20' || echo "NVLink topology check failed"
+  echo "================================="
+  fi  # End of A100-specific Fabric Manager section
+
+  python3 -m pip install -U pip
+  python3 -m pip install -U uv
+
+  uv venv --python 3.12 --seed
+  source .venv/bin/activate
+
+  # Install dependencies
+  uv pip install "datasets" "requests" "pynvml"
+
+  # ========================================================================
+  # vLLM + PyTorch Installation - GPU-specific versions
+  # ========================================================================
+  # A100 (p4d/p4de): driver 535.x only supports CUDA 12.1, needs vLLM 0.7.3 + torch 2.5.1
+  # L40S/L4/others: driver 550.x+ supports CUDA 12.4, can use vLLM 0.10.0 + torch 2.7.1
+  # ========================================================================
+
+  if [ "$IS_A100" = "true" ]; then
+    # A100-specific: older driver requires cu121 and older vLLM
+    echo "=== Installing PyTorch 2.5.1 with CUDA 12.1 (for A100 driver 535.x) ==="
+    uv pip install --index-url https://download.pytorch.org/whl/cu121       "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+
+    echo "=== Installing vLLM 0.7.3 (for A100 with torch 2.5.x) ==="
+    uv pip install --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu121 "vllm==0.7.3"
+  else
+    # L40S/L4/others: use latest stable vLLM with default PyTorch
+    echo "=== Installing vLLM 0.10.0 (latest stable for L40S/L4/other GPUs) ==="
+    uv pip install "vllm==0.10.0"
+  fi
+
+  # Verify PyTorch has CUDA support
+  echo "=== PyTorch CUDA Check ==="
+  python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.version.cuda:', torch.version.cuda); print('torch.__version__:', torch.__version__); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A')" || echo "PyTorch CUDA check failed!"
+  echo "==========================="
+  
+  # ========================================================================
+  # LMCACHE DISABLED FOR DEBUGGING CUDA ISSUES
+  # LMCache may be overwriting torch with CPU-only version causing CUDA errors
+  # Re-enable once CUDA is working on A100
+  # ========================================================================
+  # # Install LMCache v0.2.1 (compatible with vLLM 0.7.x)
+  # # See: https://docs.lmcache.ai/getting_started/installation.html
+  # # Note: v0.2.2 doesn't exist! Available v0.2.x tags: v0.2.0, v0.2.1
+  # # Using --no-build-isolation to ensure torch version compatibility
+  # rm -rf lmcache
+  # git clone https://github.com/lmcache/lmcache.git
+  # cd lmcache
+  # git checkout v0.2.1
+  # # Set CUDA architecture explicitly to avoid auto-detection (which may fail during setup)
+  # # A100 = 8.0, L40S = 8.9, L4 = 7.5, H100 = 9.0
+  # export TORCH_CUDA_ARCH_LIST="8.0;8.9;7.5;9.0"
+  # export FORCE_CUDA="1"
+  # uv pip install . --no-build-isolation || {
+  #   # Fallback: try with just A100 arch (most common)
+  #   export TORCH_CUDA_ARCH_LIST="8.0"
+  #   uv pip install . --no-build-isolation
+  # }
+  # cd ..
+
+  # # ========================================================================
+  # # CRITICAL FIX: LMCache dependencies overwrite torch with CPU-only version!
+  # # The log showed: - torch==2.5.1+cu121  ->  + torch==2.7.0 (CPU-only)
+  # # We MUST force reinstall CUDA-enabled torch AFTER LMCache installation
+  # # Using cu121 for A100 driver 535.x compatibility
+  # # ========================================================================
+  # echo "=== CRITICAL: Reinstalling PyTorch with CUDA 12.1 (after LMCache) ==="
+  # uv pip install --force-reinstall --index-url https://download.pytorch.org/whl/cu121   #   "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+
+  # # Verify torch is now CUDA-enabled
+  # echo "=== Verifying torch CUDA after reinstall ==="
+  # python3 -c "import torch; print('torch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('CUDA version:', torch.version.cuda)"
+
+  echo "=== LMCACHE DISABLED - Skipping LMCache installation ==="
+  mkdir -p /tmp/lmcache_disk
+
+run: |
+  set -euxo pipefail
+
+  # CRITICAL: Set LD_LIBRARY_PATH for CUDA libraries FIRST
+  # This must be done before any Python imports that use CUDA
+  export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
+  export CUDA_HOME="${CUDA_HOME:-/usr/local/cuda}"
+
+  # Diagnostics before running benchmark
+  echo "=== Pre-run Diagnostics ==="
+  nvidia-smi || echo "WARNING: nvidia-smi not available in run phase!"
+
+  # A100-SXM4 specific diagnostics - check for Fabric Manager
+  echo "--- A100 SXM4 Diagnostics ---"
+  echo "Checking NVIDIA Fabric Manager (required for NVSwitch on A100-SXM4)..."
+  systemctl status nvidia-fabricmanager 2>&1 || echo "Fabric Manager status check failed or not present"
+
+  echo "Checking for NVLink topology..."
+  nvidia-smi topo -m 2>&1 || echo "NVLink topology check failed"
+
+  echo "Checking for GPU processes and errors..."
+  nvidia-smi -q -d ERRORS 2>&1 | awk 'NR<=50' || echo "Error check failed"
+
+  echo "--- CUDA Device Query ---"
+  # Try direct CUDA device query through Python (single line to avoid YAML issues)
+  python3 -c "import ctypes; cudart = ctypes.CDLL('libcudart.so.12'); count = ctypes.c_int(); result = cudart.cudaGetDeviceCount(ctypes.byref(count)); print(f'cudaGetDeviceCount result: {result} (0=success), device count: {count.value}')" 2>&1 || echo "Direct CUDA query script failed"
+  echo "==========================="
+
+  source .venv/bin/activate
+
+  # Critical: Detailed PyTorch CUDA diagnostics before running benchmark
+  echo "=== DETAILED PyTorch CUDA Diagnostics (in run phase) ==="
+  echo "--- Environment ---"
+  echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH" || true
+  echo "CUDA_HOME: $CUDA_HOME" || true
+  which python3
+  echo "--- Torch info ---"
+  python3 -c "import torch; print('torch.__version__:', torch.__version__); print('torch.__file__:', torch.__file__); print('torch.version.cuda:', torch.version.cuda); print('torch.backends.cuda.is_built():', torch.backends.cuda.is_built())"
+  echo "--- CUDA check ---"
+  python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A - checking why...')"
+  echo "--- Loading CUDA libs directly ---"
+  python3 -c "import ctypes; libs=['libcuda.so.1','libcudart.so.12','libnvidia-ml.so.1']; [print(l+': OK') if ctypes.CDLL(l) else None for l in libs]" 2>&1 || echo "Some libs failed"
+  echo "--- Manual CUDA init attempt ---"
+  python3 -c "import torch; torch.cuda.init(); print('torch.cuda.init() OK, device_count:', torch.cuda.device_count())" 2>&1 || echo "CUDA init failed"
+  echo "--- Installed torch packages ---"
+  pip list | grep -i -E "torch|nvidia|cuda|triton"
+  echo "========================================="
+
+  # Ensure CUDA libraries are in LD_LIBRARY_PATH for PyTorch
+  export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
+  
+  # LMCache environment variables (must be set before Ray workers start)
+  export LMCACHE_USE_EXPERIMENTAL="True"
+  export LMCACHE_CHUNK_SIZE="256"
+  export LMCACHE_LOCAL_CPU="True"
+  export LMCACHE_MAX_LOCAL_CPU_SIZE="40.0"
+  export LMCACHE_SAVE_UNFULL_CHUNK="True"
+  # export VLLM_USE_RAY_COMPILED_DAG_CHANNEL_TYPE="shm"
+  # export VLLM_USE_RAY_WRAPPED_PP_COMM=1
+  export LMCACHE_ENABLE_ASYNC_LOADING="False"
+  export LMCACHE_REMOTE_SERDE="cachegen"
+  export LMCACHE_USE_LAYERWISE="True"
+  export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR="True"
+  export NCCL_P2P_DISABLE=0
+  export NCCL_P2P_LEVEL=SYS
+  # export NCCL_ALGO=Tree
+  # export NCCL_MIN_NCHANNELS=4
+  export NCCL_TIMEOUT=3600
+  export TORCH_NCCL_BLOCKING_WAIT=1
+  export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+  export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+  export TORCH_DISTRIBUTED_DEBUG=DETAIL
+  export NCCL_DEBUG=INFO
+  # export LMCACHE_LOOKUP_TIMEOUT_MS="12000"
+  # export LMCACHE_LOCAL_DISK="/tmp/lmcache_disk"
+  # export LMCACHE_MAX_LOCAL_DISK_SIZE="100"
+  # export LMCACHE_DISK_PERSISTENCE="True"
+  # export LMCACHE_LOG_LEVEL="INFO"
+
+  python roofline_benchmarks/benchmark_roofline-tp4-pp1-2048in-512out-L40S.py
+    
+
+  echo "Cluster ready for benchmarking"

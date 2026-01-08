@@ -10,10 +10,15 @@ resources:
   # This helps find capacity when us-east-1 is full (especially during US business hours)
 num_nodes: 4
 workdir: .
-setup: | 
+setup: |
   export PYTHONHASHSEED=0
   set -euxo pipefail
-  
+
+  # GPU type for conditional setup (A100 requires special handling)
+  GPU_TYPE="A10G"
+  IS_A100=false
+  echo "GPU Type: $GPU_TYPE, Is A100: $IS_A100"
+
   # Diagnostics: Check NVIDIA driver and CUDA availability BEFORE any setup
   echo "=== Initial System Diagnostics ==="
   echo "Checking for NVIDIA driver..."
@@ -23,7 +28,7 @@ setup: |
   echo "CUDA toolkit path:"
   ls -la /usr/local/cuda* 2>/dev/null || echo "INFO: No /usr/local/cuda* found yet"
   echo "==================================="
-  
+
   # Check if nvidia-smi exists; if not, we might need to install drivers
   # However, on AWS GPU instances, drivers should already be installed via the AMI
   # SkyPilot should handle this automatically when accelerators are specified
@@ -35,8 +40,9 @@ setup: |
   fi
 
   # ========================================================================
-  # CRITICAL: Install NVIDIA Fabric Manager for A100-SXM4 (NVSwitch) systems
+  # NVIDIA Fabric Manager - ONLY for A100-SXM4 (NVSwitch) systems
   # ========================================================================
+  if [ "$IS_A100" = "true" ]; then
   # On p4d/p4de instances with A100-SXM4 GPUs connected via NVSwitch:
   #   - CUDA Error 802 ("system not yet initialized") occurs without Fabric Manager
   #   - nvidia-smi shows GPUs but CUDA runtime cannot access them
@@ -136,6 +142,7 @@ setup: |
   echo "=== Verifying NVLink topology ==="
   nvidia-smi topo -m 2>&1 | awk 'NR<=20' || echo "NVLink topology check failed"
   echo "================================="
+  fi  # End of A100-specific Fabric Manager section
 
   python3 -m pip install -U pip
   python3 -m pip install -U uv
@@ -147,42 +154,29 @@ setup: |
   uv pip install "datasets" "requests" "pynvml"
 
   # ========================================================================
-  # CRITICAL: vLLM + PyTorch + CUDA compatibility chain
+  # vLLM + PyTorch Installation - GPU-specific versions
   # ========================================================================
-  # Problem: AWS A100 (p4de) has driver 535.216.01 which only supports CUDA 12.2!
-  #          PyTorch cu124 wheels require CUDA 12.4+ driver (550.x+)
-  #          PyTorch cu121 wheels work with CUDA 12.1+ driver (525.x+)
-  #
-  # Solution: Use torch 2.5.1+cu121 for A100 (driver 535.x)
-  #   - torch 2.6.0 does NOT have cu121 wheels (only cu124/cu126)
-  #   - torch 2.5.1 HAS cu121 wheels that work with driver 535.x
-  #   - vLLM 0.7.3 works with torch 2.5.x
-  #
-  # CUDA Toolkit vs Driver compatibility:
-  #   - cu121 (CUDA 12.1 toolkit) -> requires driver >= 525.60.13
-  #   - cu124 (CUDA 12.4 toolkit) -> requires driver >= 550.54.14
-  #   - A100 p4de has driver 535.216.01 -> supports cu121, NOT cu124!
+  # A100 (p4d/p4de): driver 535.x only supports CUDA 12.1, needs vLLM 0.7.3 + torch 2.5.1
+  # L40S/L4/others: driver 550.x+ supports CUDA 12.4, can use vLLM 0.10.0 + torch 2.7.1
   # ========================================================================
 
-  # Install PyTorch 2.5.1 with CUDA 12.1 (works with driver 535.x on A100)
-  echo "=== Installing PyTorch 2.5.1 with CUDA 12.1 support (for A100 driver 535.x) ==="
-  uv pip install --index-url https://download.pytorch.org/whl/cu121     "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+  if [ "$IS_A100" = "true" ]; then
+    # A100-specific: older driver requires cu121 and older vLLM
+    echo "=== Installing PyTorch 2.5.1 with CUDA 12.1 (for A100 driver 535.x) ==="
+    uv pip install --index-url https://download.pytorch.org/whl/cu121       "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+
+    echo "=== Installing vLLM 0.7.3 (for A100 with torch 2.5.x) ==="
+    uv pip install --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu121 "vllm==0.7.3"
+  else
+    # L40S/L4/others: use latest stable vLLM with default PyTorch
+    echo "=== Installing vLLM 0.10.0 (latest stable for L40S/L4/other GPUs) ==="
+    uv pip install "vllm==0.10.0"
+  fi
 
   # Verify PyTorch has CUDA support
-  echo "=== PyTorch CUDA Check (after install) ==="
-  python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.version.cuda:', torch.version.cuda); print('torch.__version__:', torch.__version__)"
-  echo "=============================================="
-
-  # Install vLLM 0.7.3 (works with torch 2.5.x)
-  # Use --index-strategy unsafe-best-match to allow mixing PyPI and PyTorch indexes
-  # Use cu121 extra-index to match our torch installation
-  echo "=== Installing vLLM 0.7.3 ==="
-  uv pip install --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu121 "vllm==0.7.3"
-
-  # Final PyTorch CUDA verification
-  echo "=== Final PyTorch CUDA Check ==="
+  echo "=== PyTorch CUDA Check ==="
   python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.version.cuda:', torch.version.cuda); print('torch.__version__:', torch.__version__); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A')" || echo "PyTorch CUDA check failed!"
-  echo "================================="
+  echo "==========================="
   
   # ========================================================================
   # LMCACHE DISABLED FOR DEBUGGING CUDA ISSUES
@@ -287,7 +281,10 @@ run: |
   export LMCACHE_REMOTE_SERDE="cachegen"
   export LMCACHE_USE_LAYERWISE="True"
   export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR="True"
-  export NCCL_P2P_DISABLE=1
+  export NCCL_P2P_DISABLE=0
+  # export NCCL_P2P_LEVEL=SYS
+  # export NCCL_ALGO=Tree
+  # export NCCL_MIN_NCHANNELS=4
   export NCCL_TIMEOUT=3600
   export TORCH_NCCL_BLOCKING_WAIT=1
   export TORCH_NCCL_ASYNC_ERROR_HANDLING=1

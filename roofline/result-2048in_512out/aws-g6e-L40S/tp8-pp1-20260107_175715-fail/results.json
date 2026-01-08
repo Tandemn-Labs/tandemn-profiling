@@ -1,0 +1,11 @@
+[
+  {
+    "tp": 8,
+    "pp": 1,
+    "max_input_length": 2048,
+    "max_output_length": 512,
+    "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 1."
+  }
+]
