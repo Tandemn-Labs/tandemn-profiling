@@ -25,12 +25,12 @@ GPU_CONFIGS = {
         }
     },
     "L4": {
-        "available_gpus": [1, 2, 4],
+        "available_gpus": [1, 4, 8],
         "instance_family": "g6",
         "pricing": {
             1: {"instance_type": "g6.2xlarge", "price_per_hour": 0.526},
-            2: {"instance_type": "g6.12xlarge", "price_per_hour": 0.752},
-            4: {"instance_type": "g6.48xlarge", "price_per_hour": 1.204},
+            4: {"instance_type": "g6.12xlarge", "price_per_hour": 0.752},
+            8: {"instance_type": "g6.48xlarge", "price_per_hour": 1.204},
         }
     },
     "A10G": {
@@ -42,7 +42,7 @@ GPU_CONFIGS = {
             8: {"instance_type": "g5.48xlarge", "price_per_hour": 16.384},
         }
     },
-    "A100-40gb": {
+    "A100_40gb": {
         "available_gpus": [1, 4, 8],
         "instance_family": "p4d",
         "pricing": {
@@ -51,7 +51,7 @@ GPU_CONFIGS = {
             8: {"instance_type": "p4d.24xlarge", "price_per_hour": 32.77},  # 8 GPUs (40GB per GPU)
         }
     },
-    "A100-80gb": {
+    "A100_80gb": {
         "available_gpus": [1, 4, 8],
         "instance_family": "p4de",
         "pricing": {
@@ -250,8 +250,67 @@ def group_by_input_output_then_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE):
     
     return result
 
+def cleanup_old_benchmark_files(work_dir=None):
+    """
+    Remove old benchmark files that don't have GPU type in their names.
+    These files are from the old naming scheme and are now obsolete.
+    
+    Old naming pattern: roofline-tp{TP}-pp{PP}[-{input}in-{output}out].yaml
+    New naming pattern: roofline-tp{TP}-pp{PP}-{input}in-{output}out-{GPU_TYPE}.yaml
+    
+    This function identifies old files by checking if they don't end with any known GPU type.
+    """
+    if work_dir is None:
+        work_dir = Path("roofline_benchmarks")
+    
+    if not work_dir.exists():
+        print("ℹ️  roofline_benchmarks directory doesn't exist")
+        return 0
+    
+    # List of known GPU types to check against
+    known_gpu_types = list(GPU_CONFIGS.keys())
+    gpu_type_suffixes = [gpu.replace("_", "-").replace("/", "-") for gpu in known_gpu_types]
+    
+    removed_count = 0
+    removed_files = []
+    
+    # Check YAML files
+    for file_path in work_dir.glob("roofline-*.yaml"):
+        # Check if filename doesn't end with any GPU type suffix
+        filename = file_path.stem  # without .yaml extension
+        has_gpu_type = any(filename.endswith(f"-{suffix}") for suffix in gpu_type_suffixes)
+        
+        if not has_gpu_type:
+            removed_files.append(file_path.name)
+            file_path.unlink()
+            removed_count += 1
+    
+    # Check Python benchmark scripts
+    for file_path in work_dir.glob("benchmark_roofline-*.py"):
+        # Check if filename doesn't end with any GPU type suffix
+        filename = file_path.stem.replace("benchmark_roofline-", "")  # remove prefix
+        has_gpu_type = any(filename.endswith(f"-{suffix}") for suffix in gpu_type_suffixes)
+        
+        if not has_gpu_type:
+            removed_files.append(file_path.name)
+            file_path.unlink()
+            removed_count += 1
+    
+    if removed_count > 0:
+        print(f"🗑️  Removed {removed_count} old benchmark files:")
+        for fname in sorted(removed_files):
+            print(f"   - {fname}")
+        print(f"✅ Cleaned up {removed_count} old benchmark files")
+    else:
+        print("ℹ️  No old benchmark files to clean up")
+    
+    return removed_count
+
 def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE):
     lmcache_exports = """
+  # Ensure CUDA libraries are in LD_LIBRARY_PATH for PyTorch
+  export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
+  
   # LMCache environment variables (must be set before Ray workers start)
   export LMCACHE_USE_EXPERIMENTAL="True"
   export LMCACHE_CHUNK_SIZE="256"
@@ -264,7 +323,10 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
   export LMCACHE_REMOTE_SERDE="cachegen"
   export LMCACHE_USE_LAYERWISE="True"
   export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR="True"
-  export NCCL_P2P_DISABLE=1
+  export NCCL_P2P_DISABLE=0
+  export NCCL_P2P_LEVEL=SYS
+  # export NCCL_ALGO=Tree
+  # export NCCL_MIN_NCHANNELS=4
   export NCCL_TIMEOUT=3600
   export TORCH_NCCL_BLOCKING_WAIT=1
   export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
@@ -324,53 +386,299 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
   # Cleanup Ray
   uv run ray stop
         """
-    # Handle A100 variants: use A100 as accelerator name but specify instance type
-    accelerator_name = gpu_type
+    # Handle A100 variants: Only specify accelerators, let SkyPilot choose instance
+    # SkyPilot will automatically select the right instance type and install drivers
+    # DON'T specify instance_type as it can cause issues with driver installation
+    accelerator_spec = ""
     instance_type_constraint = ""
-    if gpu_type in ["A100-40gb", "A100-80gb"]:
+    if gpu_type in ["A100_40gb", "A100-40gb"]:
+        # Use "A100" without memory suffix - SkyPilot will select p4d.24xlarge (40GB)
         accelerator_name = "A100"
-        # Force specific instance type (p4d for 40gb, p4de for 80gb)
-        gpu_config = GPU_CONFIGS[gpu_type]
-        instance_type = gpu_config["pricing"][gpus_per_node]["instance_type"]
-        instance_type_constraint = f"  instance_type: {instance_type}\n"
+        accelerator_spec = f"  accelerators: {accelerator_name}:{gpus_per_node}\n"
+    elif gpu_type in ["A100_80gb", "A100-80gb"]:
+        # Use "A100-80GB" with memory suffix - SkyPilot will select p4de.24xlarge (80GB)
+        accelerator_name = "A100-80GB"
+        accelerator_spec = f"  accelerators: {accelerator_name}:{gpus_per_node}\n"
+    else:
+        # For other GPU types, specify accelerators normally
+        accelerator_spec = f"  accelerators: {gpu_type}:{gpus_per_node}\n"
     
+    # Determine if this is an A100 GPU type
+    is_a100 = gpu_type.upper().startswith("A100")
+
     return f"""
 name: {cluster_name}
 resources:
   cloud: aws
-  accelerators: {accelerator_name}:{gpus_per_node}
-{instance_type_constraint}  use_spot: false
+{accelerator_spec}{instance_type_constraint}  use_spot: false
   disk_size: 500GB
   memory: "64GB+"
   # No region constraint - SkyPilot will try all available AWS regions
   # This helps find capacity when us-east-1 is full (especially during US business hours)
 num_nodes: {num_nodes}
 workdir: .
-setup: | 
+setup: |
   export PYTHONHASHSEED=0
   set -euxo pipefail
+
+  # GPU type for conditional setup (A100 requires special handling)
+  GPU_TYPE="{gpu_type}"
+  IS_A100={"true" if is_a100 else "false"}
+  echo "GPU Type: $GPU_TYPE, Is A100: $IS_A100"
+
+  # Diagnostics: Check NVIDIA driver and CUDA availability BEFORE any setup
+  echo "=== Initial System Diagnostics ==="
+  echo "Checking for NVIDIA driver..."
+  nvidia-smi || echo "WARNING: nvidia-smi not found - drivers may need installation!"
+  echo "Checking CUDA libraries..."
+  ldconfig -p | grep cuda || echo "INFO: No CUDA libraries in ldconfig yet"
+  echo "CUDA toolkit path:"
+  ls -la /usr/local/cuda* 2>/dev/null || echo "INFO: No /usr/local/cuda* found yet"
+  echo "==================================="
+
+  # Check if nvidia-smi exists; if not, we might need to install drivers
+  # However, on AWS GPU instances, drivers should already be installed via the AMI
+  # SkyPilot should handle this automatically when accelerators are specified
+  if ! command -v nvidia-smi &> /dev/null; then
+    echo "⚠️  NVIDIA drivers not found! This should not happen with GPU instances."
+    echo "⚠️  SkyPilot should have installed drivers. Checking if this is p4de/p4d instance..."
+    # On AWS p4d/p4de, drivers are usually pre-installed in the AMI
+    # If they're missing, SkyPilot setup might have failed
+  fi
+
+  # ========================================================================
+  # NVIDIA Fabric Manager - ONLY for A100-SXM4 (NVSwitch) systems
+  # ========================================================================
+  if [ "$IS_A100" = "true" ]; then
+  # On p4d/p4de instances with A100-SXM4 GPUs connected via NVSwitch:
+  #   - CUDA Error 802 ("system not yet initialized") occurs without Fabric Manager
+  #   - nvidia-smi shows GPUs but CUDA runtime cannot access them
+  #   - NVLink topology shows only PCIe (PHB/NODE/SYS) instead of NV#
+  #
+  # The Fabric Manager service is REQUIRED to:
+  #   - Initialize the NVSwitch fabric topology
+  #   - Enable peer-to-peer GPU communication via NVLink
+  #   - Allow CUDA runtime to properly enumerate and access GPUs
+  # ========================================================================
+  echo "=== Installing NVIDIA Fabric Manager for A100-SXM4 NVSwitch support ==="
+
+  # Get the FULL driver version (e.g., 535.216.01) to install EXACT matching Fabric Manager
+  # The Fabric Manager MUST match the driver version EXACTLY or it will fail to start
+  # Note: Use --id=0 to query single GPU instead of piping to head (avoids SIGPIPE with set -e)
+  DRIVER_VERSION_FULL=$(nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader)
+  DRIVER_VERSION_MAJOR=$(echo "$DRIVER_VERSION_FULL" | cut -d. -f1)
+  echo "Detected NVIDIA driver version: $DRIVER_VERSION_FULL (major: $DRIVER_VERSION_MAJOR)"
+
+  # Check if Fabric Manager is already installed and running
+  if systemctl is-active --quiet nvidia-fabricmanager 2>/dev/null; then
+    echo "✅ NVIDIA Fabric Manager is already running"
+  else
+    echo "Installing NVIDIA Fabric Manager..."
+    sudo apt-get update
+
+    # Check available Fabric Manager versions
+    echo "Available Fabric Manager versions:"
+    apt-cache madison nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}} 2>/dev/null | awk 'NR<=5' || true
+
+    # Try to install the EXACT version matching the driver
+    # Format: nvidia-fabricmanager-535=535.216.01-1
+    FM_INSTALLED=false
+    echo "Attempting to install exact version: nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}}=${{DRIVER_VERSION_FULL}}-1"
+    if sudo apt-get install -y "nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}}=${{DRIVER_VERSION_FULL}}-1" 2>/dev/null; then
+      echo "✅ Installed exact Fabric Manager version ${{DRIVER_VERSION_FULL}}"
+      FM_INSTALLED=true
+    fi
+
+    # If exact version failed, we need to UPDATE the driver to match available Fabric Manager
+    if [ "$FM_INSTALLED" = "false" ]; then
+      echo "⚠️  Exact Fabric Manager version ${{DRIVER_VERSION_FULL}} not available in apt repository"
+      echo "The AWS AMI has driver ${{DRIVER_VERSION_FULL}} but NVIDIA repo has newer Fabric Manager"
+      echo ""
+      echo "Solution: Update NVIDIA driver to match the available Fabric Manager version"
+
+      # Get the latest available Fabric Manager version for this major
+      # Note: Use awk 'NR==1' instead of head -1 to avoid SIGPIPE with set -e
+      FM_LATEST=$(apt-cache madison nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}} 2>/dev/null | awk 'NR==1 {{print $3}}' | sed 's/-1$//')
+      echo "Latest available Fabric Manager: $FM_LATEST"
+
+      if [ -n "$FM_LATEST" ]; then
+        echo "Updating NVIDIA driver to version $FM_LATEST to match Fabric Manager..."
+
+        # Install matching driver version
+        # The driver package is nvidia-driver-535 or similar
+        sudo apt-get install -y --allow-downgrades \
+          nvidia-driver-${{DRIVER_VERSION_MAJOR}}=${{FM_LATEST}}-1 \
+          nvidia-dkms-${{DRIVER_VERSION_MAJOR}}=${{FM_LATEST}}-1 \
+          nvidia-kernel-source-${{DRIVER_VERSION_MAJOR}}=${{FM_LATEST}}-1 \
+          2>/dev/null || {{
+            echo "Could not update driver, trying alternative approach..."
+            # Try installing just the Fabric Manager - sometimes the versions are close enough
+            sudo apt-get install -y nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}} || true
+          }}
+
+        # Now install Fabric Manager
+        sudo apt-get install -y nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}} || true
+        FM_INSTALLED=true
+      fi
+    fi
+
+    # Start and enable the Fabric Manager service
+    echo "Starting NVIDIA Fabric Manager service..."
+    sudo systemctl start nvidia-fabricmanager || echo "Warning: Failed to start Fabric Manager"
+    sudo systemctl enable nvidia-fabricmanager || echo "Warning: Failed to enable Fabric Manager"
+
+    # Give Fabric Manager time to initialize the NVSwitch fabric
+    echo "Waiting for Fabric Manager to initialize NVSwitch fabric..."
+    sleep 5
+
+    # Verify Fabric Manager is running
+    if systemctl is-active --quiet nvidia-fabricmanager; then
+      echo "✅ NVIDIA Fabric Manager started successfully"
+      # Verify new driver version (use --id=0 to avoid SIGPIPE)
+      nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader
+    else
+      echo "⚠️  NVIDIA Fabric Manager failed to start"
+      echo "This usually means version mismatch between driver and Fabric Manager"
+      echo "Driver version: $(nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader)"
+      echo "Installed Fabric Manager:"
+      dpkg -l | grep nvidia-fabricmanager || true
+      systemctl status nvidia-fabricmanager 2>&1 || true
+      echo ""
+      echo "⚠️  CUDA will NOT work on this A100-SXM4 instance without Fabric Manager!"
+      echo "⚠️  Consider using a different AMI with matching driver/Fabric Manager versions"
+    fi
+  fi
+
+  # Verify NVLink topology after Fabric Manager
+  echo "=== Verifying NVLink topology ==="
+  nvidia-smi topo -m 2>&1 | awk 'NR<=20' || echo "NVLink topology check failed"
+  echo "================================="
+  fi  # End of A100-specific Fabric Manager section
+
   python3 -m pip install -U pip
   python3 -m pip install -U uv
 
   uv venv --python 3.12 --seed
   source .venv/bin/activate
 
-  # Install vLLM and LMCache
-
+  # Install dependencies
   uv pip install "datasets" "requests" "pynvml"
-  uv pip install "vllm==0.10.0" # old vllm
-  # uv pip install "lmcache==0.3.11"
-  git clone https://github.com/lmcache/lmcache.git
-  cd lmcache
-  git checkout v0.3.6
-  uv pip install . --no-build-isolation
-  cd ..
 
+  # ========================================================================
+  # vLLM + PyTorch Installation - GPU-specific versions
+  # ========================================================================
+  # A100 (p4d/p4de): driver 535.x only supports CUDA 12.1, needs vLLM 0.7.3 + torch 2.5.1
+  # L40S/L4/others: driver 550.x+ supports CUDA 12.4, can use vLLM 0.10.0 + torch 2.7.1
+  # ========================================================================
+
+  if [ "$IS_A100" = "true" ]; then
+    # A100-specific: older driver requires cu121 and older vLLM
+    echo "=== Installing PyTorch 2.5.1 with CUDA 12.1 (for A100 driver 535.x) ==="
+    uv pip install --index-url https://download.pytorch.org/whl/cu121 \
+      "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+
+    echo "=== Installing vLLM 0.7.3 (for A100 with torch 2.5.x) ==="
+    uv pip install --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu121 "vllm==0.7.3"
+  else
+    # L40S/L4/others: use latest stable vLLM with default PyTorch
+    echo "=== Installing vLLM 0.10.0 (latest stable for L40S/L4/other GPUs) ==="
+    uv pip install "vllm==0.10.0"
+  fi
+
+  # Verify PyTorch has CUDA support
+  echo "=== PyTorch CUDA Check ==="
+  python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.version.cuda:', torch.version.cuda); print('torch.__version__:', torch.__version__); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A')" || echo "PyTorch CUDA check failed!"
+  echo "==========================="
+  
+  # ========================================================================
+  # LMCACHE DISABLED FOR DEBUGGING CUDA ISSUES
+  # LMCache may be overwriting torch with CPU-only version causing CUDA errors
+  # Re-enable once CUDA is working on A100
+  # ========================================================================
+  # # Install LMCache v0.2.1 (compatible with vLLM 0.7.x)
+  # # See: https://docs.lmcache.ai/getting_started/installation.html
+  # # Note: v0.2.2 doesn't exist! Available v0.2.x tags: v0.2.0, v0.2.1
+  # # Using --no-build-isolation to ensure torch version compatibility
+  # rm -rf lmcache
+  # git clone https://github.com/lmcache/lmcache.git
+  # cd lmcache
+  # git checkout v0.2.1
+  # # Set CUDA architecture explicitly to avoid auto-detection (which may fail during setup)
+  # # A100 = 8.0, L40S = 8.9, L4 = 7.5, H100 = 9.0
+  # export TORCH_CUDA_ARCH_LIST="8.0;8.9;7.5;9.0"
+  # export FORCE_CUDA="1"
+  # uv pip install . --no-build-isolation || {{
+  #   # Fallback: try with just A100 arch (most common)
+  #   export TORCH_CUDA_ARCH_LIST="8.0"
+  #   uv pip install . --no-build-isolation
+  # }}
+  # cd ..
+
+  # # ========================================================================
+  # # CRITICAL FIX: LMCache dependencies overwrite torch with CPU-only version!
+  # # The log showed: - torch==2.5.1+cu121  ->  + torch==2.7.0 (CPU-only)
+  # # We MUST force reinstall CUDA-enabled torch AFTER LMCache installation
+  # # Using cu121 for A100 driver 535.x compatibility
+  # # ========================================================================
+  # echo "=== CRITICAL: Reinstalling PyTorch with CUDA 12.1 (after LMCache) ==="
+  # uv pip install --force-reinstall --index-url https://download.pytorch.org/whl/cu121 \
+  #   "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+
+  # # Verify torch is now CUDA-enabled
+  # echo "=== Verifying torch CUDA after reinstall ==="
+  # python3 -c "import torch; print('torch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('CUDA version:', torch.version.cuda)"
+
+  echo "=== LMCACHE DISABLED - Skipping LMCache installation ==="
   mkdir -p /tmp/lmcache_disk
 
 run: |
   set -euxo pipefail
-  source .venv/bin/activate {ray_run}
+
+  # CRITICAL: Set LD_LIBRARY_PATH for CUDA libraries FIRST
+  # This must be done before any Python imports that use CUDA
+  export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${{LD_LIBRARY_PATH:-}}"
+  export CUDA_HOME="${{CUDA_HOME:-/usr/local/cuda}}"
+
+  # Diagnostics before running benchmark
+  echo "=== Pre-run Diagnostics ==="
+  nvidia-smi || echo "WARNING: nvidia-smi not available in run phase!"
+
+  # A100-SXM4 specific diagnostics - check for Fabric Manager
+  echo "--- A100 SXM4 Diagnostics ---"
+  echo "Checking NVIDIA Fabric Manager (required for NVSwitch on A100-SXM4)..."
+  systemctl status nvidia-fabricmanager 2>&1 || echo "Fabric Manager status check failed or not present"
+
+  echo "Checking for NVLink topology..."
+  nvidia-smi topo -m 2>&1 || echo "NVLink topology check failed"
+
+  echo "Checking for GPU processes and errors..."
+  nvidia-smi -q -d ERRORS 2>&1 | awk 'NR<=50' || echo "Error check failed"
+
+  echo "--- CUDA Device Query ---"
+  # Try direct CUDA device query through Python (single line to avoid YAML issues)
+  python3 -c "import ctypes; cudart = ctypes.CDLL('libcudart.so.12'); count = ctypes.c_int(); result = cudart.cudaGetDeviceCount(ctypes.byref(count)); print(f'cudaGetDeviceCount result: {{result}} (0=success), device count: {{count.value}}')" 2>&1 || echo "Direct CUDA query script failed"
+  echo "==========================="
+
+  source .venv/bin/activate
+
+  # Critical: Detailed PyTorch CUDA diagnostics before running benchmark
+  echo "=== DETAILED PyTorch CUDA Diagnostics (in run phase) ==="
+  echo "--- Environment ---"
+  echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH" || true
+  echo "CUDA_HOME: $CUDA_HOME" || true
+  which python3
+  echo "--- Torch info ---"
+  python3 -c "import torch; print('torch.__version__:', torch.__version__); print('torch.__file__:', torch.__file__); print('torch.version.cuda:', torch.version.cuda); print('torch.backends.cuda.is_built():', torch.backends.cuda.is_built())"
+  echo "--- CUDA check ---"
+  python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A - checking why...')"
+  echo "--- Loading CUDA libs directly ---"
+  python3 -c "import ctypes; libs=['libcuda.so.1','libcudart.so.12','libnvidia-ml.so.1']; [print(l+': OK') if ctypes.CDLL(l) else None for l in libs]" 2>&1 || echo "Some libs failed"
+  echo "--- Manual CUDA init attempt ---"
+  python3 -c "import torch; torch.cuda.init(); print('torch.cuda.init() OK, device_count:', torch.cuda.device_count())" 2>&1 || echo "CUDA init failed"
+  echo "--- Installed torch packages ---"
+  pip list | grep -i -E "torch|nvidia|cuda|triton"
+  echo "========================================="
+{ray_run}
 
   echo "Cluster ready for benchmarking"
 """
@@ -403,16 +711,42 @@ os.environ["LMCACHE_LOG_LEVEL"] = "INFO"
 import requests
 import json
 import time
-import torch
 import gc
+
+# DO NOT import torch or call any CUDA functions before vLLM!
+# vLLM 0.10.0's V1 engine uses multiprocessing with fork.
+# If CUDA is initialized before fork, workers fail with:
+#   "Cannot re-initialize CUDA in forked subprocess"
+# Let vLLM handle CUDA initialization internally.
+
 import ray
 from datasets import load_dataset
 from vllm import LLM, SamplingParams
-from vllm.config import KVTransferConfig
-from vllm.distributed import cleanup_dist_env_and_memory
+
+# Import torch AFTER vLLM to avoid "Cannot re-initialize CUDA in forked subprocess" error
+# vLLM 0.10.0's V1 engine uses multiprocessing with fork, and CUDA must not be initialized before fork
+import torch
+
+# Handle API differences between vLLM versions
+try:
+    from vllm.config import KVTransferConfig
+except ImportError:
+    KVTransferConfig = None
+
+try:
+    from vllm.distributed import cleanup_dist_env_and_memory
+except ImportError:
+    # Fallback for older vLLM versions
+    def cleanup_dist_env_and_memory(shutdown_ray=True):
+        import gc
+        import torch
+        gc.collect()
+        torch.cuda.empty_cache()
+        if shutdown_ray:
+            ray.shutdown()
+
 import shutil
 import subprocess
-import time
 import threading
 from collections import defaultdict
 
@@ -557,7 +891,7 @@ class DistributedGPUMonitor:
             # Create a placement group with one bundle per node
             bundles = [{{"CPU": 0.1}} for _ in alive_nodes]
             pg = placement_group(bundles, strategy="STRICT_SPREAD")
-            ray.get(pg.ready(), timeout=30.0)
+            ray.get(pg.ready(), timeout=60.0)  # Increased timeout for heavy Ray load
             print(f"   Created placement group with {{len(bundles)}} bundles")
             
             # Create actors using placement group
@@ -601,7 +935,7 @@ class DistributedGPUMonitor:
                     
                     # Try to get the Ray node where the actor is actually running
                     try:
-                        ray_node_id = ray.get(actor.get_ray_node_id.remote(), timeout=5.0)
+                        ray_node_id = ray.get(actor.get_ray_node_id.remote(), timeout=15.0)  # Increased timeout
                         print(f"     Actor running on Ray node: {{ray_node_id}}")
                     except Exception as node_check_err:
                         print(f"     Could not determine actor node: {{node_check_err}}")
@@ -611,14 +945,16 @@ class DistributedGPUMonitor:
                     traceback.print_exc()
 
         # Start all actors with individual timeouts to avoid hanging
+        # Use longer timeouts when Ray is under heavy load (e.g., from vLLM)
         print(f"   Starting monitoring on {{len(self.actors)}} nodes...")
         started_count = 0
         for idx, actor in enumerate(self.actors):
             try:
                 # Start each actor individually with timeout
+                # Increased timeout to handle Ray being busy with vLLM operations
                 print(f"   Starting monitor on node{{idx}}...")
                 future = actor.start.remote()
-                ray.get(future, timeout=10.0)  # 10 second timeout per actor
+                ray.get(future, timeout=30.0)  # Increased from 10s to 30s for heavy Ray load
                 started_count += 1
                 print(f"   ✓ Started monitor on node{{idx}}")
             except Exception as e:
@@ -629,9 +965,13 @@ class DistributedGPUMonitor:
         
         if started_count > 0:
             print(f"📊 GPU monitoring started on {{started_count}}/{{len(self.actors)}} nodes")
+            return True  # Success
         else:
             print(f"⚠️  Warning: No actors started successfully. Falling back to local monitoring.")
-            raise Exception("Failed to start any distributed GPU monitors")
+            # Clear actors so fallback works
+            self.actors = []
+            self.node_map = {{}}  # Empty dict - escaped for f-string
+            return False  # Failed - should fall back to local
 
     def stop(self):
         """Stop all monitor actors."""
@@ -1037,15 +1377,33 @@ def get_vllm_config_info(llm):
         # Scheduler config (concurrency settings)
         if hasattr(engine, 'scheduler_config'):
             sched_cfg = engine.scheduler_config
+            # Extract scheduler config attributes
             config_info['max_num_seqs'] = getattr(sched_cfg, 'max_num_seqs', None)
             config_info['max_num_batched_tokens'] = getattr(sched_cfg, 'max_num_batched_tokens', None)
             config_info['max_model_len'] = getattr(sched_cfg, 'max_model_len', None)
             config_info['chunked_prefill_enabled'] = getattr(sched_cfg, 'chunked_prefill_enabled', None)
             config_info['max_paddings'] = getattr(sched_cfg, 'max_paddings', None)
             config_info['delay_factor'] = getattr(sched_cfg, 'delay_factor', None)
-            config_info['enable_chunked_prefill'] = getattr(sched_cfg, 'enable_chunked_prefill', None)
             config_info['chunked_prefill_size'] = getattr(sched_cfg, 'chunked_prefill_size', None)
             config_info['max_seq_len'] = getattr(sched_cfg, 'max_seq_len', None)
+            config_info['policy'] = getattr(sched_cfg, 'policy', None)
+            config_info['long_prefill_token_threshold'] = getattr(sched_cfg, 'long_prefill_token_threshold', None)
+            config_info['max_long_partial_prefills'] = getattr(sched_cfg, 'max_long_partial_prefills', None)
+        
+        # Also check scheduler instance (not just config) for runtime values
+        if hasattr(engine, 'scheduler'):
+            scheduler = engine.scheduler
+            # Try to get runtime scheduler values if config doesn't have them
+            if config_info.get('max_num_seqs') is None:
+                config_info['max_num_seqs'] = getattr(scheduler, 'max_num_seqs', None)
+            if config_info.get('max_num_batched_tokens') is None:
+                config_info['max_num_batched_tokens'] = getattr(scheduler, 'max_num_batched_tokens', None)
+        
+        # Ensure these keys exist even if scheduler_config doesn't exist or attributes are missing
+        if 'max_num_seqs' not in config_info:
+            config_info['max_num_seqs'] = None
+        if 'max_num_batched_tokens' not in config_info:
+            config_info['max_num_batched_tokens'] = None
 
         # Model config
         if hasattr(engine, 'model_config'):
@@ -1069,7 +1427,13 @@ def get_vllm_config_info(llm):
         if hasattr(engine, 'decoding_config'):
             decoding_cfg = engine.decoding_config
             config_info['use_chunked_prefill'] = getattr(decoding_cfg, 'use_chunked_prefill', None)
-            config_info['max_num_batched_tokens'] = getattr(decoding_cfg, 'max_num_batched_tokens', None)
+            # Prefer decoding_config value, but keep scheduler_config value if decoding_config doesn't have it
+            decoding_max_batched = getattr(decoding_cfg, 'max_num_batched_tokens', None)
+            if decoding_max_batched is not None:
+                config_info['max_num_batched_tokens'] = decoding_max_batched
+            # If not set yet, ensure it's at least None
+            if 'max_num_batched_tokens' not in config_info:
+                config_info['max_num_batched_tokens'] = None
 
         # Check for LMCache configuration
         try:
@@ -1247,7 +1611,21 @@ def run_benchmark(exp):
         print(f"✅ Warmup complete, starting actual measurement")
 
         # Start GPU monitoring
-        gpu_monitor.start()
+        # If distributed monitoring fails, it will fall back gracefully
+        if use_distributed:
+            try:
+                success = gpu_monitor.start()
+                if not success or (hasattr(gpu_monitor, 'actors') and len(gpu_monitor.actors) == 0):
+                    print("⚠️  Distributed monitoring failed, falling back to local")
+                    raise Exception("Distributed monitoring not available")
+            except Exception as monitor_error:
+                print(f"⚠️  Failed to start distributed GPU monitoring: {{monitor_error}}")
+                print("📊 Falling back to local GPU monitoring")
+                gpu_monitor = GPUMonitor(sample_interval=0.5)
+                use_distributed = False
+                gpu_monitor.start()
+        else:
+            gpu_monitor.start()
 
         # Start scheduler monitoring (queue depths)
         scheduler_monitor = SchedulerMonitor(llm, sample_interval=0.25)
@@ -1487,7 +1865,10 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
     # Include input/output length in cluster name to avoid conflicts across IO groups
     input_len = experiments[0]['max_input_length']
     output_len = experiments[0]['max_output_length']
-    cluster_name = f"roofline-tp{tp}-pp{pp}-{input_len}in-{output_len}out"
+    # Include GPU type in cluster name to avoid conflicts when using different GPU types
+    # Normalize GPU type for use in filenames (replace special chars)
+    gpu_type_safe = gpu_type.replace("_", "-").replace("/", "-")
+    cluster_name = f"roofline-tp{tp}-pp{pp}-{input_len}in-{output_len}out-{gpu_type_safe}"
 
     # Create consolidated result directory with datetime
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1543,6 +1924,22 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
     work_dir.mkdir(exist_ok=True)
     yaml_path = work_dir / f"{cluster_name}.yaml"
     script_path = work_dir / f"benchmark_{cluster_name}.py"
+    
+    # Clean up old files without GPU type in name (if they match this config)
+    # This prevents confusion from old files that might have different GPU types
+    old_yaml_pattern = f"roofline-tp{tp}-pp{pp}-{input_len}in-{output_len}out.yaml"
+    old_script_pattern = f"benchmark_roofline-tp{tp}-pp{pp}-{input_len}in-{output_len}out.py"
+    old_yaml_path = work_dir / old_yaml_pattern
+    old_script_path = work_dir / old_script_pattern
+    
+    # Only remove if they exist and don't match the new naming (i.e., no GPU type suffix)
+    if old_yaml_path.exists() and old_yaml_path != yaml_path:
+        logger.info(f"🗑️  Removing old YAML file: {old_yaml_path.name} (replaced by GPU-type-specific file)")
+        old_yaml_path.unlink()
+    if old_script_path.exists() and old_script_path != script_path:
+        logger.info(f"🗑️  Removing old script file: {old_script_path.name} (replaced by GPU-type-specific file)")
+        old_script_path.unlink()
+    
     yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type)
     yaml_path.write_text(yaml_content)
 
@@ -1723,8 +2120,18 @@ Examples:
                        help=f'GPU type to use (default: {DEFAULT_GPU_TYPE})')
     parser.add_argument('--run', action='store_true',
                        help='Actually launch clusters (default: dry run)')
+    parser.add_argument('--cleanup', action='store_true',
+                       help='Clean up old benchmark files without GPU type in their names')
     
     args = parser.parse_args()
+    
+    # Handle cleanup option
+    if args.cleanup:
+        print("🧹 Cleaning up old benchmark files...")
+        cleanup_old_benchmark_files()
+        if not args.run and args.csv_file == parser.get_default('csv_file'):
+            # If only cleanup was requested (no other args), exit after cleanup
+            return
     
     csv_path = args.csv_file
     gpu_type = args.gpu_type
