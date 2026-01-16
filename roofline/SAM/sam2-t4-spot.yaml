@@ -1,28 +1,24 @@
-name: sam2-benchmark
+name: sam2-test
 
 resources:
   accelerators: T4:1
-  use_spot: true
+  use_spot: true  # Use on-demand for testing (more reliable)
   disk_size: 100
-  memory: "16GB+"
-  job_recovery:
-    strategy: EAGER_NEXT_REGION  # Move to new region on preemption
+  ports: 8080
+  # image_id: docker:choprahetarth/sam2-server:latest
 
 workdir: .
 
 setup: |
-  set -euxo pipefail
-  
-  # Install SAM2
-  pip install torch torchvision
-  pip install git+https://github.com/facebookresearch/sam2.git
-  
-  # Download model checkpoint (using tiny for T4 - fits in memory nicely)
-  mkdir -p checkpoints
-  cd checkpoints
-  wget -q https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt
-  cd ..
+  echo "Using pre-built Docker image choprahetarth/sam2-server"
+  echo "No installation required - cold start will be FAST!"
+  docker pull choprahetarth/sam2-server:latest
+
 
 run: |
-  set -euxo pipefail
-  python benchmark_sam2.py
+  echo "Docker container starting SAM2 server..."
+  docker run --rm \
+    --gpus all \
+    -p 8080:8080 \
+    --name sam2-server \
+    choprahetarth/sam2-server:latest
