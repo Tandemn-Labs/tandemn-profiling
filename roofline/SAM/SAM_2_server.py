@@ -65,6 +65,7 @@ def predict():
             {"point": [x,y]. "label": 1},
             {"point": [x,y]. "label": 1}
         ]
+        "multimask_output": true/false
     }
 
     Output - 
@@ -86,7 +87,7 @@ def predict():
     
     # the image is processed, now get the prompts
     prompts = data.get("prompts", [])
-
+    multimask_output = data.get("multimask_output", True)
     # encode the image
     encode_start = time.time()
     predictor.set_image(image_np)
@@ -103,7 +104,7 @@ def predict():
         masks, scores, logits = predictor.predict(
             point_coords=point,
             point_labels=label,
-            multimask_output=True,
+            multimask_output=multimask_output,
         )
         prompt_result = {
             "prompt_id": 1,
