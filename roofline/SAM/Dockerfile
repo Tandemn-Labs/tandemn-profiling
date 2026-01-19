@@ -11,7 +11,10 @@ RUN pip install --no-cache-dir \
     torch==2.9.1 \
     torchvision==0.24.1 \
     flask==3.1.2 \
-    pillow==12.1.0
+    pillow==12.1.0 \
+    gunicorn \ 
+    pycocotools \
+    gevent
 RUN pip install --no-cache-dir git+https://github.com/facebookresearch/sam2.git
 RUN mkdir -p /app/checkpoints && \
     cd /app/checkpoints && \
@@ -21,4 +24,5 @@ RUN python3 -c "import sam2; import os; import shutil; \
     shutil.copytree(os.path.join(sam2_path, 'configs'), '/app/configs')"
 COPY SAM_2_server.py /app/
 EXPOSE 8080
-CMD ["python3", "SAM_2_server.py", "--port", "8080", "--host", "0.0.0.0"]
+# CMD ["python3", "SAM_2_server.py", "--port", "8080", "--host", "0.0.0.0"]
+CMD ["gunicorn", "SAM_2_server:app", "--bind", "0.0.0.0:8080", "--workers", "1", "--worker-class", "gevent", "--worker-connections", "100", "--timeout", "120"]
