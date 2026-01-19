@@ -1,19 +1,20 @@
 """
 Just a Flask Server for Deploying SAM2
 """
-import io 
-import json
+import io
 import time
 import logging
-import torch
-from flask import Flask, request, jsonify
+import base64
+import argparse
+
 import torch
 import numpy as np
 from PIL import Image
+from flask import Flask, request, jsonify
+from pycocotools import mask as mask_utils
+
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
-import base64
-import argparse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,6 +27,24 @@ app = Flask(__name__)
 # we have a global model object 
 predictor = None
 
+
+def mask_to_rle(binary_mask):
+    """
+    Convert a binary mask to COCO RLE format.
+    
+    Args:
+        binary_mask: numpy array of shape (H, W) with boolean or 0/1 values
+        
+    Returns:
+        dict with 'size' [H, W] and 'counts' (RLE string)
+    """
+    # pycocotools requires Fortran-order array
+    fortran_mask = np.asfortranarray(binary_mask.astype(np.uint8))
+    rle = mask_utils.encode(fortran_mask)
+    # Convert bytes to string for JSON serialization
+    rle['counts'] = rle['counts'].decode('utf-8')
+    return rle
+
 def load_model():
     """Load the SAM2 Model"""
     global predictor
@@ -34,6 +53,9 @@ def load_model():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logger.info(f"Using device: {device}")
     sam2 = build_sam2(MODEL_CFG, CHECKPOINT, device=device)
+    if device == "cuda" and hasattr(torch, 'compile'):
+        logger.info("Compiling model with torch.compile()...")
+        sam2 = torch.compile(sam2, mode="reduce-overhead")
     predictor = SAM2ImagePredictor(sam2)
     logger.info(f"Model loaded in {time.time() - start:.2f} seconds")
     logger.info("Warming up the model...")
@@ -60,23 +82,43 @@ def predict():
 
     Input - 
     {
-        "Image" : "base64 encpded image",
+        "image" : "base64 encoded image",
         "prompts": [
-            {"point": [x,y]. "label": 1},
-            {"point": [x,y]. "label": 1}
-        ]
+            {"point": [x,y], "label": 1},
+            {"point": [x,y], "label": 1}
+        ],
         "multimask_output": true/false
     }
 
     Output - 
     {
         "success": true,
-        "results": results in base64 encoded format
-        "num_prompts": number of prompts
-        "encode_time": time taken to encode the image
-        "predict_time": time taken to predict the masks
-        "total_time": total time taken to process the request
+        "results": [
+            {
+                "prompt_id": 0,
+                "num_masks": 3,
+                "scores": [0.95, 0.87, 0.72],
+                "masks": [
+                    {
+                        "size": [H, W],
+                        "counts": "RLE encoded string"
+                    },
+                    ...
+                ]
+            },
+            ...
+        ],
+        "image_size": [H, W],
+        "num_prompts": number of prompts,
+        "encode_time": time taken to encode the image (ms),
+        "predict_time": time taken to predict the masks (ms),
+        "total_time": total time taken to process the request (ms)
     }
+    
+    Note: Masks are returned in COCO RLE format. To decode on client side:
+        from pycocotools import mask as mask_utils
+        rle['counts'] = rle['counts'].encode('utf-8')
+        binary_mask = mask_utils.decode(rle)
     """
     start_time = time.time()
     data = request.get_json()
@@ -90,42 +132,41 @@ def predict():
     multimask_output = data.get("multimask_output", True)
     # encode the image
     encode_start = time.time()
-    predictor.set_image(image_np)
-    encode_time = time.time() - encode_start
+    with torch.inference_mode():
+        # predictor.set_image(image_np)
+        with torch.autocast("cuda", dtype=torch.float16):
+            encode_time = time.time() - encode_start
+            predictor.set_image(image_np)
+            predict_start = time.time()
+            results = []
 
-    # run the predictions
-    predict_start = time.time()
-    results = []
-
-    for i, prompt in enumerate(prompts):
-        point = np.array([[prompt["point"][0], prompt["point"][1]]])
-        label = np.array([prompt["label"]])
-
-        masks, scores, logits = predictor.predict(
-            point_coords=point,
-            point_labels=label,
-            multimask_output=multimask_output,
-        )
-        prompt_result = {
-            "prompt_id": 1,
-            "num_masks": len(masks),
-            "scores": scores.tolist(),
-        }
-        mask_images = []
-        for mask in masks:
-            mask_img = Image.fromarray((mask * 255).astype(np.uint8))
-            buffer = io.BytesIO()
-            mask_img.save(buffer, format='PNG')
-            mask_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-            mask_images.append(mask_b64)
-        prompt_result["masks_png"] = mask_images
-        results.append(prompt_result)
-    predict_time = time.time() - predict_start
+            for i, prompt in enumerate(prompts):
+                point = np.array([[prompt["point"][0], prompt["point"][1]]])
+                label = np.array([prompt["label"]])
+                masks, scores, logits = predictor.predict(
+                    point_coords=point,
+                    point_labels=label,
+                    multimask_output=multimask_output,
+                )
+                prompt_result = {
+                    "prompt_id": i,
+                    "num_masks": len(masks),
+                    "scores": scores.tolist(),
+                }
+                # Encode masks as COCO RLE (much faster than PNG)
+                mask_rles = []
+                for mask in masks:
+                    rle = mask_to_rle(mask)
+                    mask_rles.append(rle)
+                prompt_result["masks"] = mask_rles
+                results.append(prompt_result)
+            predict_time = time.time() - predict_start
     total_time = time.time() - start_time
 
     return jsonify({
         "success": True,
         "results": results,
+        "image_size": [image_np.shape[0], image_np.shape[1]],  # [H, W]
         "num_prompts": len(prompts),
         "encode_time": encode_time * 1000,
         "predict_time": predict_time * 1000,
@@ -143,12 +184,12 @@ def info():
         "ready": predictor is not None
     }), 200
 
+load_model()
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8080)
     parser.add_argument('--host', type=str, default='0.0.0.0')
     args = parser.parse_args()
     
-    load_model()
     logger.info(f"Starting server on {args.host}:{args.port}")
-    app.run(host=args.host, port=args.port, threaded=True)
+    app.run(host=args.host, port=args.port, threaded=False)
