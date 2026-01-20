@@ -74,6 +74,14 @@ GPU_CONFIGS = {
 # Default GPU type (for backward compatibility)
 DEFAULT_GPU_TYPE = "L40S"
 
+# VM selection strategies for mapping (TP, PP) -> (gpus_per_node, num_nodes)
+# - prefer_single_node: Strategy 1 then fallback to Strategy 2 (current/default behavior)
+# - fit_tp_then_scale: Always use Strategy 2 (fit TP within a node, then scale nodes)
+VM_SELECTION_STRATEGIES = {
+    "prefer_single_node": "Prefer single-node when TP×PP fits; otherwise fit TP per node and scale.",
+    "fit_tp_then_scale": "Always fit TP per node (smallest instance >= TP) and scale nodes.",
+}
+
 # Global logger instance
 logger = logging.getLogger("benchmark")
 
@@ -166,16 +174,21 @@ atexit.register(cleanup_on_exit)
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
-def get_cluster_config(tp, pp, gpu_type=DEFAULT_GPU_TYPE):
+def get_cluster_config(tp, pp, gpu_type=DEFAULT_GPU_TYPE, vm_strategy="prefer_single_node"):
     """
     Calculate the best instance configuration for given TP/PP and GPU type.
 
     Returns (gpus_per_node, num_nodes) that can accommodate TP×PP GPUs.
 
+    Strategy:
+    1. Prefer single-node configurations when possible (better for PP communication)
+    2. Otherwise, use smallest instance that fits TP GPUs per node
+
     Examples:
-        TP=4, PP=2 → 4 GPUs/node × 2 nodes = 8 GPUs (TP fits in one node)
-        TP=2, PP=4 → 4 GPUs/node × 2 nodes = 8 GPUs (2 TP groups per node, 2 PP stages per node)
+        TP=4, PP=2 → 8 GPUs/node × 1 node = 8 GPUs (single node preferred, avoids inter-node latency)
+        TP=2, PP=4 → 8 GPUs/node × 1 node = 8 GPUs (single node preferred if available)
         TP=8, PP=1 → 8 GPUs/node × 1 node = 8 GPUs
+        TP=4, PP=4 → 4 GPUs/node × 4 nodes = 16 GPUs (no single instance fits 16 GPUs, falls back to multi-node)
     """
     if pp < 1:
         raise ValueError(f"Invalid PP={pp}. Must be >= 1")
@@ -184,10 +197,28 @@ def get_cluster_config(tp, pp, gpu_type=DEFAULT_GPU_TYPE):
     if gpu_type not in GPU_CONFIGS:
         raise ValueError(f"Invalid GPU type: {gpu_type}. Must be one of {list(GPU_CONFIGS.keys())}")
 
+    if vm_strategy not in VM_SELECTION_STRATEGIES:
+        raise ValueError(f"Invalid vm_strategy: {vm_strategy}. Must be one of {list(VM_SELECTION_STRATEGIES.keys())}")
+
     total_gpus = tp * pp
     available_gpus = GPU_CONFIGS[gpu_type]["available_gpus"]
 
-    # Find the smallest instance type that can fit TP GPUs (for fast TP communication)
+    # Strategy 1: Prefer single-node configuration if possible (better for PP communication)
+    # Only used when vm_strategy == "prefer_single_node".
+    if vm_strategy == "prefer_single_node":
+        # Check if there's an instance type that can fit all GPUs in one node
+        single_node_gpus = None
+        for gpu_count in available_gpus:
+            if gpu_count >= total_gpus:
+                single_node_gpus = gpu_count
+                break
+
+        if single_node_gpus is not None:
+            # Single node is possible and preferred (avoids inter-node network latency)
+            return single_node_gpus, 1
+
+    # Strategy 2: Multi-node fallback - find smallest instance that fits TP GPUs
+    # This ensures TP communication stays within a node (fast)
     gpus_per_node = None
     for gpu_count in available_gpus:
         if gpu_count >= tp:
@@ -222,15 +253,15 @@ def load_experiments(csv_path):
             })
     return experiments
 
-def group_by_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE):
+def group_by_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE, vm_strategy="prefer_single_node"):
     groups = defaultdict(list)
     for exp in experiments:
-        gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type)
+        gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type, vm_strategy=vm_strategy)
         key = (gpus_per_node, num_nodes)
         groups[key].append(exp)
     return dict(groups)
 
-def group_by_input_output_then_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE):
+def group_by_input_output_then_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE, vm_strategy="prefer_single_node"):
     """Group experiments first by input/output length, then by cluster config."""
     # First level: group by input/output length
     io_groups = defaultdict(list)
@@ -243,7 +274,7 @@ def group_by_input_output_then_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE):
     for io_key, io_exps in io_groups.items():
         cluster_groups = defaultdict(list)
         for exp in io_exps:
-            gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type)
+            gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type, vm_strategy=vm_strategy)
             cluster_key = (gpus_per_node, num_nodes)
             cluster_groups[cluster_key].append(exp)
         result[io_key] = dict(cluster_groups)
@@ -324,7 +355,7 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
   export LMCACHE_USE_LAYERWISE="True"
   export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR="True"
   export NCCL_P2P_DISABLE=0
-  export NCCL_P2P_LEVEL=SYS
+  # export NCCL_P2P_LEVEL=SYS
   # export NCCL_ALGO=Tree
   # export NCCL_MIN_NCHANNELS=4
   export NCCL_TIMEOUT=3600
@@ -383,8 +414,13 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
   # Run benchmark
   PYTHONHASHSEED=0 python roofline_benchmarks/benchmark_{cluster_name}.py
 
-  # Cleanup Ray
-  uv run ray stop
+  # Cleanup Ray (non-fatal - benchmark may have already cleaned up vLLM workers)
+  # vLLM's Ray workers for pipeline parallelism may still be active, causing Ray to crash during shutdown.
+  # This is a known issue: Ray workers holding GPU resources can't be cleanly shut down.
+  # Since the benchmark completed successfully, we don't fail the job if Ray cleanup has issues.
+  echo "Cleaning up Ray (this may show warnings if vLLM workers are still active)..."
+  sleep 2  # Give vLLM workers a moment to finish cleanup
+  uv run ray stop || echo "⚠️  Ray stop completed with warnings (this is OK - benchmark succeeded)"
         """
     # Handle A100 variants: Only specify accelerators, let SkyPilot choose instance
     # SkyPilot will automatically select the right instance type and install drivers
@@ -555,6 +591,9 @@ setup: |
   echo "================================="
   fi  # End of A100-specific Fabric Manager section
 
+  # Install numactl for NUMA diagnostics
+  sudo apt-get install -y numactl 2>/dev/null || echo "numactl installation skipped"
+
   python3 -m pip install -U pip
   python3 -m pip install -U uv
 
@@ -651,6 +690,30 @@ run: |
   echo "Checking for NVLink topology..."
   nvidia-smi topo -m 2>&1 || echo "NVLink topology check failed"
 
+  echo "--- NUMA Topology and GPU-NUMA Mapping ---"
+  echo "NUMA hardware layout:"
+  numactl --hardware 2>&1 || echo "numactl not available"
+  echo ""
+  echo "GPU PCIe Bus IDs and NUMA node assignments:"
+  gpu_count=$(nvidia-smi --query-gpu=count --format=csv,noheader 2>/dev/null | head -1 || echo "0")
+  if [ "$gpu_count" -gt 0 ] 2>/dev/null; then
+    for gpu in $(seq 0 $((gpu_count - 1))); do
+      bus=$(nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i $gpu 2>/dev/null)
+      if [ -n "$bus" ]; then
+        # Convert to lowercase and proper sysfs path format (0000:XX:YY.Z)
+        bus_lower=$(echo "$bus" | tr '[:upper:]' '[:lower:]')
+        numa_node=$(cat /sys/bus/pci/devices/$bus_lower/numa_node 2>/dev/null || echo "N/A")
+        local_cpus=$(cat /sys/bus/pci/devices/$bus_lower/local_cpulist 2>/dev/null || echo "N/A")
+        echo "GPU$gpu: PCIe=$bus, NUMA_node=$numa_node, local_cpus=$local_cpus"
+      else
+        echo "GPU$gpu: Could not get PCIe bus ID"
+      fi
+    done
+  else
+    echo "Could not detect GPU count"
+  fi
+  echo "-------------------------------------------"
+
   echo "Checking for GPU processes and errors..."
   nvidia-smi -q -d ERRORS 2>&1 | awk 'NR<=50' || echo "Error check failed"
 
@@ -683,7 +746,7 @@ run: |
   echo "Cluster ready for benchmarking"
 """
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463127774414770227/PX_asJ7IXfvQrff6vCW-yGL9k7pBk1v2ZMmRyzUdMNS3mht3pDVO8ligaclUAAFItbvz"
 
 def send_discord_message(message):
     payload = {"content": message}
@@ -1332,7 +1395,7 @@ class SchedulerMonitor:
         summary['scheduler_samples'] = len(self.timeseries)
         return summary
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463127774414770227/PX_asJ7IXfvQrff6vCW-yGL9k7pBk1v2ZMmRyzUdMNS3mht3pDVO8ligaclUAAFItbvz"
 
 def send_discord_message(message):
     payload = {{"content": message}}
@@ -1347,7 +1410,7 @@ os.makedirs(cache_dir, exist_ok=True)
 
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
-NUM_SAMPLES = 30
+NUM_SAMPLES = 50
 
 # Cluster pricing information
 INSTANCE_TYPE = "{cluster_instance_type}"
@@ -1533,11 +1596,12 @@ def run_benchmark(exp):
         )
 
         # Initialize GPU monitor AFTER LLM creation (Ray is now initialized)
-        # For PP > 1, we should use distributed monitoring. vLLM initializes Ray internally,
+        # For multi-node PP > 1, we should use distributed monitoring. vLLM initializes Ray internally,
         # but we need to explicitly connect to it using RAY_ADDRESS.
+        # For single-node setups (even with Ray), use local monitoring to avoid Ray timeout issues.
         use_distributed = False
         if backend == "ray":
-            print("📡 Attempting distributed GPU monitoring across Ray cluster...")
+            print("📡 Checking Ray cluster for GPU monitoring...")
             try:
                 # vLLM initializes Ray internally, but we need to connect to it explicitly
                 # Get Ray address from environment (set at the top of the script)
@@ -1555,8 +1619,9 @@ def run_benchmark(exp):
                     # Now check if we can access nodes
                     nodes = ray.nodes()
                     alive_nodes = [n for n in nodes if n.get('Alive', False)]
-                    ray_available = len(alive_nodes) > 0
-                    print(f"   Ray cluster detected: {{len(alive_nodes)}} alive nodes")
+                    num_nodes = len(alive_nodes)
+                    ray_available = num_nodes > 0
+                    print(f"   Ray cluster detected: {{num_nodes}} alive node(s)")
                     for idx, node in enumerate(alive_nodes):
                         node_id = node.get('NodeID', 'unknown')
                         print(f"      Node {{idx}}: {{node_id}}")
@@ -1564,12 +1629,21 @@ def run_benchmark(exp):
                     print(f"   Could not access Ray cluster: {{ray_check_error}}")
                     print(f"   Ray.is_initialized(): {{ray.is_initialized() if hasattr(ray, 'is_initialized') else 'N/A'}}")
                     print(f"   RAY_ADDRESS: {{ray_address}}")
+                    num_nodes = 0
                 
                 if ray_available:
-                    # Try to initialize distributed monitor
-                    gpu_monitor = DistributedGPUMonitor(sample_interval=0.5)
-                    use_distributed = True
-                    print("✅ Distributed GPU monitoring initialized successfully")
+                    # Only use distributed monitoring for multi-node setups
+                    # Single-node Ray clusters should use local monitoring to avoid timeout issues
+                    if num_nodes > 1:
+                        print(f"📡 Using distributed GPU monitoring ({{num_nodes}} nodes)")
+                        # Try to initialize distributed monitor
+                        gpu_monitor = DistributedGPUMonitor(sample_interval=0.5)
+                        use_distributed = True
+                        print("✅ Distributed GPU monitoring initialized successfully")
+                    else:
+                        print(f"📊 Using local GPU monitoring (single-node Ray cluster)")
+                        gpu_monitor = GPUMonitor(sample_interval=0.5)
+                        use_distributed = False
                 else:
                     raise Exception("Ray cluster not accessible")
             except Exception as e:
@@ -2019,34 +2093,91 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
         # Save updated results
         with open(local_results, 'w') as f:
             json.dump(results, f, indent=2)
-
+        
         # Save CSV in the same result directory with timestamp
         csv_filename = f"benchmark_results-{timestamp}.csv"
         csv_path = result_dir / csv_filename
         save_results_csv(results, str(csv_path))
 
+        # Automatically plot timeseries for successful experiments
+        try:
+            successful_ts_files = [
+                Path(r['timeseries_file'])
+                for r in results
+                if r.get('status') == 'success' and r.get('timeseries_file')
+            ]
+            if successful_ts_files:
+                logger.info(f"📈 Plotting timeseries for {len(successful_ts_files)} successful experiment(s)...")
+                # For now, call plot_timeseries.py once on the result directory;
+                # the script will discover all timeseries_*.json files inside.
+                subprocess.run(
+                    [
+                        "python",
+                        "plot_timeseries.py",
+                        str(result_dir),
+                        "--output",
+                        str(result_dir / "timeseries_plots.pdf"),
+                    ],
+                    check=False,
+                )
+        except Exception as plot_err:
+            logger.warning(f"⚠️  Failed to generate timeseries plots: {plot_err}")
+        
         logger.info(f"✅ Results saved to {result_dir}/")
         send_discord_message(f"✅ Results saved to {result_dir}")
         return results
 
     except Exception as e:
-        # Mark ALL experiments in this cluster as failed
+        # Cluster error occurred, but benchmark might have completed successfully
         logger.error(f"❌ Cluster error: {e}")
-        logger.info(f"📥 Attempting to fetch partial results...")
-        send_discord_message(f"❌ Cluster {cluster_name} FAILED: {str(e)[:100]}")
+        logger.info(f"📥 Attempting to fetch results (benchmark may have completed)...")
+        
+        fetched_results = None
         try:
-            logger.info(f"📥 Fetching results...")
+            logger.info(f"📥 Fetching results.json from cluster...")
             subprocess.run([
                 "scp",
                 f"{cluster_name}:/tmp/benchmark_results.json",
                 str(local_results)
             ], check=True)
-        except:
-            pass
-        failed_results = [{**exp, 'status': 'cluster_error', 'error': str(e)} for exp in experiments]
+            
+            # Best-effort fetch of timeseries files even when sky launch failed
+            logger.info(f"📈 Attempting to fetch timeseries data from cluster (best-effort)...")
+            subprocess.run([
+                "scp",
+                f"{cluster_name}:/tmp/timeseries_*.json",
+                str(result_dir)
+            ], check=False)  # Don't fail the cleanup path if timeseries are missing
+            
+            # Check if we successfully fetched valid results
+            if local_results.exists():
+                with open(local_results) as f:
+                    fetched_results = json.load(f)
+                    # Check if any results have 'success' status
+                    has_success = any(r.get('status') == 'success' for r in fetched_results)
+                    if has_success:
+                        logger.info(f"✅ Found successful benchmark results despite cluster error!")
+                        logger.info(f"   This is likely a cleanup error, not a benchmark failure.")
+                        send_discord_message(f"✅ Cluster {cluster_name} completed benchmarks but had a cleanup error: {str(e)[:80]}")
+                    else:
+                        send_discord_message(f"❌ Cluster {cluster_name} FAILED: {str(e)[:100]}")
+        except Exception as fetch_error:
+            logger.warning(f"⚠️  Could not fetch results: {fetch_error}")
+            send_discord_message(f"❌ Cluster {cluster_name} FAILED and results could not be fetched: {str(e)[:60]} | fetch error: {str(fetch_error)[:60]}")
         
-        # Rename directory to include -fail suffix for cluster errors
-        new_subdir_name = f"tp{tp}-pp{pp}-{timestamp}-fail"
+        # Use fetched results if they contain successful benchmarks, otherwise mark as failed
+        if fetched_results and any(r.get('status') == 'success' for r in fetched_results):
+            results = fetched_results
+            # Determine status suffix based on whether all succeeded
+            all_succeeded = all(r.get('status') == 'success' for r in results)
+            status_suffix = 'success' if all_succeeded else 'fail'
+        else:
+            # No valid results fetched, mark all as failed
+            results = [{**exp, 'status': 'cluster_error', 'error': str(e)} for exp in experiments]
+            status_suffix = 'fail'
+        
+        # Rename directory to include status suffix
+        new_subdir_name = f"tp{tp}-pp{pp}-{timestamp}-{status_suffix}"
         new_result_dir = instance_path / new_subdir_name
         
         if result_dir != new_result_dir:
@@ -2056,15 +2187,41 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
             # Update local_results path
             local_results = result_dir / "results.json"
         
-        with open(local_results, 'w') as f:
-            json.dump(failed_results, f, indent=2)
+        # If we have successful results and timeseries files, rewrite their paths
+        if results and any(r.get('status') == 'success' for r in results):
+            for result in results:
+                if 'timeseries_file' in result and result.get('status') == 'success':
+                    remote_filename = Path(result['timeseries_file']).name
+                    local_ts_path = result_dir / remote_filename
+                    result['timeseries_file'] = str(local_ts_path)
         
-        # Save CSV in the same result directory even for failed results (with timestamp)
+        # Save results (either fetched successful ones or failed markers)
+        with open(local_results, 'w') as f:
+            json.dump(results, f, indent=2)
+        
+        # Save CSV in the same result directory
         csv_filename = f"benchmark_results-{timestamp}.csv"
         csv_path = result_dir / csv_filename
-        save_results_csv(failed_results, str(csv_path))
+        save_results_csv(results, str(csv_path))
+
+        # If we have successful results, also attempt to plot timeseries
+        if results and any(r.get('status') == 'success' for r in results):
+            try:
+                logger.info(f"📈 Plotting timeseries for successful experiment(s) after cluster error...")
+                subprocess.run(
+                    [
+                        "python",
+                        "plot_timeseries.py",
+                        str(result_dir),
+                        "--output",
+                        str(result_dir / "timeseries_plots.pdf"),
+                    ],
+                    check=False,
+                )
+            except Exception as plot_err:
+                logger.warning(f"⚠️  Failed to generate timeseries plots after cluster error: {plot_err}")
         
-        return failed_results
+        return results
 
     finally:
         # 6. Teardown
@@ -2118,6 +2275,10 @@ Examples:
                        choices=list(GPU_CONFIGS.keys()),
                        default=DEFAULT_GPU_TYPE,
                        help=f'GPU type to use (default: {DEFAULT_GPU_TYPE})')
+    parser.add_argument('--vm-strategy', dest='vm_strategy',
+                       choices=list(VM_SELECTION_STRATEGIES.keys()),
+                       default='prefer_single_node',
+                       help='VM selection strategy for TP/PP -> cluster sizing')
     parser.add_argument('--run', action='store_true',
                        help='Actually launch clusters (default: dry run)')
     parser.add_argument('--cleanup', action='store_true',
@@ -2135,6 +2296,7 @@ Examples:
     
     csv_path = args.csv_file
     gpu_type = args.gpu_type
+    vm_strategy = args.vm_strategy
     dry_run = not args.run
 
     print(f"🔧 Using GPU type: {gpu_type}")
@@ -2143,7 +2305,7 @@ Examples:
         print("💡 DRY RUN mode - add --run to actually launch clusters")
 
     experiments = load_experiments(csv_path)
-    io_groups = group_by_input_output_then_cluster(experiments, gpu_type)
+    io_groups = group_by_input_output_then_cluster(experiments, gpu_type, vm_strategy=vm_strategy)
 
     print(f"📊 Loaded {len(experiments)} experiments")
     print(f"📦 Grouped by input/output length, then by cluster config:")
@@ -2177,19 +2339,9 @@ Examples:
                     io_group_results.extend(results)
                     all_results.extend(results)
             
-            # Save combined CSV for this IO group in the parent directory
-            if io_group_results:
-                gpu_config = GPU_CONFIGS[gpu_type]
-                instance_family = gpu_config["instance_family"]
-                gpu_name = gpu_type
-                instance_dir = f"aws-{instance_family}-{gpu_name}"
-                parent_path = Path(parent_dir)
-                instance_path = parent_path / instance_dir
-                instance_path.mkdir(exist_ok=True)
-                
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                csv_path = instance_path / f"benchmark_results-{timestamp}.csv"
-                save_results_csv(io_group_results, str(csv_path))
+            # Note: per-cluster CSVs are already saved inside each cluster's result directory
+            # by run_cluster_benchmarks(). We intentionally do NOT write an extra aggregated
+            # CSV at the IO-group level here to avoid duplicate benchmark_results-*.csv files.
     except Exception as e:
         print(f"\n❌ Unexpected error in main: {e}")
         print("   Cleanup will be triggered automatically...")
