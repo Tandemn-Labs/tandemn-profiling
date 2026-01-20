@@ -135,31 +135,46 @@ def predict():
     with torch.inference_mode():
         # predictor.set_image(image_np)
         with torch.autocast("cuda", dtype=torch.float16):
-            encode_time = time.time() - encode_start
             predictor.set_image(image_np)
+            encode_time = time.time() - encode_start
             predict_start = time.time()
             results = []
 
-            for i, prompt in enumerate(prompts):
-                point = np.array([[prompt["point"][0], prompt["point"][1]]])
-                label = np.array([prompt["label"]])
+            # Batch all prompts for parallel GPU processing
+            if len(prompts) > 0:
+                # Stack all prompts into batched arrays
+                batched_points = np.array([
+                    [prompt["point"]]  # Shape: (num_prompts, 1, 2)
+                    for prompt in prompts
+                ])
+                batched_labels = np.array([
+                    [prompt["label"]]  # Shape: (num_prompts, 1)
+                    for prompt in prompts
+                ])
+                
                 masks, scores, logits = predictor.predict(
-                    point_coords=point,
-                    point_labels=label,
+                    point_coords=batched_points,
+                    point_labels=batched_labels,
                     multimask_output=multimask_output,
                 )
-                prompt_result = {
-                    "prompt_id": i,
-                    "num_masks": len(masks),
-                    "scores": scores.tolist(),
-                }
-                # Encode masks as COCO RLE (much faster than PNG)
-                mask_rles = []
-                for mask in masks:
-                    rle = mask_to_rle(mask)
-                    mask_rles.append(rle)
-                prompt_result["masks"] = mask_rles
-                results.append(prompt_result)
+                
+                # Unpack results for each prompt
+                for i in range(len(prompts)):
+                    prompt_masks = masks[i]  # (num_masks, H, W)
+                    prompt_scores = scores[i]  # (num_masks,)
+                    
+                    prompt_result = {
+                        "prompt_id": i,
+                        "num_masks": len(prompt_masks),
+                        "scores": prompt_scores.tolist(),
+                    }
+                    mask_rles = []
+                    for mask in prompt_masks:
+                        rle = mask_to_rle(mask)
+                        mask_rles.append(rle)
+                    prompt_result["masks"] = mask_rles
+                    results.append(prompt_result)
+            
             predict_time = time.time() - predict_start
     total_time = time.time() - start_time
 
