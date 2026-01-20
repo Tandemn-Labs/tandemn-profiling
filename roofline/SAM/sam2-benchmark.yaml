@@ -1,0 +1,50 @@
+name: sam2-serve
+
+service:
+  readiness_probe:
+    path: /health
+    initial_delay_seconds: 1200 # experiment with this!
+    timeout_seconds: 10
+  
+  replica_policy:
+    min_replicas: 0
+    max_replicas: 10
+    target_qps_per_replica: 6
+    dynamic_ondemand_fallback: true
+    upscale_delay_seconds: 5
+    downscale_delay_seconds: 600
+
+resources:
+  # Multiple GPU types for better spot availability
+  accelerators: {T4:1, L4:1, A10G:1}
+  use_spot: true
+  disk_size: 100
+  ports: 8080
+  image_id: docker:choprahetarth/sam2-server:latest
+  
+  # Try multiple regions for even better availability
+  any_of:
+    - infra: aws/us-east-1
+    - infra: aws/us-west-2
+    - infra: aws/us-west-1
+    - infra: aws/us-east-2
+    - infra: aws/eu-central-1
+    - infra: aws/eu-west-1
+    - infra: aws/eu-west-2
+    - infra: aws/ap-northeast-1
+    - infra: aws/ap-southeast-1
+    - infra: aws/ap-southeast-2
+    - infra: aws/ap-northeast-2
+    - infra: vast
+
+setup: |
+  # just run the container 
+  # echo "Pulling Docker image choprahetarth/sam2-server:latest"
+  # docker pull choprahetarth/sam2-server:latest
+
+run: |
+  echo "Starting container with GPU..."
+  cd /app
+  # python3 SAM_2_server.py --port 8080 --host 0.0.0.0
+  # gunicorn SAM_2_server:app --bind 0.0.0.0:8080 --workers 1
+  gunicorn SAM_2_server:app --bind 0.0.0.0:8080 --workers 5 --worker-class gevent --worker-connections 100 --timeout 120
