@@ -44,7 +44,7 @@ def load_and_process_data(csv_path):
     successful = successful.sort_values(['tp', 'pp'])
 
     # Create labels for x-axis
-    successful['config'] = successful.apply(lambda x: f'TP{x["tp"]}\nPP{x["pp"]}', axis=1)
+    successful['config'] = successful.apply(lambda x: f'TP{x["tp"]}, PP{x["pp"]}', axis=1)
 
     return successful
 
@@ -69,8 +69,8 @@ def create_performance_plot(df, save_path=None):
         'total_tokens_per_sec': '#DC143C'   # Crimson red
     }
 
-    # Set up the plot with better proportions (3 subplots now)
-    fig = plt.figure(figsize=(18, 16), facecolor='white')
+    # Set up the plot with better proportions (3 subplots now, wider for instance names)
+    fig = plt.figure(figsize=(24, 16), facecolor='white')
 
     # Main performance plot with more space
     ax1 = plt.subplot(3, 1, 1)
@@ -79,10 +79,10 @@ def create_performance_plot(df, save_path=None):
     n_configs = len(df)
     n_metrics = len(metrics)
 
-    # Optimized bar width and spacing
-    bar_width = 0.20
+    # Optimized bar width and spacing (adjusted for more configurations with instance names)
+    bar_width = 0.18
     group_width = n_metrics * bar_width + 0.08  # Add gap between groups
-    group_spacing = 0.5  # Increased spacing between parallelism groups for better separation
+    group_spacing = 0.8  # Increased spacing between configurations for better separation
     group_centers = np.arange(n_configs) * (group_width + group_spacing)  # More spacing between groups
 
     # Create bars for each metric with error bars showing variance
@@ -270,7 +270,7 @@ def create_performance_plot(df, save_path=None):
     # Set x-axis ticks and labels - NOW WITH LABELS!
     ax1.set_xticks(group_centers)
     ax1.set_xticklabels(df['config'].values, fontsize=12, fontweight='bold',
-                       rotation=0, ha='center')
+                       rotation=45, ha='center')
 
     # Make y-axis tick labels larger
     ax1.tick_params(axis='y', labelsize=12)
@@ -425,7 +425,8 @@ def create_performance_plot(df, save_path=None):
                  fontsize=16, fontweight='bold', pad=20)
 
     ax2.set_xticks(group_centers)
-    ax2.set_xticklabels(df['config'].values, fontsize=12, fontweight='bold')
+    ax2.set_xticklabels(df['config'].values, fontsize=12, fontweight='bold',
+                       rotation=45, ha='center')
 
     # Make y-axis tick labels larger
     ax2.tick_params(axis='y', labelsize=12, labelcolor='#2E8B57')
@@ -567,7 +568,8 @@ def create_performance_plot(df, save_path=None):
                  fontsize=16, fontweight='bold', pad=20)
     
     ax3.set_xticks(group_centers)
-    ax3.set_xticklabels(df['config'].values, fontsize=12, fontweight='bold')
+    ax3.set_xticklabels(df['config'].values, fontsize=12, fontweight='bold',
+                       rotation=45, ha='center')
     
     # Make y-axis tick labels larger
     ax3.tick_params(axis='y', labelsize=12, labelcolor='#FF6B35')
@@ -597,8 +599,8 @@ def create_performance_plot(df, save_path=None):
     legend3.get_frame().set_alpha(0.95)
     legend3.get_frame().set_edgecolor('#cccccc')
 
-    # Adjust layout for better spacing (3 subplots now, increased right margin for third y-axis)
-    plt.subplots_adjust(hspace=0.3, top=0.95, bottom=0.06, left=0.08, right=0.90)
+    # Adjust layout for better spacing (3 subplots now, increased right margin for third y-axis, increased bottom margin for rotated labels, increased vertical spacing)
+    plt.subplots_adjust(hspace=0.7, top=0.95, bottom=0.15, left=0.08, right=0.90)
 
     # Save or show
     if save_path:
@@ -618,7 +620,7 @@ def create_summary_table(df):
     output_col = 'output_tokens_per_sec_mean' if 'output_tokens_per_sec_mean' in df.columns else 'output_tokens_per_sec'
     total_col = 'total_tokens_per_sec_mean' if 'total_tokens_per_sec_mean' in df.columns else 'total_tokens_per_sec'
     
-    summary_cols = ['config', 'tp', 'pp', req_col, input_col, output_col, total_col]
+    summary_cols = ['config', 'instance', 'tp', 'pp', req_col, input_col, output_col, total_col]
     
     # Only include columns that exist
     available_cols = [col for col in summary_cols if col in df.columns]
@@ -638,8 +640,8 @@ def find_and_merge_csvs(directory):
     if not directory.exists():
         raise FileNotFoundError(f"Directory not found: {directory}")
     
-    # Find all benchmark_results*.csv files recursively
-    csv_files = list(directory.rglob("benchmark_results*.csv"))
+    # Find all benchmark_results*.csv files recursively, but skip merged files
+    csv_files = [f for f in directory.rglob("benchmark_results*.csv") if "merged" not in f.name]
     
     if not csv_files:
         raise FileNotFoundError(f"No benchmark_results*.csv files found in {directory}")
@@ -654,8 +656,23 @@ def find_and_merge_csvs(directory):
         try:
             df = pd.read_csv(csv_file)
             if len(df) > 0:
+                # Extract instance name from the 'instance_type' column
+                if 'instance_type' in df.columns:
+                    # Get the first non-null instance_type value
+                    instance_type_values = df['instance_type'].dropna()
+                    if len(instance_type_values) > 0:
+                        instance_name = instance_type_values.iloc[0]
+                    else:
+                        print(f"  ⚠️  Skipping {csv_file.name}: no valid instance_type values")
+                        continue
+                else:
+                    print(f"  ⚠️  Skipping {csv_file.name}: missing instance_type column")
+                    continue
+
+                # Add instance column
+                df['instance'] = instance_name
                 dfs.append(df)
-                print(f"  ✓ Loaded {len(df)} rows from {csv_file.name}")
+                print(f"  ✓ Loaded {len(df)} rows from {csv_file.name} (instance: {instance_name})")
         except Exception as e:
             print(f"  ⚠️  Skipped {csv_file.name}: {e}")
     
@@ -714,9 +731,9 @@ def main():
         if col in successful.columns:
             successful[col] = pd.to_numeric(successful[col], errors='coerce')
 
-    # Group by TP and PP to aggregate multiple runs
-    print("\nGrouping by TP/PP configuration...")
-    grouped = successful.groupby(['tp', 'pp'], as_index=False)
+    # Group by instance, TP and PP to aggregate multiple runs
+    print("\nGrouping by instance/TP/PP configuration...")
+    grouped = successful.groupby(['instance', 'tp', 'pp'], as_index=False)
     
     # Calculate statistics for each metric
     agg_dict = {}
@@ -725,29 +742,41 @@ def main():
             agg_dict[col] = ['mean', 'min', 'max', 'std']
     
     # Also keep first value for non-numeric columns we need
-    for col in ['max_input_length', 'max_output_length', 'model']:
+    for col in ['max_input_length', 'max_output_length', 'model', 'instance']:
         if col in successful.columns:
             agg_dict[col] = 'first'
     
     df_agg = grouped.agg(agg_dict)
-    
+
     # Flatten column names (e.g., 'requests_per_sec_mean', 'requests_per_sec_min', etc.)
-    df_agg.columns = ['_'.join(col).strip('_') if col[1] else col[0] for col in df_agg.columns.values]
+    def flatten_col(col):
+        name, agg_func = col
+        if agg_func == 'first':
+            # For 'first' aggregations, just use the column name
+            return name
+        elif agg_func:
+            # For other aggregations, join with underscore
+            return f'{name}_{agg_func}'
+        else:
+            # For grouping columns
+            return name
+
+    df_agg.columns = [flatten_col(col) for col in df_agg.columns.values]
     
-    # Rename tp and pp columns
-    df_agg = df_agg.rename(columns={'tp_': 'tp', 'pp_': 'pp'})
+    # Rename tp, pp, and instance columns
+    df_agg = df_agg.rename(columns={'tp_': 'tp', 'pp_': 'pp', 'instance_': 'instance'})
+
+    # Sort by tp, then pp, then instance (TP from lower to higher, PP from lower to higher)
+    df_agg = df_agg.sort_values(['tp', 'pp', 'instance'])
+
+    # Create labels for x-axis (include instance name)
+    df_agg['config'] = df_agg.apply(lambda x: f'{x["instance"]}\nTP{x["tp"]}, PP{x["pp"]}', axis=1)
     
-    # Sort by tp, then pp
-    df_agg = df_agg.sort_values(['tp', 'pp'])
-    
-    # Create labels for x-axis
-    df_agg['config'] = df_agg.apply(lambda x: f'TP{x["tp"]}\nPP{x["pp"]}', axis=1)
-    
-    print(f"Aggregated to {len(df_agg)} unique TP/PP configurations")
+    print(f"Aggregated to {len(df_agg)} unique instance/TP/PP configurations")
     for _, row in df_agg.iterrows():
-        tp, pp = row['tp'], row['pp']
-        count = len(successful[(successful['tp'] == tp) & (successful['pp'] == pp)])
-        print(f"  TP{tp}/PP{pp}: {count} run(s)")
+        instance, tp, pp = row['instance'], row['tp'], row['pp']
+        count = len(successful[(successful['instance'] == instance) & (successful['tp'] == tp) & (successful['pp'] == pp)])
+        print(f"  {instance}/TP{tp}/PP{pp}: {count} run(s)")
     
     df = df_agg
 
@@ -755,11 +784,31 @@ def main():
         print("No successful experiments found in the CSV.")
         return
 
-    print(f"Found {len(df)} unique TP/PP configurations:")
+    # Validate that all configurations have the same input/output lengths
+    input_lengths = df['max_input_length'].unique()
+    output_lengths = df['max_output_length'].unique()
+
+    if len(input_lengths) > 1:
+        print(f"ERROR: Multiple input lengths found in the data: {sorted(input_lengths)}")
+        print("This suggests data from different workloads was mixed together.")
+        print("Please ensure all configurations use the same input length.")
+        return
+
+    if len(output_lengths) > 1:
+        print(f"ERROR: Multiple output lengths found in the data: {sorted(output_lengths)}")
+        print("This suggests data from different workloads was mixed together.")
+        print("Please ensure all configurations use the same output length.")
+        return
+
+    input_length = input_lengths[0]
+    output_length = output_lengths[0]
+    print(f"All configurations use the same workload: {input_length} input tokens, {output_length} output tokens")
+
+    print(f"Found {len(df)} unique instance/TP/PP configurations:")
     # Use aggregated column names if available, otherwise use original
     req_col = 'requests_per_sec_mean' if 'requests_per_sec_mean' in df.columns else 'requests_per_sec'
     total_col = 'total_tokens_per_sec_mean' if 'total_tokens_per_sec_mean' in df.columns else 'total_tokens_per_sec'
-    print(df[['tp', 'pp', req_col, total_col]].to_string(index=False))
+    print(df[['instance', 'tp', 'pp', req_col, total_col]].to_string(index=False))
 
     # Create summary table
     summary = create_summary_table(df)

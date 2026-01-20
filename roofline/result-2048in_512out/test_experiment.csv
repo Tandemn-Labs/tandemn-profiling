@@ -1,2 +1,2 @@
 tensor_degree,pipeline_degree,max_input_length,max_output_length,model
-4,4,2048,512,deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+4,2,2048,512,deepseek-ai/DeepSeek-R1-Distill-Llama-70B
