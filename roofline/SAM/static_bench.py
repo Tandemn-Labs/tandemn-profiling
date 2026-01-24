@@ -59,8 +59,12 @@ async def call_api(session, endpoint: str, image_b64: str, prompts: list) -> dic
                 return {
                     "success": True,
                     "total_time": elapsed,
+                    "decode_time": data.get("decode_time", 0) / 1000,
                     "encode_time": data.get("encode_time", 0) / 1000,
                     "predict_time": data.get("predict_time", 0) / 1000,
+                    "gpu_time": data.get("gpu_time", 0) / 1000,
+                    "rle_time": data.get("rle_time", 0) / 1000,
+                    "queue_wait_ms": data.get("queue_wait_ms", 0) / 1000,
                     "num_prompts": data.get("num_prompts", 0),
                     "masks": sum(r["num_masks"] for r in data.get("results", [])),
                 }
@@ -111,8 +115,12 @@ def compute_stats(results: list, total_time: float) -> dict:
     
     # Gather all timing data
     times = [r[f"req{i+1}"]["total_time"] for r in successful for i in range(len(PROMPTS))]
+    decode_times = [r[f"req{i+1}"].get("decode_time", 0) for r in successful for i in range(len(PROMPTS))]
     encode_times = [r[f"req{i+1}"]["encode_time"] for r in successful for i in range(len(PROMPTS))]
     predict_times = [r[f"req{i+1}"]["predict_time"] for r in successful for i in range(len(PROMPTS))]
+    gpu_times = [r[f"req{i+1}"].get("gpu_time", 0) for r in successful for i in range(len(PROMPTS))]
+    rle_times = [r[f"req{i+1}"].get("rle_time", 0) for r in successful for i in range(len(PROMPTS))]
+    queue_waits = [r[f"req{i+1}"].get("queue_wait_ms", 0) for r in successful for i in range(len(PROMPTS))]
     
     api_calls = len(successful) * len(PROMPTS)
     prompts_total = sum(r[f"req{i+1}"]["num_prompts"] for r in successful for i in range(len(PROMPTS)))
@@ -133,8 +141,12 @@ def compute_stats(results: list, total_time: float) -> dict:
         "p50_latency_ms": np.percentile(times, 50) * 1000,
         "p95_latency_ms": np.percentile(times, 95) * 1000,
         "p99_latency_ms": np.percentile(times, 99) * 1000,
+        "avg_decode_ms": np.mean(decode_times) * 1000,
         "avg_encode_ms": np.mean(encode_times) * 1000,
         "avg_predict_ms": np.mean(predict_times) * 1000,
+        "avg_gpu_ms": np.mean(gpu_times) * 1000,
+        "avg_rle_ms": np.mean(rle_times) * 1000,
+        "avg_queue_wait_ms": np.mean(queue_waits) * 1000,
     }
 
 
@@ -160,8 +172,12 @@ def print_results(stats: dict):
     print(f"  P99: {stats['p99_latency_ms']:.1f}ms")
     
     print(f"\nBREAKDOWN:")
-    print(f"  Encode: {stats['avg_encode_ms']:.1f}ms")
-    print(f"  Predict: {stats['avg_predict_ms']:.1f}ms")
+    print(f"  Queue Wait: {stats['avg_queue_wait_ms']:.1f}ms")
+    print(f"  Decode (CPU): {stats['avg_decode_ms']:.1f}ms")
+    print(f"  Encode (GPU): {stats['avg_encode_ms']:.1f}ms")
+    print(f"  Predict (GPU): {stats['avg_predict_ms']:.1f}ms")
+    print(f"  GPU Total: {stats['avg_gpu_ms']:.1f}ms")
+    print(f"  RLE (CPU): {stats['avg_rle_ms']:.1f}ms")
 
 
 async def main():
