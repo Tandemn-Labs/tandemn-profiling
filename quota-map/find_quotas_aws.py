@@ -1,261 +1,127 @@
 #!/usr/bin/env python3
 import pandas as pd
-from typing import Dict, List, Optional, Set
-from sky.catalog import aws_catalog
 from sky.adaptors import aws as aws_adaptor
-from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-# AWS Family-level quota codes (fallback mapping)
-# These are standard AWS quota codes for EC2 instance families
+# Quota codes are at the FAMILY level, not instance level
+# G family = Graphics instances, P family = GPU Compute instances
 FAMILY_QUOTA_CODES = {
-    # GPU Graphics families - G instances
-    'g4dn': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},  
-    'g4ad': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
-    'g5': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
-    'g5g': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
-    'g6': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
-    'g6e': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
-    'g6f': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
-    'gr6': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
-    'gr6f': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
-    
-    # GPU Compute families - P instances
-    'p2': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},  
-    'p3': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
-    'p3dn': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
-    'p4d': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
-    'p4de': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
-    'p5': {'on-demand': 'L-417A185B', 'spot': 'L-C4BD4855'},
-    'p5e': {'on-demand': 'L-417A185B', 'spot': 'L-C4BD4855'},
-    'p5en': {'on-demand': 'L-417A185B', 'spot': 'L-C4BD4855'},
-    'p6-b200': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
-    'p6-b300': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
-    
-    # Inferentia families
-    'inf1': {'on-demand': 'L-1945791B', 'spot': 'L-B5D1601B'},  
-    'inf2': {'on-demand': 'L-1945791B', 'spot': 'L-B5D1601B'},
-    
-    # Trainium families
-    'trn1': {'on-demand': 'L-2C3B7624', 'spot': 'L-6B0D517C'},  
-    'trn1n': {'on-demand': 'L-2C3B7624', 'spot': 'L-6B0D517C'},
-    'trn2': {'on-demand': 'L-2C3B7624', 'spot': 'L-6B0D517C'},
-    
-    # Gaudi (DL1)
-    'dl1': {'on-demand': 'L-6E869C2A', 'spot': 'L-7212CCBC'}, }
+    'G': {'on-demand': 'L-DB2E81BA', 'spot': 'L-3819A6DF'},
+    'P4_P3_P2': {'on-demand': 'L-417A185B', 'spot': 'L-7212CCBC'},
+    'P5_P6': {'on-demand': 'L-417A185B', 'spot': 'L-C4BD4855'},
+}
 
-def get_quota_code(instance_type: str, use_spot: bool) -> Optional[str]:
-    """
-    This tries to get the quota code for the instance type, using skypilot,
-    but then using these hardcoded values, it falls back to them.
-    """
-    quota_code = aws_catalog.get_quota_code(instance_type, use_spot)
-    if quota_code:
-        return quota_code
-    
-    # Fallback: use family-level quota codes
-    print("Using Fallback, as I did not find any quota code for the instance type: ", instance_type)
-    family = instance_type.split('.')[0]  #(e.g., 'g6e' from 'g6e.xlarge')
-    mode = 'spot' if use_spot else 'on-demand'
-    
-    if family in FAMILY_QUOTA_CODES:
-        return FAMILY_QUOTA_CODES[family][mode]
-    
-    return None
+ALL_AWS_REGIONS = [
+    'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2',
+    'eu-west-1', 'eu-west-2', 'eu-west-3', 'eu-central-1', 'eu-north-1', 
+    'ap-south-1', 'ap-northeast-1', 'ap-northeast-2', 'ap-northeast-3',
+    'ap-southeast-1', 'ap-southeast-2',
+    'ca-central-1', 'sa-east-1', 
+]
 
-def get_all_aws_gpu_accelerators():
-    accelerators = aws_catalog.list_accelerators(
-        gpus_only=True,
-        name_filter=None,
-        region_filter=None,
-        quantity_filter=None,
-        all_regions=True
+
+ALL_FAMILY_TYPES = ['G', 'P4_P3_P2', 'P5_P6']
+
+
+def load_resource_table(csv_path):
+    """Load resource table and filter for GPU family types only"""
+    df = pd.read_csv(csv_path)
+    gpu_families = df[df['Family_type'].isin(ALL_FAMILY_TYPES)]
+    return gpu_families
+
+
+def get_quota(quota_code, region):
+    """Get quota value for a quota code in a region"""
+    client = aws_adaptor.client('service-quotas', region_name=region)
+    response = client.get_service_quota(
+        ServiceCode='ec2',
+        QuotaCode=quota_code
     )
-    return accelerators
+    return int(response['Quota']['Value'])
 
 
-def get_all_gpu_instance_types() -> Set[str]:
-    """
-    Get all unique GPU instance types (e.g., 'g6e.xlarge', 'p4d.24xlarge').
-    """
-    accelerators = get_all_aws_gpu_accelerators()
-    instance_types = set()
+def fetch_family_region_quota(family_type, region):
+    """Fetch on-demand and spot quotas for a family in a region"""
+    on_demand_code = FAMILY_QUOTA_CODES[family_type]['on-demand']
+    spot_code = FAMILY_QUOTA_CODES[family_type]['spot']
     
-    for _, instance_list in accelerators.items():
-        for instance_info in instance_list:
-            if instance_info.instance_type:
-                instance_types.add(instance_info.instance_type)
+    on_demand = get_quota(on_demand_code, region)
     
-    return instance_types
+    # If spot code is N/A, return 0
+    if spot_code == 'N/A':
+        spot = 0
+    else:
+        spot = get_quota(spot_code, region)
+    
+    print(f"  {family_type} in {region}: on-demand={on_demand}, spot={spot}")
+    
+    return (family_type, region, on_demand, spot)
 
 
-def get_instance_types_by_gpu_family():
-    """
-    Group instance types by family (g5, g6, p3, p4, etc.).
-    """
-    instance_types = get_all_gpu_instance_types()
-    families = defaultdict(set)
+def fetch_all_quotas():
+    """Fetch quotas for all family types across all regions (parallelized)"""
+    print("Fetching quotas for all GPU families across all regions...")
     
-    for instance in instance_types:
-        family = instance.split('.')[0] 
-        families[family].add(instance)
+    # Build all (family, region) combinations to check
+    tasks = [(family, region) for family in ALL_FAMILY_TYPES for region in ALL_AWS_REGIONS]
     
-    return families
+    # Result structure: quotas[family_type][region] = {'on_demand': X, 'spot': Y}
+    quotas = {family: {} for family in ALL_FAMILY_TYPES}
+    
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        futures = [executor.submit(fetch_family_region_quota, f, r) for f, r in tasks]
+        
+        for future in as_completed(futures):
+            family_type, region, on_demand, spot = future.result()
+            quotas[family_type][region] = {'on_demand': on_demand, 'spot': spot}
+    
+    return quotas
 
 
-def create_complete_quota_map(
-    use_spot: bool = False,
-    gpu_filter: Optional[str] = None
-) -> pd.DataFrame:
-    """
-    Create a complete map of GPU quotas across all AWS regions.
-    """
-    print(f"🔍 Discovering all AWS GPU instance types...")
-
-    # Get all unique instance types and regions
-    instance_to_regions = defaultdict(set)
+def create_quota_map_by_region(resource_table_path, output_path):
+    """Create quota map with on-demand and spot allocations per region"""
     
-    # Use all_regions=True to get full region availability
-    accelerators_all_regions = aws_catalog.list_accelerators(
-        gpus_only=True,
-        name_filter=gpu_filter,
-        region_filter=None,
-        quantity_filter=None,
-        all_regions=True
-    )
+    quotas = fetch_all_quotas()
+    print("\nLoading resource table...")
+    resource_df = load_resource_table(resource_table_path)
+    print(f"Found {len(resource_df)} GPU instance types (G and P families)")
     
-    for _, instance_list in accelerators_all_regions.items():
-        for info in instance_list:
-            instance_to_regions[info.instance_type].add(info.region)
-    
-    print(f"Found {len(instance_to_regions)} unique GPU instance types")
-    
-    # Check quotas
     results = []
-    for instance_type, regions in instance_to_regions.items():
-        family = instance_type.split('.')[0] 
-        print(f"\n📊 Checking {instance_type} (family: {family}, {'spot' if use_spot else 'on-demand'})...")
+    
+    for idx, row in resource_df.iterrows():
+        family_type = row['Family_type']
         
-        quota_code = get_quota_code(instance_type, use_spot)
+        row_data = {
+            'Family': row['Family'],
+            'Instance_Type': row['GPU instance type'],
+            'vCPU': row['vCPU req'],
+            'GPU_Type': row['gpu type'],
+            'VRAM_per_GPU': row['VRAM per GPU (GiB)'],
+            'Total_VRAM': row['Total VRAM (GiB)'],
+            'Family_Type': family_type
+        }
         
-        for region in sorted(regions):
-            quota = None
-            status = "Unknown"
-            
-            if quota_code:
-                try:
-                    client = aws_adaptor.client('service-quotas', region_name=region)
-                    response = client.get_service_quota(
-                        ServiceCode='ec2',
-                        QuotaCode=quota_code
-                    )
-                    quota = response['Quota']['Value']
-                    status = "Available" if quota > 0 else "Zero Quota"
-                    if quota > 0:
-                        print(f"  {region}: {quota} vCPUs")
-                except Exception as e:
-                    status = "Error"
-                    error_msg = str(e)
-                    print(f"  {region}: Error - {error_msg[:40]}")
-            else:
-                status = "No Quota Code"
-            
-            results.append({
-                'InstanceType': instance_type,
-                'Family': family,
-                'Region': region,
-                'QuotaCode': quota_code if quota_code else 'N/A',
-                'Quota_vCPUs': quota if quota is not None else -1,
-                'Status': status,
-                'Mode': 'spot' if use_spot else 'on-demand'
-            })
+        for region in ALL_AWS_REGIONS:
+            row_data[f'{region}_on_demand'] = quotas[family_type][region]['on_demand']
+            row_data[f'{region}_spot'] = quotas[family_type][region]['spot']
+        
+        results.append(row_data)
     
-    return pd.DataFrame(results)
+    output_df = pd.DataFrame(results)
+    output_df.to_csv(output_path, index=False)
+    
+    print(f"\nSaved quota map to {output_path}")
+    return output_df
 
 
-def print_gpu_summary():
-    """Print a summary of all AWS GPUs and instance families."""
-    print("="*80)
-    print("AWS GPU ACCELERATORS SUMMARY")
-    print("="*80)
-    
-    # Get all accelerators
-    accelerators = get_all_aws_gpu_accelerators()
-    
-    print(f"\n📌 Total GPU Types: {len(accelerators)}")
-    print("\nGPU Accelerators:")
-    for i, gpu_name in enumerate(sorted(accelerators.keys()), 1):
-        instance_count = len(accelerators[gpu_name])
-        print(f"  {i:2d}. {gpu_name:15s} - {instance_count} instance types")
-    
-    print("\n" + "="*80)
-    print("INSTANCE TYPE FAMILIES")
-    print("="*80)
-    
-    families = get_instance_types_by_gpu_family()
-    print(f"\n📌 Total Instance Families: {len(families)}")
-    
-    for family, instances in sorted(families.items()):
-        print(f"\n{family} family ({len(instances)} types):")
-        for instance in sorted(instances):
-            print(f"  - {instance}")
-
-
-# Example Usage
 if __name__ == '__main__':
-    import sys
-
-    print_gpu_summary()
+    resource_table_path = 'resource_table.csv'
+    output_path = 'aws_gpu_quota_by_region.csv'
     
-    print("\n" + "="*80)
-    print("ALL AWS GPU TYPES")
-    print("="*80)
-    accelerators = get_all_aws_gpu_accelerators()
-    for gpu in sorted(accelerators.keys()):
-        print(f"  • {gpu}")
+    quota_map = create_quota_map_by_region(resource_table_path, output_path)
     
-    # 3. Get all instance types
-    print("\n" + "="*80)
-    print("ALL GPU INSTANCE TYPES (sample)")
-    print("="*80)
-    instance_types = sorted(get_all_gpu_instance_types())
-    print(f"Total: {len(instance_types)} instance types\n")
-    
-    # Show by family
-    for family in sorted(FAMILY_QUOTA_CODES.keys()):
-        matching = [it for it in instance_types if it.startswith(family + '.')]
-        if matching:
-            print(f"{family}: {', '.join(matching)}")
-    
-    if '--check-quotas' in sys.argv:
-        # Determine if we want spot or on-demand quotas
-        use_spot = '--spot' in sys.argv
-
-        print("\n" + "="*80)
-        mode_str = "SPOT" if use_spot else "ON-DEMAND"
-        print(f"CHECKING QUOTAS ({mode_str} | This may take several minutes...)")
-        print("="*80)
-        
-        quota_df = create_complete_quota_map(
-            use_spot=use_spot,  # use_spot True if --spot, False otherwise
-            gpu_filter=None  # None = all GPUs
-        )
-        
-        print("\n📊 Quota Map (showing all results):")
-        print(quota_df.to_string(index=False))
-        
-        # Filter to only save non-zero quotas
-        quota_df_filtered = quota_df[quota_df['Quota_vCPUs'] > 0]
-        
-        print(f"\n📊 Summary:")
-        print(f"  Total entries: {len(quota_df)}")
-        print(f"  Available quotas (>0): {len(quota_df_filtered)}")
-        print(f"  Zero quotas: {len(quota_df[quota_df['Quota_vCPUs'] == 0])}")
-        print(f"  Failed checks: {len(quota_df[quota_df['Quota_vCPUs'] < 0])}")
-        
-        # Save only non-zero quotas
-        output_filename = (
-            'aws_gpu_quota_map_spot.csv' if use_spot else 'aws_gpu_quota_map.csv'
-        )
-        quota_df_filtered.to_csv(output_filename, index=False)
-        print(f"\n✅ Saved available quotas to {output_filename}")
+    print("\nQuota map created successfully!")
+    print(f"Total rows: {len(quota_map)}")
+    print("\nSample output:")
+    print(quota_map.head())
