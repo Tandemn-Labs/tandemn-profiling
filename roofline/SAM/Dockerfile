@@ -13,8 +13,7 @@ RUN pip install --no-cache-dir \
     flask==3.1.2 \
     pillow==12.1.0 \
     gunicorn \ 
-    pycocotools \
-    gevent
+    pycocotools
 RUN pip install --no-cache-dir git+https://github.com/facebookresearch/sam2.git
 RUN mkdir -p /app/checkpoints && \
     cd /app/checkpoints && \
@@ -25,4 +24,5 @@ RUN python3 -c "import sam2; import os; import shutil; \
 COPY SAM_2_server.py /app/
 EXPOSE 8080
 # CMD ["python3", "SAM_2_server.py", "--port", "8080", "--host", "0.0.0.0"]
-CMD ["gunicorn", "SAM_2_server:app", "--bind", "0.0.0.0:8080", "--workers", "1", "--worker-class", "gevent", "--worker-connections", "100", "--timeout", "120"]
+# CMD ["gunicorn", "SAM_2_server:app", "--bind", "0.0.0.0:8080", "--workers", "1", "--worker-class", "gevent", "--worker-connections", "100", "--timeout", "120"]
+CMD ["gunicorn", "SAM_2_server:app", "--bind", "0.0.0.0:8080", "--workers", "5", "--threads", "8", "--timeout", "120"]
