@@ -6,12 +6,17 @@ import time
 import logging
 import base64
 import argparse
-
+from queue import Queue, Empty, Full
+import threading
 import torch
 import numpy as np
 from PIL import Image
 from flask import Flask, request, jsonify
 from pycocotools import mask as mask_utils
+from dataclasses import dataclass
+from concurrent.futures import Future
+from typing import Any,Dict,List,Optional
+
 
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
@@ -26,6 +31,62 @@ app = Flask(__name__)
 
 # we have a global model object 
 predictor = None
+
+#####################GPUWorker Code#####################
+
+@dataclass
+class Job:
+    """
+    A job needs:
+        input: image_np, prompts, multimask_output
+        output container: something the HTTP handler can wait on
+
+    In Python, the simplest "waitable" is concurrent.futures.Future.
+    """
+    image_np: np.ndarray
+    prompts: List[Dict[str, Any]]
+    multimask_output: bool
+    future: Future 
+    t0: float # enqueue timestamp
+# make the queue that will hold the jobs
+MAX_QUEUE_SIZE = 500
+job_queue: Queue[Job] = Queue(maxsize=MAX_QUEUE_SIZE)
+# make the event that will be used to stop the worker thread
+stop_event = threading.Event()
+worker_thread = None
+
+
+def start_gpu_worker():
+    global worker_thread
+    worker_thread = threading.Thread(
+        target=gpu_worker_loop,
+        args=(predictor, job_queue, stop_event),
+        daemon=True
+    )
+    worker_thread.start()
+    logger.info("GPU worker thread started")
+
+# Make the GPU Worker Function that will be a loop that runs per process
+def gpu_worker_loop(predictor, job_queue: Queue, stop_event: threading.Event):
+    torch.backends.cudnn.benchmark = True
+
+    while not stop_event.is_set():
+        try:
+            job = job_queue.get(timeout=0.1)
+        except Empty:
+            continue
+
+        try:
+            result = run_one_job(predictor, job)
+            job.future.set_result(result)
+        except Exception as e:
+            job.future.set_exception(e)
+        finally:
+            job_queue.task_done()
+
+########################################################
+
+#####################Python Endpoints###################
 
 
 def mask_to_rle(binary_mask):
@@ -110,9 +171,13 @@ def predict():
         ],
         "image_size": [H, W],
         "num_prompts": number of prompts,
-        "encode_time": time taken to encode the image (ms),
-        "predict_time": time taken to predict the masks (ms),
-        "total_time": total time taken to process the request (ms)
+        "decode_time": time to decode base64+PIL+numpy (ms),
+        "encode_time": time to encode image features on GPU (ms),
+        "predict_time": time to predict masks on GPU (ms),
+        "gpu_time": encode_time + predict_time (ms),
+        "rle_time": time to convert masks to RLE format (ms),
+        "queue_wait_ms": time spent waiting in queue (ms),
+        "total_time": total end-to-end time (ms)
     }
     
     Note: Masks are returned in COCO RLE format. To decode on client side:
@@ -120,73 +185,119 @@ def predict():
         rle['counts'] = rle['counts'].encode('utf-8')
         binary_mask = mask_utils.decode(rle)
     """
+    if predictor is None:
+        return jsonify({"success": False, "error": "Model not loaded"}), 503
+
     start_time = time.time()
     data = request.get_json()
+
+    # decode image
+    t_decode_start = time.time()
     image_b64 = data.get("image")
+    if not image_b64:
+        return jsonify({"success": False, "error": "Missing image"}), 400
+
     image_bytes = base64.b64decode(image_b64)
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     image_np = np.array(image)
-    
-    # the image is processed, now get the prompts
+    decode_time = (time.time() - t_decode_start) * 1000
+
     prompts = data.get("prompts", [])
-    multimask_output = data.get("multimask_output", True)
-    # encode the image
-    encode_start = time.time()
+    multimask_output = bool(data.get("multimask_output", True))
+
+    fut = Future() # this will be set by the GPU worker when it's done
+    t_enqueue = time.time()
+    job = Job(
+        image_np=image_np,
+        prompts=prompts,
+        multimask_output=multimask_output,
+        future=fut,
+        t0=t_enqueue
+    )
+
+    try:
+        job_queue.put(job, block=False)
+    except Full:
+        return jsonify({"success": False, "error": "Overloaded"}), 503
+
+    try:
+        out = fut.result(timeout=120)  # higher timeout for long running jobs
+        # Add decode_time to the output
+        out["decode_time"] = decode_time
+        out["queue_wait_ms"] = (out.get("t_gpu_start", t_enqueue) - t_enqueue) * 1000
+        return jsonify(out), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+def run_one_job(predictor, job: Job) -> dict:
+    t_gpu_start = time.time()
+    image_np = job.image_np
+    prompts = job.prompts
+    multimask_output = job.multimask_output
+
     with torch.inference_mode():
-        # predictor.set_image(image_np)
+        # --- Encode image (embedding) ---
+        t_enc0 = time.time()
         with torch.autocast("cuda", dtype=torch.float16):
             predictor.set_image(image_np)
-            encode_time = time.time() - encode_start
-            predict_start = time.time()
-            results = []
+        encode_time = (time.time() - t_enc0) * 1000
 
-            # Batch all prompts for parallel GPU processing
-            if len(prompts) > 0:
-                # Stack all prompts into batched arrays
-                batched_points = np.array([
-                    [prompt["point"]]  # Shape: (num_prompts, 1, 2)
-                    for prompt in prompts
-                ])
-                batched_labels = np.array([
-                    [prompt["label"]]  # Shape: (num_prompts, 1)
-                    for prompt in prompts
-                ])
-                
+        # --- Predict for prompts ---
+        t_pred0 = time.time()
+        results = []
+
+        if len(prompts) > 0:
+            # Make batched prompt arrays
+            batched_points = np.array([ [p["point"]] for p in prompts ], dtype=np.float32)
+            batched_labels = np.array([ [p["label"]] for p in prompts ], dtype=np.int32)
+
+            with torch.autocast("cuda", dtype=torch.float16):
                 masks, scores, logits = predictor.predict(
                     point_coords=batched_points,
                     point_labels=batched_labels,
                     multimask_output=multimask_output,
                 )
-                
-                # Unpack results for each prompt
-                for i in range(len(prompts)):
-                    prompt_masks = masks[i]  # (num_masks, H, W)
-                    prompt_scores = scores[i]  # (num_masks,)
-                    
-                    prompt_result = {
-                        "prompt_id": i,
-                        "num_masks": len(prompt_masks),
-                        "scores": prompt_scores.tolist(),
-                    }
-                    mask_rles = []
-                    for mask in prompt_masks:
-                        rle = mask_to_rle(mask)
-                        mask_rles.append(rle)
-                    prompt_result["masks"] = mask_rles
-                    results.append(prompt_result)
-            
-            predict_time = time.time() - predict_start
-    total_time = time.time() - start_time
 
-    return jsonify({
+            predict_time = (time.time() - t_pred0) * 1000
+            gpu_time = encode_time + predict_time
+
+            # --- Convert masks to RLE (CPU-heavy) ---
+            t_rle_start = time.time()
+            for i in range(len(prompts)):
+                prompt_masks = masks[i]
+                prompt_scores = scores[i]
+                mask_rles = [mask_to_rle(m) for m in prompt_masks]
+                results.append({
+                    "prompt_id": i,
+                    "num_masks": len(prompt_masks),
+                    "scores": prompt_scores.tolist(),
+                    "masks": mask_rles
+                })
+            rle_time = (time.time() - t_rle_start) * 1000
+        else:
+            predict_time = 0
+            gpu_time = encode_time
+            rle_time = 0
+
+    total_queue_to_done = (time.time() - job.t0) * 1000
+    queue_wait = (t_gpu_start - job.t0) * 1000
+
+    logger.info(f"Job timing - Queue: {queue_wait:.1f}ms | Encode: {encode_time:.1f}ms | "
+                f"Predict: {predict_time:.1f}ms | RLE: {rle_time:.1f}ms | Total: {total_queue_to_done:.1f}ms")
+
+    return {
         "success": True,
         "results": results,
-        "image_size": [image_np.shape[0], image_np.shape[1]],  # [H, W]
+        "image_size": [int(image_np.shape[0]), int(image_np.shape[1])],
         "num_prompts": len(prompts),
-        "encode_time": encode_time * 1000,
-        "predict_time": predict_time * 1000,
-        "total_time": total_time * 1000,
-    }), 200
+        "encode_time": encode_time,
+        "predict_time": predict_time,
+        "gpu_time": gpu_time,
+        "rle_time": rle_time,
+        "total_time": total_queue_to_done,
+        "t_gpu_start": t_gpu_start,
+    }
 
 
 @app.route('/info', methods=['GET'])
@@ -198,8 +309,12 @@ def info():
         "gpu_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "ready": predictor is not None
     }), 200
+########################################################
 
+#####################Main Code#########################
 load_model()
+start_gpu_worker()
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8080)
@@ -207,4 +322,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     logger.info(f"Starting server on {args.host}:{args.port}")
-    app.run(host=args.host, port=args.port, threaded=False)
+    app.run(host=args.host, port=args.port)
+########################################################
