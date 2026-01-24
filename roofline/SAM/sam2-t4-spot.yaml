@@ -32,4 +32,4 @@ run: |
   cd /app
   # python3 SAM_2_server.py --port 8080 --host 0.0.0.0
   # gunicorn SAM_2_server:app --bind 0.0.0.0:8080 --workers 1
-  gunicorn SAM_2_server:app --bind 0.0.0.0:8080 --workers 5 --worker-class gevent --worker-connections 100 --timeout 120
+  # gunicorn SAM_2_server:app --bind 0.0.0.0:8080 --workers 5 --worker-class gevent --worker-connections 100 --timeout 120
