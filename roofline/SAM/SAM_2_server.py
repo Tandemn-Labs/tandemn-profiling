@@ -221,7 +221,7 @@ def predict():
         return jsonify({"success": False, "error": "Overloaded"}), 503
 
     try:
-        out = fut.result(timeout=120)  # higher timeout for long running jobs
+        out = fut.result(timeout=200)  # higher timeout for long running jobs
         # Add decode_time to the output
         out["decode_time"] = decode_time
         out["queue_wait_ms"] = (out.get("t_gpu_start", t_enqueue) - t_enqueue) * 1000
