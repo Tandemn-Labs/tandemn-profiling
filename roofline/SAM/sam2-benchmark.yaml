@@ -3,7 +3,7 @@ name: sam2-serve
 service:
   readiness_probe:
     path: /health
-    initial_delay_seconds: 1200 # experiment with this!
+    initial_delay_seconds: 800 # experiment with this!
     timeout_seconds: 10
   
   replica_policy:
