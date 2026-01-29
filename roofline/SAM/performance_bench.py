@@ -20,6 +20,7 @@ from datetime import datetime
 from dataclasses import dataclass, asdict
 from typing import Optional, List, Dict, Tuple
 from collections import deque
+import os
 
 # =============================================================================
 # CONFIG
@@ -78,11 +79,12 @@ class PhaseStats:
 # =============================================================================
 
 class LoadGenerator:
-    def __init__(self, endpoint: str, image_path: str, stats_interval: int = 60):
+    def __init__(self, endpoint: str, image_path: str, stats_interval: int = 60, api_key: Optional[str] = None):
         self.endpoint = endpoint.rstrip('/')
         self.image_b64 = self._encode_image(image_path)
         self.stats_interval = stats_interval
         self.service_name = "sam2-serve"  # Default, can be overridden
+        self.api_key = api_key
         
         # State
         self.running = True
@@ -138,7 +140,7 @@ class LoadGenerator:
             async with session.post(
                 f"{self.endpoint}/predict",
                 json=payload,
-                timeout=aiohttp.ClientTimeout(total=120)
+                timeout=aiohttp.ClientTimeout(total=200)
             ) as resp:
                 latency = (time.time() - start) * 1000
                 result.latency_ms = latency
@@ -438,7 +440,11 @@ class LoadGenerator:
         
         # Create session with connection pooling
         connector = aiohttp.TCPConnector(limit=50, keepalive_timeout=30)
-        async with aiohttp.ClientSession(connector=connector) as session:
+        headers = {}
+        if self.api_key:
+            headers["x-api-key"] = self.api_key
+
+        async with aiohttp.ClientSession(connector=connector, headers=headers) as session:
             # Start stats logger
             stats_task = asyncio.create_task(self._stats_logger())
             
@@ -488,9 +494,11 @@ async def async_main():
     parser.add_argument('--quick-minutes', type=int, default=20, help='Quick test duration')
     parser.add_argument('--stats-interval', type=int, default=60, help='Stats log interval (s)')
     parser.add_argument('--service-name', default='sam2-serve', help='SkyServe service name for log collection')
+    parser.add_argument('--api-key', default=None, help='Static API key for router (or set API_KEY env var)')
     args = parser.parse_args()
     
-    gen = LoadGenerator(args.endpoint, args.image, args.stats_interval)
+    api_key = args.api_key or os.getenv("API_KEY")
+    gen = LoadGenerator(args.endpoint, args.image, args.stats_interval, api_key=api_key)
     gen.service_name = args.service_name
     
     # Signal handlers
