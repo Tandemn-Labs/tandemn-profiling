@@ -1,0 +1,30 @@
+name: azure-demo-t4
+
+resources:
+  cloud: azure
+  region: eastus
+  accelerators: T4:1
+  use_spot: false
+  disk_size: 200
+  memory: "28GB+"
+
+num_nodes: 1
+workdir: .
+
+setup: |
+  set -euxo pipefail
+
+  # Install uv for fast package management
+  python3 -m pip install -U pip
+  python3 -m pip install -U uv
+
+  # Create venv and install dependencies
+  uv venv --python 3.12 --seed
+  source .venv/bin/activate
+
+  uv pip install "vllm==0.11.0" "datasets"
+
+run: |
+  set -euxo pipefail
+  source .venv/bin/activate
+  python demo_benchmark_azure.py
