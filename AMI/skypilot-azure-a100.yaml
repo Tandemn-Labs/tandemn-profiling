@@ -1,0 +1,40 @@
+name: vllm-a100-azure
+
+resources:
+  cloud: azure
+  region: westus3
+  accelerators: A100-80GB:4
+  use_spot: false
+  disk_size: 200
+
+num_nodes: 1
+
+setup: |
+  set -euxo pipefail
+  nvidia-smi
+
+  pip install -U pip uv
+  uv venv --python 3.12 --seed
+  source .venv/bin/activate
+
+  uv pip install \
+    "torch==2.7.1" \
+    "torchvision==0.22.1" \
+    "torchaudio==2.7.1" \
+    --index-url https://download.pytorch.org/whl/cu128
+
+  uv pip install "xformers==0.0.31" --index-url https://download.pytorch.org/whl/cu128
+  uv pip install "vllm==0.10.0"
+  uv pip install "transformers==4.53.2"
+
+  python -c "import vllm; print(f'vLLM={vllm.__version__}')"
+  python -c "import torch; print(f'torch={torch.__version__}, devices={torch.cuda.device_count()}')"
+
+run: |
+  source .venv/bin/activate
+  python -m vllm.entrypoints.openai.api_server \
+    --model ${MODEL:-Qwen/Qwen2.5-72B-Instruct} \
+    --tensor-parallel-size ${TP:-4} \
+    --pipeline-parallel-size ${PP:-1} \
+    --host 0.0.0.0 \
+    --port 8000
