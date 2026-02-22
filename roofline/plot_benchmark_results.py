@@ -690,6 +690,79 @@ def find_and_merge_csvs(directory):
     
     return merged_df, merged_csv_path
 
+def create_concise_merged_csv(merged_df, output_dir):
+    """Create a concise merged CSV with key metrics and cost efficiency."""
+    df = merged_df.copy()
+
+    # Map model name to requested column
+    if 'model' in df.columns and 'model_name' not in df.columns:
+        df['model_name'] = df['model']
+
+    # Map device type to requested column
+    if 'device_type' not in df.columns:
+        if 'instance_type' in df.columns:
+            df['device_type'] = df['instance_type']
+        elif 'instance' in df.columns:
+            df['device_type'] = df['instance']
+
+    # Map total cost to requested column
+    if 'total_cost' not in df.columns:
+        if 'cost_for_run_usd' in df.columns:
+            df['total_cost'] = df['cost_for_run_usd']
+
+    # Compute dollar per million tokens
+    dollar_per_million = None
+    if 'tokens_per_dollar' in df.columns:
+        tpd = pd.to_numeric(df['tokens_per_dollar'], errors='coerce')
+        dollar_per_million = 1_000_000 / tpd.replace(0, np.nan)
+    elif {'cost_for_run_usd', 'total_tokens_per_sec', 'elapsed_time'}.issubset(df.columns):
+        cost = pd.to_numeric(df['cost_for_run_usd'], errors='coerce')
+        tps = pd.to_numeric(df['total_tokens_per_sec'], errors='coerce')
+        elapsed = pd.to_numeric(df['elapsed_time'], errors='coerce')
+        total_tokens = tps * elapsed
+        dollar_per_million = (cost / total_tokens.replace(0, np.nan)) * 1_000_000
+
+    if dollar_per_million is not None:
+        df['dollar_per_million_token'] = dollar_per_million
+
+    # Build concise dataframe with requested columns
+    requested_cols = [
+        'model_name',
+        'max_input_length',
+        'max_output_length',
+        'total_tokens_per_sec',
+        'input_tokens_per_sec',
+        'output_tokens_per_sec',
+        'device_type',
+        'tp',
+        'pp',
+        'mem_per_gpu_gb',
+        'total_cost',
+        'dollar_per_million_token',
+    ]
+
+    concise_df = df.reindex(columns=requested_cols)
+    # Drop rows that are missing core metrics/cost; keep mem_per_gpu_gb optional
+    concise_df = concise_df.replace('', np.nan)
+    required_cols = [
+        'model_name',
+        'max_input_length',
+        'max_output_length',
+        'total_tokens_per_sec',
+        'input_tokens_per_sec',
+        'output_tokens_per_sec',
+        'device_type',
+        'tp',
+        'pp',
+        'total_cost',
+        'dollar_per_million_token',
+    ]
+    concise_df = concise_df.dropna(subset=required_cols, how='any')
+    concise_csv_path = Path(output_dir) / "benchmark_results_merged_concise.csv"
+    concise_df.to_csv(concise_csv_path, index=False)
+    print(f"Saved concise merged CSV to: {concise_csv_path}")
+    return concise_df, concise_csv_path
+
 def main():
     """Main function to run the analysis."""
 
@@ -717,6 +790,9 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         return
+
+    # Save concise merged CSV with key metrics and cost efficiency
+    concise_df, concise_csv_path = create_concise_merged_csv(merged_df, input_dir)
 
     # Process merged data (filter successful experiments and prepare for plotting)
     print("\nProcessing merged data...")
@@ -825,6 +901,9 @@ def main():
     except:
         pass  # In case we're not in an interactive environment
 
+    print(f"file saved in {merged_csv_path}")
+    print(f"file saved in {concise_csv_path}")
+    print(f"file saved in {output_plot}")
     print("Analysis complete!")
 
 if __name__ == "__main__":

@@ -1,0 +1,10 @@
+model_name,max_input_length,max_output_length,total_tokens_per_sec,input_tokens_per_sec,output_tokens_per_sec,device_type,tp,pp,mem_per_gpu_gb,total_cost,dollar_per_million_token
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,252.06,200.65,51.4,g6.12xlarge,4,1,,1.5524,5.15757713324224
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,887.38,706.41,180.97,2x g6.12xlarge,4,2,,0.8819,2.929989597950929
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,1048.91,835.0,213.91,3x g6.12xlarge,4,3,,1.1192,3.718160324173013
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,1125.87,896.26,229.6,4x g6.12xlarge,4,4,,1.3902,4.618668417573073
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,532.07,423.56,108.51,g6.48xlarge,8,1,,2.0978,6.969615889832118
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,747.86,595.35,152.52,2x g6.48xlarge,8,2,,2.985,9.917146210271664
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,920.51,732.78,187.72,3x g6.48xlarge,8,3,,3.6378,12.08572550126755
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,776.91,618.47,158.44,2x g6.12xlarge,2,4,,1.0073,3.3465883890718224
+deepseek-ai/DeepSeek-R1-Distill-Llama-70B,8192,2048,524.64,417.64,106.99,8x g6.2xlarge,1,8,,1.2622,4.193384114655844
