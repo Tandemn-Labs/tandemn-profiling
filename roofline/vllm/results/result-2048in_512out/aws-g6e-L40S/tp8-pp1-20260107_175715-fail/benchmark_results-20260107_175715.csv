@@ -1,0 +1,2 @@
+tp,pp,max_input_length,max_output_length,model,status,error
+8,1,2048,512,deepseek-ai/DeepSeek-R1-Distill-Llama-70B,cluster_error,Command 'sky launch' returned non-zero exit status 1.

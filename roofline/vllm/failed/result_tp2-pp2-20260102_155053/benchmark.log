@@ -1,0 +1,24 @@
+2026-01-02 15:50:53,827 - INFO - Results will be saved to: result_tp2-pp2-20260102_155053
+2026-01-02 15:50:53,827 - INFO - 🚀 Launching roofline-tp2-pp2...
+2026-01-02 15:50:53,827 - INFO - YAML to run: roofline_benchmarks/roofline-tp2-pp2.yaml
+2026-01-02 15:50:53,828 - INFO - Running on cluster: roofline-tp2-pp2
+2026-01-02 15:50:55,023 - INFO - YAML to run: roofline_benchmarks/roofline-tp2-pp2.yaml
+2026-01-02 15:50:55,141 - INFO - Running on cluster: roofline-tp2-pp2
+2026-01-02 15:50:56,638 - INFO - Considered resources (1 node):
+2026-01-02 15:50:56,639 - INFO - ---------------------------------------------------------------------------------
+2026-01-02 15:50:56,639 - INFO -  INFRA             INSTANCE       vCPUs   Mem(GB)   GPUS     COST ($)   CHOSEN
+2026-01-02 15:50:56,639 - INFO - ---------------------------------------------------------------------------------
+2026-01-02 15:50:56,639 - INFO -  AWS (us-east-1)   g6e.12xlarge   48      384       L40S:4   10.49      [32m   ✔[0m
+2026-01-02 15:50:56,639 - INFO - ---------------------------------------------------------------------------------
+2026-01-02 15:50:56,639 - INFO - [2m🔍 Multiple AWS instances satisfy L40S:4. The cheapest (gpus=L40S:4, g6e.12xlarge, ...) is considered among: g6e.24xlarge, g6e.12xlarge.[0m
+2026-01-02 15:50:56,639 - INFO - To list more details, run: sky show-gpus L40S
+2026-01-02 15:50:56,639 - INFO - 
+2026-01-02 15:50:56,639 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a,us-east-1b,us-east-1c,us-east-1d).
+2026-01-02 15:51:27,641 - INFO - 
+2026-01-02 15:51:27,642 - INFO - [?25hRequest ec06a08a-f451-4440-b202-f929497121af cancelled by user
+2026-01-02 15:51:27,644 - INFO - 'sky.launch' request ec06a08a-f451-4440-b202-f929497121af cancelled
+2026-01-02 15:51:27,787 - INFO - sky.exceptions.RequestCancelled: [33mCurrent 'sky.launch' request (ec06a08a-f451-4440-b202-f929497121af) is cancelled by another process.[0m
+2026-01-02 15:51:28,044 - ERROR - ❌ Cluster error: Command 'sky launch' returned non-zero exit status 1.
+2026-01-02 15:51:28,044 - INFO - 📥 Attempting to fetch partial results...
+2026-01-02 15:51:28,371 - INFO - 📥 Fetching results...
+2026-01-02 15:51:28,379 - INFO - 🗑️  Tearing down roofline-tp2-pp2...

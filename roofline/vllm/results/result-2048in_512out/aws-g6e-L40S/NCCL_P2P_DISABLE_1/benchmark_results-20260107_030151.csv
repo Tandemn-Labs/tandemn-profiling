@@ -1,0 +1,63 @@
+tp,pp,max_input_length,max_output_length,model,status,error,instance_type,price_per_hour,num_nodes,gpus_per_node,total_gpus,llm_model,llm_tensor_parallel_size,llm_pipeline_parallel_size,llm_max_model_len,llm_trust_remote_code,llm_distributed_executor_backend,llm_gpu_memory_utilization,llm_enforce_eager,llm_enable_chunked_prefill,llm_enable_prefix_caching,llm_kv_transfer_config,sampling_temperature,sampling_max_tokens,sampling_min_tokens,sampling_ignore_eos,benchmark_num_samples,benchmark_dataset,benchmark_prompt_prefix,benchmark_warmup_samples,gpu_monitor_sample_interval,gpu_monitor_type,scheduler_monitor_sample_interval
+4,4,2048,512,deepseek-ai/DeepSeek-R1-Distill-Llama-70B,error,"[36mray::RayWorkerWrapper.execute_method()[39m (pid=4545, ip=172.31.26.111, actor_id=3c7f9d5f5403807167d7a4b101000000, repr=<vllm.executor.ray_utils.RayWorkerWrapper object at 0x7c55641a2d80>)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/worker/worker_base.py"", line 582, in execute_method
+    raise e
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/worker/worker_base.py"", line 573, in execute_method
+    return run_method(target, method, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/utils.py"", line 2196, in run_method
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/utils/_contextlib.py"", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/worker/worker.py"", line 229, in determine_num_available_blocks
+    self.model_runner.profile_run()
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/utils/_contextlib.py"", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/worker/model_runner.py"", line 1235, in profile_run
+    self._dummy_run(max_num_batched_tokens, max_num_seqs)
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/worker/model_runner.py"", line 1346, in _dummy_run
+    self.execute_model(model_input, kv_caches, intermediate_tensors)
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/utils/_contextlib.py"", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/worker/model_runner.py"", line 1772, in execute_model
+    logits = self.model.compute_logits(hidden_or_intermediate_states,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/model_executor/models/llama.py"", line 557, in compute_logits
+    logits = self.logits_processor(self.lm_head, hidden_states,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py"", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py"", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/model_executor/layers/logits_processor.py"", line 74, in forward
+    logits = self._get_logits(hidden_states, lm_head, embedding_bias)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/model_executor/layers/logits_processor.py"", line 116, in _get_logits
+    logits = self._gather_logits(logits)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/model_executor/layers/logits_processor.py"", line 101, in _gather_logits
+    logits = tensor_model_parallel_gather(logits)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/distributed/communication_op.py"", line 26, in tensor_model_parallel_gather
+    return get_tp_group().gather(input_, dst, dim)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/distributed/parallel_state.py"", line 338, in gather
+    return self.device_communicator.gather(input_, dst, dim)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/vllm/distributed/device_communicators/base_device_communicator.py"", line 86, in gather
+    torch.distributed.gather(input_,
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py"", line 83, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py"", line 3620, in gather
+    work = group.gather(output_tensors, input_tensors, opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Inplace update to inference tensor outside InferenceMode is not allowed.You can make a clone to get a normal tensor before doing inplace update.See https://github.com/pytorch/rfcs/pull/17 for more details.",4x g6e.12xlarge,18.72,4,4,16,deepseek-ai/DeepSeek-R1-Distill-Llama-70B,4,4,2559,True,ray,0.85,True,False,False,,0.8,512,512,True,30,emozilla/pg19-test,Please summarize the following text: ,5,0.5,distributed,0.25

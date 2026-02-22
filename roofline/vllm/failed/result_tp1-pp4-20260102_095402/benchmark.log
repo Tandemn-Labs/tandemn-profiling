@@ -1,0 +1,41 @@
+2026-01-02 09:54:02,437 - INFO - Results will be saved to: result_tp1-pp4-20260102_095402
+2026-01-02 09:54:02,438 - INFO - 🚀 Launching roofline-tp1-pp4...
+2026-01-02 09:54:02,438 - INFO - YAML to run: roofline_benchmarks/roofline-tp1-pp4.yaml
+2026-01-02 09:54:02,438 - INFO - Running on cluster: roofline-tp1-pp4
+2026-01-02 09:54:03,634 - INFO - YAML to run: roofline_benchmarks/roofline-tp1-pp4.yaml
+2026-01-02 09:54:03,751 - INFO - Running on cluster: roofline-tp1-pp4
+2026-01-02 09:54:04,766 - INFO - Considered resources (4 nodes):
+2026-01-02 09:54:04,766 - INFO - --------------------------------------------------------------------------------
+2026-01-02 09:54:04,766 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS     COST ($)   CHOSEN
+2026-01-02 09:54:04,766 - INFO - --------------------------------------------------------------------------------
+2026-01-02 09:54:04,766 - INFO -  AWS (us-east-1)   g6e.2xlarge   8       64        L40S:1   8.97       [32m   ✔[0m
+2026-01-02 09:54:04,766 - INFO - --------------------------------------------------------------------------------
+2026-01-02 09:54:04,766 - INFO - [2m🔍 Multiple AWS instances satisfy L40S:1. The cheapest (gpus=L40S:1, g6e.2xlarge, ...) is considered among: g6e.16xlarge, g6e.2xlarge, g6e.8xlarge, g6e.4xlarge.[0m
+2026-01-02 09:54:04,766 - INFO - To list more details, run: sky show-gpus L40S
+2026-01-02 09:54:04,766 - INFO - 
+2026-01-02 09:54:04,766 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-01-02 09:54:09,777 - INFO - [2mW 01-02 09:54:09.737 PID=15134 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6e.2xlarge capacity in the Availability Zone you requested (us-east-1a). Our system will be working on provisioning additional capacity. You can currently get g6e.2xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1b, us-east-1c, us-east-1d.[0m
+2026-01-02 09:54:10,381 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-01-02 09:54:10,381 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1b).
+2026-01-02 09:54:14,997 - INFO - [2mW 01-02 09:54:14.981 PID=15134 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6e.2xlarge capacity in the Availability Zone you requested (us-east-1b). Our system will be working on provisioning additional capacity. You can currently get g6e.2xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1c, us-east-1d.[0m
+2026-01-02 09:54:15,399 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-01-02 09:54:15,499 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1c).
+2026-01-02 09:54:20,316 - INFO - [2mW 01-02 09:54:20.245 PID=15134 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6e.2xlarge capacity in the Availability Zone you requested (us-east-1c). Our system will be working on provisioning additional capacity. You can currently get g6e.2xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1b, us-east-1d.[0m
+2026-01-02 09:54:20,617 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-01-02 09:54:20,718 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1d).
+2026-01-02 09:54:25,336 - INFO - [2mW 01-02 09:54:25.284 PID=15134 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6e.2xlarge capacity in the Availability Zone you requested (us-east-1d). Our system will be working on provisioning additional capacity. You can currently get g6e.2xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1b, us-east-1c.[0m
+2026-01-02 09:54:25,840 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-01-02 09:54:25,840 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-east-1 for {AWS(mem=64.0+, {'L40S': 1}, disk_size=500)}.
+2026-01-02 09:54:25,840 - INFO - 
+2026-01-02 09:54:25,840 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-01-02 09:54:25,940 - INFO - [0m[31m⨯[0m Failed to provision resources. [2mView logs: [1msky logs --provision roofline-tp1-pp4[0m[0m
+2026-01-02 09:54:26,880 - INFO - sky.exceptions.ResourcesUnavailableError: [31mFailed to provision all possible launchable resources.[0m Relax the task's resource requirements: 4x AWS(mem=64.0+, {'L40S': 1}, disk_size=500)
+2026-01-02 09:54:26,880 - INFO - To keep retrying until the cluster is up, use the `--retry-until-up` flag.
+2026-01-02 09:54:26,880 - INFO - Reasons for provision failures (for details, please check the log above):
+2026-01-02 09:54:26,881 - INFO - INFRA            RESOURCES                        REASON
+2026-01-02 09:54:26,881 - INFO - AWS (us-east-1)  (gpus=L40S:1, g6e.2xlarge, ...)  Failed to acquire resources in all zones in us-east-1 for {AWS(mem=64.0+,
+2026-01-02 09:54:26,881 - INFO -                                                   {'L40S': 1}, disk_size=500)}.
+2026-01-02 09:54:27,131 - ERROR - ❌ Cluster error: Command 'sky launch' returned non-zero exit status 1.
+2026-01-02 09:54:27,131 - INFO - 📥 Attempting to fetch partial results...
+2026-01-02 09:54:27,416 - INFO - 📥 Fetching results...
+2026-01-02 09:54:27,426 - INFO - 🗑️  Tearing down roofline-tp1-pp4...

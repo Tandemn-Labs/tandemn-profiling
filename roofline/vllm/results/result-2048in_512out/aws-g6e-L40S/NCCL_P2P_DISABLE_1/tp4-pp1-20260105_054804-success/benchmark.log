@@ -1,0 +1,879 @@
+2026-01-05 05:48:04,689 - INFO - Results will be saved to: result-2048in_512out/aws-g6e-L40S/tp4-pp1-20260105_054804
+2026-01-05 05:48:04,690 - INFO - 🚀 Launching roofline-tp4-pp1-2048in-512out...
+2026-01-05 05:48:04,690 - INFO - YAML to run: roofline_benchmarks/roofline-tp4-pp1-2048in-512out.yaml
+2026-01-05 05:48:04,690 - INFO - Running on cluster: roofline-tp4-pp1-2048in-512out
+2026-01-05 05:48:06,042 - INFO - YAML to run: roofline_benchmarks/roofline-tp4-pp1-2048in-512out.yaml
+2026-01-05 05:48:06,179 - INFO - Running on cluster: roofline-tp4-pp1-2048in-512out
+2026-01-05 05:48:07,001 - INFO - Considered resources (1 node):
+2026-01-05 05:48:07,001 - INFO - ---------------------------------------------------------------------------------
+2026-01-05 05:48:07,001 - INFO -  INFRA             INSTANCE       vCPUs   Mem(GB)   GPUS     COST ($)   CHOSEN
+2026-01-05 05:48:07,001 - INFO - ---------------------------------------------------------------------------------
+2026-01-05 05:48:07,001 - INFO -  AWS (us-east-1)   g6e.12xlarge   48      384       L40S:4   10.49      [32m   ✔[0m
+2026-01-05 05:48:07,001 - INFO - ---------------------------------------------------------------------------------
+2026-01-05 05:48:07,001 - INFO - [2m🔍 Multiple AWS instances satisfy L40S:4. The cheapest (gpus=L40S:4, g6e.12xlarge, ...) is considered among: g6e.24xlarge, g6e.12xlarge.[0m
+2026-01-05 05:48:07,001 - INFO - To list more details, run: sky show-gpus L40S
+2026-01-05 05:48:07,001 - INFO - 
+2026-01-05 05:48:07,001 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a,us-east-1b,us-east-1c,us-east-1d).
+2026-01-05 05:48:09,107 - INFO - [2mW 01-05 05:48:09.088 PID=5033 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6e.12xlarge capacity in the Availability Zone you requested (us-east-1a). Our system will be working on provisioning additional capacity. You can currently get g6e.12xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1b, us-east-1c, us-east-1d.[0m
+2026-01-05 05:48:09,908 - INFO - [2mW 01-05 05:48:09.871 PID=5033 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6e.12xlarge capacity in the Availability Zone you requested (us-east-1b). Our system will be working on provisioning additional capacity. You can currently get g6e.12xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1c, us-east-1d.[0m
+2026-01-05 05:48:44,527 - INFO - [2m└── [0m[2mInstance is up.[0m
+2026-01-05 05:49:14,443 - INFO - [0m[32m✓ Cluster launched: roofline-tp4-pp1-2048in-512out.[0m[0m  [2mView logs: [1msky logs --provision roofline-tp4-pp1-2048in-512out[0m[0m
+2026-01-05 05:49:14,443 - INFO - [0m⚙︎ Syncing files.
+2026-01-05 05:49:14,544 - INFO -   [2mSyncing workdir (to 1 node): /home/ubuntu/projects/tandemn-profiling/roofline -> ~/sky_workdir[0m
+2026-01-05 05:49:14,644 - INFO - [0m[32m✓ Synced workdir.[0m[0m  [2mView logs: sky api logs -l sky-2026-01-05-05-48-06-221822/workdir_sync.log[0m
+2026-01-05 05:49:14,947 - INFO - [0m[32m✓ Setup detached.[0m[0m
+2026-01-05 05:49:17,759 - INFO - [0m⚙︎ Job submitted, ID: 1
+2026-01-05 05:49:20,108 - INFO - [2m├── [0m[2mWaiting for task resources on 1 node.[0m
+2026-01-05 05:49:20,108 - INFO - [2m└── [0mJob started. Streaming logs... [2m(Ctrl-C to exit log streaming; job will not be killed)[0m
+2026-01-05 05:49:21,914 - INFO - [36m(setup pid=3243)[0m + python3 -m pip install -U pip
+2026-01-05 05:49:22,917 - INFO - [36m(setup pid=3243)[0m Requirement already satisfied: pip in /home/ubuntu/miniconda3/lib/python3.10/site-packages (23.3.1)
+2026-01-05 05:49:23,521 - INFO - [36m(setup pid=3243)[0m Collecting pip
+2026-01-05 05:49:23,521 - INFO - [36m(setup pid=3243)[0m   Downloading pip-25.3-py3-none-any.whl.metadata (4.7 kB)
+2026-01-05 05:49:23,521 - INFO - [36m(setup pid=3243)[0m Downloading pip-25.3-py3-none-any.whl (1.8 MB)
+2026-01-05 05:49:23,521 - INFO - [36m(setup pid=3243)[0m    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 29.3 MB/s eta 0:00:00
+2026-01-05 05:49:23,521 - INFO - [36m(setup pid=3243)[0m Installing collected packages: pip
+2026-01-05 05:49:23,521 - INFO - [36m(setup pid=3243)[0m   Attempting uninstall: pip
+2026-01-05 05:49:23,521 - INFO - [36m(setup pid=3243)[0m     Found existing installation: pip 23.3.1
+2026-01-05 05:49:23,521 - INFO - [36m(setup pid=3243)[0m     Uninstalling pip-23.3.1:
+2026-01-05 05:49:24,421 - INFO - [36m(setup pid=3243)[0m       Successfully uninstalled pip-23.3.1
+2026-01-05 05:49:25,023 - INFO - [36m(setup pid=3243)[0m Successfully installed pip-25.3
+2026-01-05 05:49:25,023 - INFO - [36m(setup pid=3243)[0m + python3 -m pip install -U uv
+2026-01-05 05:49:25,525 - INFO - [36m(setup pid=3243)[0m Collecting uv
+2026-01-05 05:49:25,525 - INFO - [36m(setup pid=3243)[0m   Downloading uv-0.9.21-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+2026-01-05 05:49:25,525 - INFO - [36m(setup pid=3243)[0m Downloading uv-0.9.21-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (22.2 MB)
+2026-01-05 05:49:25,525 - INFO - [36m(setup pid=3243)[0m    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 22.2/22.2 MB 201.3 MB/s  0:00:00
+2026-01-05 05:49:25,525 - INFO - [36m(setup pid=3243)[0m Installing collected packages: uv
+2026-01-05 05:49:26,427 - INFO - [36m(setup pid=3243)[0m Successfully installed uv-0.9.21
+2026-01-05 05:49:26,427 - INFO - [36m(setup pid=3243)[0m + uv venv --python 3.12 --seed
+2026-01-05 05:49:26,427 - INFO - [36m(setup pid=3243)[0m Downloading cpython-3.12.12-linux-x86_64-gnu (download) (31.7MiB)
+2026-01-05 05:49:26,930 - INFO - [36m(setup pid=3243)[0m  Downloaded cpython-3.12.12-linux-x86_64-gnu (download)
+2026-01-05 05:49:26,930 - INFO - [36m(setup pid=3243)[0m Using CPython 3.12.12
+2026-01-05 05:49:26,930 - INFO - [36m(setup pid=3243)[0m Creating virtual environment with seed packages at: .venv
+2026-01-05 05:49:26,930 - INFO - [36m(setup pid=3243)[0m  + pip==25.3
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m Activate with: source .venv/bin/activate
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m + source .venv/bin/activate
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' -n x ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ SCRIPT_PATH=.venv/bin/activate
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' .venv/bin/activate = /tmp/sky_setup_sky-2026-01-05-05-48-06-221822 ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ deactivate nondestructive
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ unset -f pydoc
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ hash -r
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ unset VIRTUAL_ENV
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ unset VIRTUAL_ENV_PROMPT
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' '!' nondestructive = nondestructive ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ VIRTUAL_ENV=/home/ubuntu/sky_workdir/.venv
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' linux-gnu = cygwin ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' linux-gnu = msys ']'
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ export VIRTUAL_ENV
+2026-01-05 05:49:26,931 - INFO - [36m(setup pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ unset SCRIPT_PATH
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ _OLD_VIRTUAL_PATH=/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ PATH=/home/ubuntu/sky_workdir/.venv/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ export PATH
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ '[' xsky_workdir '!=' x ']'
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ VIRTUAL_ENV_PROMPT=sky_workdir
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ export VIRTUAL_ENV_PROMPT
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ _OLD_VIRTUAL_PS1='(base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ PS1='(sky_workdir) (base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ export PS1
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ alias pydoc
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ true
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m ++ hash -r
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m + uv pip install datasets requests pynvml
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m Resolved 41 packages in 61ms
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m Downloading hf-xet (3.2MiB)
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m Downloading aiohttp (1.7MiB)
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m Downloading pandas (11.8MiB)
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m Downloading numpy (15.6MiB)
+2026-01-05 05:49:26,932 - INFO - [36m(setup pid=3243)[0m Downloading pyarrow (45.5MiB)
+2026-01-05 05:49:27,632 - INFO - [36m(setup pid=3243)[0m  Downloaded hf-xet
+2026-01-05 05:49:27,633 - INFO - [36m(setup pid=3243)[0m  Downloaded aiohttp
+2026-01-05 05:49:28,133 - INFO - [36m(setup pid=3243)[0m  Downloaded numpy
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  Downloaded pyarrow
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  Downloaded pandas
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m Prepared 37 packages in 846ms
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m Installed 41 packages in 44ms
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + aiohappyeyeballs==2.6.1
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + aiohttp==3.13.3
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + aiosignal==1.4.0
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + anyio==4.12.0
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + attrs==25.4.0
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + certifi==2026.1.4
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + charset-normalizer==3.4.4
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + click==8.3.1
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + datasets==4.4.2
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + dill==0.4.0
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + filelock==3.20.2
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + frozenlist==1.8.0
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + fsspec==2025.10.0
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + h11==0.16.0
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + hf-xet==1.2.0
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + httpcore==1.0.9
+2026-01-05 05:49:28,134 - INFO - [36m(setup pid=3243)[0m  + httpx==0.28.1
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + huggingface-hub==1.2.3
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + idna==3.11
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + multidict==6.7.0
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + multiprocess==0.70.18
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + numpy==2.4.0
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + nvidia-ml-py==13.590.44
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + packaging==25.0
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + pandas==2.3.3
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + propcache==0.4.1
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + pyarrow==22.0.0
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + pynvml==13.0.1
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + python-dateutil==2.9.0.post0
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + pytz==2025.2
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + pyyaml==6.0.3
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + requests==2.32.5
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + shellingham==1.5.4
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + six==1.17.0
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + tqdm==4.67.1
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + typer-slim==0.21.0
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + typing-extensions==4.15.0
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + tzdata==2025.3
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + urllib3==2.6.2
+2026-01-05 05:49:28,135 - INFO - [36m(setup pid=3243)[0m  + xxhash==3.6.0
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m  + yarl==1.22.0
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m + uv pip install vllm==0.10.0
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Resolved 141 packages in 275ms
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading pillow (6.7MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading opencv-python-headless (51.5MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading scipy (34.0MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading torchaudio (3.3MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading pydantic-core (2.0MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading transformers (11.4MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading numba (3.7MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading networkx (2.0MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading pygments (1.2MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading tiktoken (1.1MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cusparse-cu12 (206.5MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading pycountry (6.0MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading sympy (6.0MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cufile-cu12 (1.1MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cufft-cu12 (190.9MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading soundfile (1.3MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading numpy (15.8MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading xformers (111.6MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading tokenizers (3.1MiB)
+2026-01-05 05:49:28,136 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cusolver-cu12 (150.9MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-nvjitlink-cu12 (18.8MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-curand-cu12 (53.7MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cuda-cupti-cu12 (8.5MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading cupy-cuda12x (107.7MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cublas-cu12 (374.9MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading uvloop (4.2MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading llguidance (14.3MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading outlines-core (2.2MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading vllm (368.7MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cusparselt-cu12 (149.5MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading llvmlite (40.4MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading triton (148.5MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading torchvision (7.1MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading mistral-common (6.2MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cuda-nvrtc-cu12 (22.6MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading ray (69.0MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-cudnn-cu12 (544.5MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading xgrammar (11.3MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading nvidia-nccl-cu12 (192.0MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading sentencepiece (1.3MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading setuptools (1.2MiB)
+2026-01-05 05:49:28,137 - INFO - [36m(setup pid=3243)[0m Downloading torch (783.0MiB)
+2026-01-05 05:49:28,736 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cufile-cu12
+2026-01-05 05:49:28,736 - INFO - [36m(setup pid=3243)[0m  Downloaded tiktoken
+2026-01-05 05:49:28,736 - INFO - [36m(setup pid=3243)[0m  Downloaded soundfile
+2026-01-05 05:49:28,736 - INFO - [36m(setup pid=3243)[0m  Downloaded sentencepiece
+2026-01-05 05:49:29,339 - INFO - [36m(setup pid=3243)[0m  Downloaded pygments
+2026-01-05 05:49:29,339 - INFO - [36m(setup pid=3243)[0m  Downloaded pydantic-core
+2026-01-05 05:49:29,339 - INFO - [36m(setup pid=3243)[0m  Downloaded outlines-core
+2026-01-05 05:49:29,339 - INFO - [36m(setup pid=3243)[0m  Downloaded setuptools
+2026-01-05 05:49:29,339 - INFO - [36m(setup pid=3243)[0m  Downloaded tokenizers
+2026-01-05 05:49:29,339 - INFO - [36m(setup pid=3243)[0m  Downloaded networkx
+2026-01-05 05:49:29,339 - INFO - [36m(setup pid=3243)[0m  Downloaded torchaudio
+2026-01-05 05:49:30,142 - INFO - [36m(setup pid=3243)[0m  Downloaded uvloop
+2026-01-05 05:49:30,142 - INFO - [36m(setup pid=3243)[0m  Downloaded numba
+2026-01-05 05:49:30,142 - INFO - [36m(setup pid=3243)[0m  Downloaded pycountry
+2026-01-05 05:49:30,142 - INFO - [36m(setup pid=3243)[0m  Downloaded mistral-common
+2026-01-05 05:49:30,142 - INFO - [36m(setup pid=3243)[0m  Downloaded pillow
+2026-01-05 05:49:30,142 - INFO - [36m(setup pid=3243)[0m  Downloaded torchvision
+2026-01-05 05:49:30,947 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cuda-cupti-cu12
+2026-01-05 05:49:30,947 - INFO - [36m(setup pid=3243)[0m  Downloaded sympy
+2026-01-05 05:49:30,947 - INFO - [36m(setup pid=3243)[0m  Downloaded xgrammar
+2026-01-05 05:49:31,549 - INFO - [36m(setup pid=3243)[0m  Downloaded llguidance
+2026-01-05 05:49:31,549 - INFO - [36m(setup pid=3243)[0m  Downloaded transformers
+2026-01-05 05:49:32,153 - INFO - [36m(setup pid=3243)[0m  Downloaded numpy
+2026-01-05 05:49:32,153 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-nvjitlink-cu12
+2026-01-05 05:49:32,956 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cuda-nvrtc-cu12
+2026-01-05 05:49:34,260 - INFO - [36m(setup pid=3243)[0m  Downloaded scipy
+2026-01-05 05:49:34,260 - INFO - [36m(setup pid=3243)[0m  Downloaded llvmlite
+2026-01-05 05:49:35,464 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-curand-cu12
+2026-01-05 05:49:36,167 - INFO - [36m(setup pid=3243)[0m  Downloaded opencv-python-headless
+2026-01-05 05:49:40,079 - INFO - [36m(setup pid=3243)[0m  Downloaded xformers
+2026-01-05 05:49:40,982 - INFO - [36m(setup pid=3243)[0m  Downloaded cupy-cuda12x
+2026-01-05 05:49:42,087 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cusparselt-cu12
+2026-01-05 05:49:42,087 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cusolver-cu12
+2026-01-05 05:49:42,790 - INFO - [36m(setup pid=3243)[0m  Downloaded triton
+2026-01-05 05:49:42,790 - INFO - [36m(setup pid=3243)[0m  Downloaded ray
+2026-01-05 05:49:43,694 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cufft-cu12
+2026-01-05 05:49:43,694 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-nccl-cu12
+2026-01-05 05:49:44,396 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cusparse-cu12
+2026-01-05 05:49:45,904 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cublas-cu12
+2026-01-05 05:49:48,113 - INFO - [36m(setup pid=3243)[0m  Downloaded nvidia-cudnn-cu12
+2026-01-05 05:49:48,815 - INFO - [36m(setup pid=3243)[0m  Downloaded vllm
+2026-01-05 05:49:53,930 - INFO - [36m(setup pid=3243)[0m  Downloaded torch
+2026-01-05 05:49:53,930 - INFO - [36m(setup pid=3243)[0m Prepared 109 packages in 25.80s
+2026-01-05 05:49:53,930 - INFO - [36m(setup pid=3243)[0m Uninstalled 2 packages in 16ms
+2026-01-05 05:49:54,633 - INFO - [36m(setup pid=3243)[0m Installed 113 packages in 241ms
+2026-01-05 05:49:54,633 - INFO - [36m(setup pid=3243)[0m  + annotated-doc==0.0.4
+2026-01-05 05:49:54,633 - INFO - [36m(setup pid=3243)[0m  + annotated-types==0.7.0
+2026-01-05 05:49:54,633 - INFO - [36m(setup pid=3243)[0m  + astor==0.8.1
+2026-01-05 05:49:54,633 - INFO - [36m(setup pid=3243)[0m  + blake3==1.0.8
+2026-01-05 05:49:54,633 - INFO - [36m(setup pid=3243)[0m  + cachetools==6.2.4
+2026-01-05 05:49:54,633 - INFO - [36m(setup pid=3243)[0m  + cbor2==5.8.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + cffi==2.0.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + cloudpickle==3.1.2
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + compressed-tensors==0.10.2
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + cupy-cuda12x==13.6.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + depyf==0.19.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + diskcache==5.6.3
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + distro==1.9.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + dnspython==2.8.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + einops==0.8.1
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + email-validator==2.3.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + fastapi==0.128.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + fastapi-cli==0.0.20
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + fastapi-cloud-cli==0.8.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + fastar==0.8.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + fastrlock==0.8.3
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + gguf==0.17.1
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + httptools==0.7.1
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  - huggingface-hub==1.2.3
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + huggingface-hub==0.36.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + interegular==0.3.3
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + jinja2==3.1.6
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + jiter==0.12.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + jsonschema==4.25.1
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + jsonschema-specifications==2025.9.1
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + lark==1.2.2
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + llguidance==0.7.30
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + llvmlite==0.44.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + lm-format-enforcer==0.10.12
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + markdown-it-py==4.0.0
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + markupsafe==3.0.3
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + mdurl==0.1.2
+2026-01-05 05:49:54,634 - INFO - [36m(setup pid=3243)[0m  + mistral-common==1.8.8
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + mpmath==1.3.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + msgpack==1.1.2
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + msgspec==0.20.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + networkx==3.6.1
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + ninja==1.13.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + numba==0.61.2
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  - numpy==2.4.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + numpy==2.2.6
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cublas-cu12==12.6.4.1
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cuda-cupti-cu12==12.6.80
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cuda-nvrtc-cu12==12.6.77
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cuda-runtime-cu12==12.6.77
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cudnn-cu12==9.5.1.17
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cufft-cu12==11.3.0.4
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cufile-cu12==1.11.1.6
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-curand-cu12==10.3.7.77
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cusolver-cu12==11.7.1.2
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cusparse-cu12==12.5.4.2
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-cusparselt-cu12==0.6.3
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-nccl-cu12==2.26.2
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-nvjitlink-cu12==12.6.85
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + nvidia-nvtx-cu12==12.6.77
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + openai==1.90.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + opencv-python-headless==4.12.0.88
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + outlines-core==0.2.10
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + partial-json-parser==0.2.1.1.post7
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + pillow==12.1.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + prometheus-client==0.23.1
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + prometheus-fastapi-instrumentator==7.1.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + protobuf==6.33.2
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + psutil==7.2.1
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + py-cpuinfo==9.0.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + pybase64==1.4.3
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + pycountry==24.6.1
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + pycparser==2.23
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + pydantic==2.12.5
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + pydantic-core==2.41.5
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + pydantic-extra-types==2.11.0
+2026-01-05 05:49:54,635 - INFO - [36m(setup pid=3243)[0m  + pydantic-settings==2.12.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + pygments==2.19.2
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + python-dotenv==1.2.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + python-json-logger==4.0.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + python-multipart==0.0.21
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + pyzmq==27.1.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + ray==2.53.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + referencing==0.37.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + regex==2025.11.3
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + rich==14.2.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + rich-toolkit==0.17.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + rignore==0.7.6
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + rpds-py==0.30.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + safetensors==0.7.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + scipy==1.16.3
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + sentencepiece==0.2.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + sentry-sdk==2.48.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + setuptools==79.0.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + sniffio==1.3.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + soundfile==0.13.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + soxr==1.0.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + starlette==0.50.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + sympy==1.14.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + tiktoken==0.12.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + tokenizers==0.22.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + torch==2.7.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + torchaudio==2.7.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + torchvision==0.22.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + transformers==4.57.3
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + triton==3.3.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + typer==0.21.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + typing-inspection==0.4.2
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + uvicorn==0.40.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + uvloop==0.22.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + vllm==0.10.0
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + watchfiles==1.1.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + websockets==15.0.1
+2026-01-05 05:49:54,636 - INFO - [36m(setup pid=3243)[0m  + xformers==0.0.31
+2026-01-05 05:49:54,637 - INFO - [36m(setup pid=3243)[0m  + xgrammar==0.1.21
+2026-01-05 05:49:54,637 - INFO - [36m(setup pid=3243)[0m + git clone https://github.com/lmcache/lmcache.git
+2026-01-05 05:49:54,637 - INFO - [36m(setup pid=3243)[0m Cloning into 'lmcache'...
+2026-01-05 05:49:55,133 - INFO - [36m(setup pid=3243)[0m + cd lmcache
+2026-01-05 05:49:55,133 - INFO - [36m(setup pid=3243)[0m + git checkout v0.3.6
+2026-01-05 05:49:55,133 - INFO - [36m(setup pid=3243)[0m Note: switching to 'v0.3.6'.
+2026-01-05 05:49:55,133 - INFO - [36m(setup pid=3243)[0m
+2026-01-05 05:49:55,133 - INFO - [36m(setup pid=3243)[0m You are in 'detached HEAD' state. You can look around, make experimental
+2026-01-05 05:49:55,133 - INFO - [36m(setup pid=3243)[0m changes and commit them, and you can discard any commits you make in this
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m state without impacting any branches by switching back to a branch.
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m If you want to create a new branch to retain commits you create, you may
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m do so (now or later) by using -c with the switch command. Example:
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m   git switch -c <new-branch-name>
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m Or undo this operation with:
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m   git switch -
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m Turn off this advice by setting config variable advice.detachedHead to false
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m HEAD is now at cad4db1 [Core] Add backward compatibility with vllm (#1583)
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m + uv pip install . --no-build-isolation
+2026-01-05 05:49:55,134 - INFO - [36m(setup pid=3243)[0m Using Python 3.12.12 environment at: /home/ubuntu/sky_workdir/.venv
+2026-01-05 05:49:59,147 - INFO - [36m(setup pid=3243)[0m Resolved 62 packages in 3.96s
+2026-01-05 05:49:59,148 - INFO - [36m(setup pid=3243)[0m Installed 1 package in 4ms
+2026-01-05 05:49:59,148 - INFO - [36m(setup pid=3243)[0m    Building lmcache @ file:///home/ubuntu/sky_workdir/lmcache
+2026-01-05 05:49:59,148 - INFO - [36m(setup pid=3243)[0m Downloading awscrt (3.9MiB)
+2026-01-05 05:49:59,148 - INFO - [36m(setup pid=3243)[0m  Downloaded awscrt
+2026-01-05 05:50:51,999 - INFO - [36m(setup pid=3243)[0m       Built lmcache @ file:///home/ubuntu/sky_workdir/lmcache
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m Prepared 9 packages without build isolation in 53.10s
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m Installed 9 packages in 5ms
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + aiofile==3.9.0
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + aiofiles==25.1.0
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + awscrt==0.30.0
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + caio==0.9.25
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + cufile-python==0.2.0
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + lmcache==0.0.0 (from file:///home/ubuntu/sky_workdir/lmcache)
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + nvtx==0.2.14
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + redis==7.1.0
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + setuptools-scm==9.2.2
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m  + sortedcontainers==2.4.0
+2026-01-05 05:50:52,704 - INFO - [36m(setup pid=3243)[0m + cd ..
+2026-01-05 05:50:52,705 - INFO - [36m(setup pid=3243)[0m + mkdir -p /tmp/lmcache_disk
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + source .venv/bin/activate
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' -n x ']'
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ SCRIPT_PATH=.venv/bin/activate
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' .venv/bin/activate = /tmp/sky_app_1uw0vqwp ']'
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ deactivate nondestructive
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ unset -f pydoc
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ hash -r
+2026-01-05 05:50:53,307 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ unset VIRTUAL_ENV
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ unset VIRTUAL_ENV_PROMPT
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' '!' nondestructive = nondestructive ']'
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ VIRTUAL_ENV=/home/ubuntu/sky_workdir/.venv
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' linux-gnu = cygwin ']'
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' linux-gnu = msys ']'
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ export VIRTUAL_ENV
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ unset SCRIPT_PATH
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ _OLD_VIRTUAL_PATH=/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ PATH=/home/ubuntu/sky_workdir/.venv/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ export PATH
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' xsky_workdir '!=' x ']'
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ VIRTUAL_ENV_PROMPT=sky_workdir
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ export VIRTUAL_ENV_PROMPT
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ '[' -z '' ']'
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ _OLD_VIRTUAL_PS1='(base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ PS1='(sky_workdir) (base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ export PS1
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ alias pydoc
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ true
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ hash -r
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_USE_EXPERIMENTAL=True
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_USE_EXPERIMENTAL=True
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_CHUNK_SIZE=256
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_CHUNK_SIZE=256
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_LOCAL_CPU=True
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_LOCAL_CPU=True
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_MAX_LOCAL_CPU_SIZE=40.0
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_MAX_LOCAL_CPU_SIZE=40.0
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_SAVE_UNFULL_CHUNK=True
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_SAVE_UNFULL_CHUNK=True
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_ENABLE_ASYNC_LOADING=False
+2026-01-05 05:50:53,308 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_ENABLE_ASYNC_LOADING=False
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_REMOTE_SERDE=cachegen
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_REMOTE_SERDE=cachegen
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_USE_LAYERWISE=True
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_USE_LAYERWISE=True
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR=True
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR=True
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export NCCL_P2P_DISABLE=1
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + NCCL_P2P_DISABLE=1
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export NCCL_TIMEOUT=3600
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + NCCL_TIMEOUT=3600
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export TORCH_NCCL_BLOCKING_WAIT=1
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + TORCH_NCCL_BLOCKING_WAIT=1
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export TORCH_DISTRIBUTED_DEBUG=DETAIL
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + TORCH_DISTRIBUTED_DEBUG=DETAIL
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + export NCCL_DEBUG=INFO
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + NCCL_DEBUG=INFO
+2026-01-05 05:50:53,309 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + python roofline_benchmarks/benchmark_roofline-tp4-pp1-2048in-512out.py
+2026-01-05 05:51:02,025 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:51:01 [__init__.py:235] Automatically detected platform cuda.
+2026-01-05 05:51:03,430 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m
+2026-01-05 05:51:03,430 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ======================================================================
+2026-01-05 05:51:03,431 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Running: TP=4, PP=1, input=2048, output=512
+2026-01-05 05:51:03,431 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ======================================================================
+2026-01-05 05:51:09,451 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m `torch_dtype` is deprecated! Use `dtype` instead!
+2026-01-05 05:51:09,451 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:51:09 [config.py:1604] Using max model len 2559
+2026-01-05 05:51:09,451 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:51:09 [config.py:2434] Chunked prefill is enabled with max_num_batched_tokens=8192.
+2026-01-05 05:51:10,655 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:51:10 [core.py:572] Waiting for init message from front-end.
+2026-01-05 05:51:10,655 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:51:10 [core.py:71] Initializing a V1 LLM engine (v0.10.0) with config: model='deepseek-ai/DeepSeek-R1-Distill-Llama-70B', speculative_config=None, tokenizer='deepseek-ai/DeepSeek-R1-Distill-Llama-70B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config={}, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=2559, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=4, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_backend=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=deepseek-ai/DeepSeek-R1-Distill-Llama-70B, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=False, chunked_prefill_enabled=True, use_async_output_proc=True, pooler_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":[],"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":[],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"max_capture_size":0,"local_cache_dir":null}
+2026-01-05 05:51:10,655 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:51:10 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0, 1, 2, 3], buffer_handle=(4, 16777216, 10, 'psm_aae5632b'), local_subscribe_addr='ipc:///tmp/715a75b4-5e71-491f-a9d8-996cda536691', remote_subscribe_addr=None, remote_addr_ipv6=False)
+2026-01-05 05:51:12,666 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:51:12 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_b5752835'), local_subscribe_addr='ipc:///tmp/64011e09-4ceb-4b09-a847-f8520d482943', remote_subscribe_addr=None, remote_addr_ipv6=False)
+2026-01-05 05:51:12,666 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:51:12 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_ec874517'), local_subscribe_addr='ipc:///tmp/522abe41-ccdb-47e7-9421-6e9033ca4d4b', remote_subscribe_addr=None, remote_addr_ipv6=False)
+2026-01-05 05:51:12,666 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:51:12 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_dd5aa2d8'), local_subscribe_addr='ipc:///tmp/e56edc10-d0b1-4b1c-bce5-5d5e571980c5', remote_subscribe_addr=None, remote_addr_ipv6=False)
+2026-01-05 05:51:12,666 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:12 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_23083354'), local_subscribe_addr='ipc:///tmp/9ec92ee7-a802-48e9-8030-5c7e9be5d6a0', remote_subscribe_addr=None, remote_addr_ipv6=False)
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:13 [__init__.py:1375] Found nccl from library libnccl.so.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:13 [pynccl.py:70] vLLM is using nccl==2.26.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:51:13 [__init__.py:1375] Found nccl from library libnccl.so.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:51:13 [pynccl.py:70] vLLM is using nccl==2.26.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Bootstrap: Using enp39s0:172.31.80.181<0>
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:51:13 [__init__.py:1375] Found nccl from library libnccl.so.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:51:13 [__init__.py:1375] Found nccl from library libnccl.so.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:51:13 [pynccl.py:70] vLLM is using nccl==2.26.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:51:13 [pynccl.py:70] vLLM is using nccl==2.26.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO cudaDriverVersion 12020
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO NCCL version 2.26.2+cuda12.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO cudaDriverVersion 12020
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO cudaDriverVersion 12020
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO cudaDriverVersion 12020
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Bootstrap: Using enp39s0:172.31.80.181<0>
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO NCCL version 2.26.2+cuda12.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Bootstrap: Using enp39s0:172.31.80.181<0>
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Bootstrap: Using enp39s0:172.31.80.181<0>
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO NCCL version 2.26.2+cuda12.2
+2026-01-05 05:51:13,268 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO NCCL version 2.26.2+cuda12.2
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so. Using internal net plugin.
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Failed to open libibverbs.so[.1]
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO NET/Socket : Using [0]enp39s0:172.31.80.181<0>
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO NET/Plugin: Could not find: libnccl-net.so. Using internal net plugin.
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so.
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Using network Socket
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Failed to open libibverbs.so[.1]
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO NET/Socket : Using [0]enp39s0:172.31.80.181<0>
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so.
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Using network Socket
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO ncclCommInitRank comm 0x14458c80 rank 0 nranks 4 cudaDev 0 nvmlDev 0 busId 38000 commId 0x6a75bc9ac5748065 - Init START
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO ncclCommInitRank comm 0x14458c80 rank 1 nranks 4 cudaDev 1 nvmlDev 1 busId 3a000 commId 0x6a75bc9ac5748065 - Init START
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO NET/Plugin: Could not find: libnccl-net.so. Using internal net plugin.
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Failed to open libibverbs.so[.1]
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO NET/Socket : Using [0]enp39s0:172.31.80.181<0>
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so.
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Using network Socket
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO ncclCommInitRank comm 0x14458c80 rank 3 nranks 4 cudaDev 3 nvmlDev 3 busId 3e000 commId 0x6a75bc9ac5748065 - Init START
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO NET/Plugin: Could not find: libnccl-net.so. Using internal net plugin.
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Failed to open libibverbs.so[.1]
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO NET/Socket : Using [0]enp39s0:172.31.80.181<0>
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so.
+2026-01-05 05:51:13,468 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Using network Socket
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO ncclCommInitRank comm 0x14458c80 rank 2 nranks 4 cudaDev 2 nvmlDev 2 busId 3c000 commId 0x6a75bc9ac5748065 - Init START
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Bootstrap timings total 0.000609 (create 0.000023, send 0.000094, recv 0.000168, ring 0.000065, delay 0.000000)
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Bootstrap timings total 0.003634 (create 0.000028, send 0.000102, recv 0.000089, ring 0.000068, delay 0.000001)
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Bootstrap timings total 0.014136 (create 0.000027, send 0.000095, recv 0.013641, ring 0.000076, delay 0.000000)
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Bootstrap timings total 0.014467 (create 0.000035, send 0.000137, recv 0.000391, ring 0.003099, delay 0.000001)
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO NCCL_CUMEM_ENABLE set by environment to 0.
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO NCCL_CUMEM_ENABLE set by environment to 0.
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO NCCL_CUMEM_ENABLE set by environment to 0.
+2026-01-05 05:51:13,469 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO NCCL_CUMEM_ENABLE set by environment to 0.
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO NCCL_P2P_DISABLE set by environment to 1
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO NCCL_P2P_DISABLE set by environment to 1
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Setting affinity for GPU 3 to ffff,ffffffff
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO NVLS multicast support is not available on dev 3
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Setting affinity for GPU 2 to ffff,ffffffff
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO NVLS multicast support is not available on dev 2
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO NCCL_P2P_DISABLE set by environment to 1
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO NCCL_P2P_DISABLE set by environment to 1
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Setting affinity for GPU 1 to ffff,ffffffff
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO NVLS multicast support is not available on dev 1
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Setting affinity for GPU 0 to ffff,ffffffff
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO NVLS multicast support is not available on dev 0
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO comm 0x14458c80 rank 1 nRanks 4 nNodes 1 localRanks 4 localRank 1 MNNVL 0
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO comm 0x14458c80 rank 0 nRanks 4 nNodes 1 localRanks 4 localRank 0 MNNVL 0
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO comm 0x14458c80 rank 2 nRanks 4 nNodes 1 localRanks 4 localRank 2 MNNVL 0
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO comm 0x14458c80 rank 3 nRanks 4 nNodes 1 localRanks 4 localRank 3 MNNVL 0
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Trees [0] 2/-1/-1->1->0 [1] 2/-1/-1->1->0
+2026-01-05 05:51:13,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO P2P Chunksize set to 131072
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Channel 00/02 : 0 1 2 3
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Channel 01/02 : 0 1 2 3
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Trees [0] 3/-1/-1->2->1 [1] 3/-1/-1->2->1
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO P2P Chunksize set to 131072
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO P2P Chunksize set to 131072
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Check P2P Type intraNodeP2pSupport 0 directMode 0
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Trees [0] -1/-1/-1->3->2 [1] -1/-1/-1->3->2
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO P2P Chunksize set to 131072
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:7127 [0] NCCL INFO [Proxy Service] Device 0 CPU core 14
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:7128 [1] NCCL INFO [Proxy Service] Device 1 CPU core 35
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:7131 [1] NCCL INFO [Proxy Service UDS] Device 1 CPU core 20
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:7130 [3] NCCL INFO [Proxy Service] Device 3 CPU core 22
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:7132 [2] NCCL INFO [Proxy Service UDS] Device 2 CPU core 23
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:7134 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 34
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:7129 [2] NCCL INFO [Proxy Service] Device 2 CPU core 35
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:7133 [3] NCCL INFO [Proxy Service UDS] Device 3 CPU core 37
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Channel 00 : 0[0] -> 1[1] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Channel 00 : 2[2] -> 3[3] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Channel 00 : 1[1] -> 2[2] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Channel 00 : 3[3] -> 0[0] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Channel 01 : 0[0] -> 1[1] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Channel 01 : 2[2] -> 3[3] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Channel 01 : 1[1] -> 2[2] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Channel 01 : 3[3] -> 0[0] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Channel 00 : 3[3] -> 2[2] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Channel 01 : 3[3] -> 2[2] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Channel 00 : 2[2] -> 1[1] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Channel 00 : 1[1] -> 0[0] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Channel 01 : 2[2] -> 1[1] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Channel 01 : 1[1] -> 0[0] via SHM/direct/direct
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Connected all trees
+2026-01-05 05:51:13,671 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Connected all trees
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Connected all trees
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Connected all trees
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:7135 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 40
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:7136 [2] NCCL INFO [Proxy Progress] Device 2 CPU core 46
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:7137 [1] NCCL INFO [Proxy Progress] Device 1 CPU core 44
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:7138 [3] NCCL INFO [Proxy Progress] Device 3 CPU core 41
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO CC Off, workFifoBytes 1048576
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so. Using internal tuner plugin.
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so. Using internal tuner plugin.
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so. Using internal tuner plugin.
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so. Using internal tuner plugin.
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO ncclCommInitRank comm 0x14458c80 rank 1 nranks 4 cudaDev 1 nvmlDev 1 busId 3a000 commId 0x6a75bc9ac5748065 - Init COMPLETE
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO ncclCommInitRank comm 0x14458c80 rank 3 nranks 4 cudaDev 3 nvmlDev 3 busId 3e000 commId 0x6a75bc9ac5748065 - Init COMPLETE
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO ncclCommInitRank comm 0x14458c80 rank 2 nranks 4 cudaDev 2 nvmlDev 2 busId 3c000 commId 0x6a75bc9ac5748065 - Init COMPLETE
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Init timings - ncclCommInitRank: rank 1 nranks 4 total 0.24 (kernels 0.14, alloc 0.00, bootstrap 0.01, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.07, rest 0.00)
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO ncclCommInitRank comm 0x14458c80 rank 0 nranks 4 cudaDev 0 nvmlDev 0 busId 38000 commId 0x6a75bc9ac5748065 - Init COMPLETE
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Init timings - ncclCommInitRank: rank 2 nranks 4 total 0.23 (kernels 0.15, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.07, rest 0.00)
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Init timings - ncclCommInitRank: rank 3 nranks 4 total 0.23 (kernels 0.15, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.07, rest 0.00)
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Init timings - ncclCommInitRank: rank 0 nranks 4 total 0.24 (kernels 0.14, alloc 0.00, bootstrap 0.01, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.07, rest 0.00)
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m WARNING 01-05 05:51:13 [custom_all_reduce.py:137] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m WARNING 01-05 05:51:13 [custom_all_reduce.py:137] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m WARNING 01-05 05:51:13 [custom_all_reduce.py:137] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m WARNING 01-05 05:51:13 [custom_all_reduce.py:137] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:13 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[1, 2, 3], buffer_handle=(3, 4194304, 6, 'psm_750ecca3'), local_subscribe_addr='ipc:///tmp/0cab0024-fb28-4cb6-8c75-62af52bc8051', remote_subscribe_addr=None, remote_addr_ipv6=False)
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:13 [parallel_state.py:1102] rank 0 in world size 4 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:51:13 [parallel_state.py:1102] rank 3 in world size 4 is assigned as DP rank 0, PP rank 0, TP rank 3, EP rank 3
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:51:13 [parallel_state.py:1102] rank 1 in world size 4 is assigned as DP rank 0, PP rank 0, TP rank 1, EP rank 1
+2026-01-05 05:51:13,672 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m WARNING 01-05 05:51:13 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+2026-01-05 05:51:13,673 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m WARNING 01-05 05:51:13 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+2026-01-05 05:51:13,673 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m WARNING 01-05 05:51:13 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+2026-01-05 05:51:13,673 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:51:13 [gpu_model_runner.py:1843] Starting to load model deepseek-ai/DeepSeek-R1-Distill-Llama-70B...
+2026-01-05 05:51:13,673 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:51:13 [gpu_model_runner.py:1843] Starting to load model deepseek-ai/DeepSeek-R1-Distill-Llama-70B...
+2026-01-05 05:51:13,870 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:13 [gpu_model_runner.py:1843] Starting to load model deepseek-ai/DeepSeek-R1-Distill-Llama-70B...
+2026-01-05 05:51:13,871 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:51:13 [parallel_state.py:1102] rank 2 in world size 4 is assigned as DP rank 0, PP rank 0, TP rank 2, EP rank 2
+2026-01-05 05:51:13,871 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m WARNING 01-05 05:51:13 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+2026-01-05 05:51:13,871 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:51:13 [gpu_model_runner.py:1843] Starting to load model deepseek-ai/DeepSeek-R1-Distill-Llama-70B...
+2026-01-05 05:51:13,871 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:51:13 [gpu_model_runner.py:1875] Loading model from scratch...
+2026-01-05 05:51:13,871 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:51:13 [gpu_model_runner.py:1875] Loading model from scratch...
+2026-01-05 05:51:13,871 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:13 [gpu_model_runner.py:1875] Loading model from scratch...
+2026-01-05 05:51:13,871 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:51:13 [gpu_model_runner.py:1875] Loading model from scratch...
+2026-01-05 05:51:14,771 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:51:13 [cuda.py:290] Using Flash Attention backend on V1 engine.
+2026-01-05 05:51:14,771 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:51:13 [cuda.py:290] Using Flash Attention backend on V1 engine.
+2026-01-05 05:51:14,771 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:13 [cuda.py:290] Using Flash Attention backend on V1 engine.
+2026-01-05 05:51:14,771 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:51:13 [cuda.py:290] Using Flash Attention backend on V1 engine.
+2026-01-05 05:51:14,772 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:51:14 [weight_utils.py:296] Using model weights format ['*.safetensors']
+2026-01-05 05:51:14,772 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:51:14 [weight_utils.py:296] Using model weights format ['*.safetensors']
+2026-01-05 05:51:14,772 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:51:14 [weight_utils.py:296] Using model weights format ['*.safetensors']
+2026-01-05 05:51:14,772 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:51:14 [weight_utils.py:296] Using model weights format ['*.safetensors']
+2026-01-05 05:56:53,979 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:56:53 [weight_utils.py:312] Time spent downloading weights for deepseek-ai/DeepSeek-R1-Distill-Llama-70B: 339.684958 seconds
+2026-01-05 05:56:54,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:56:54,681 - INFO - Loading safetensors checkpoint shards:   0% Completed | 0/17 [00:00<?, ?it/s]
+2026-01-05 05:56:55,485 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:56:55,486 - INFO - Loading safetensors checkpoint shards:   6% Completed | 1/17 [00:00<00:11,  1.34it/s]
+2026-01-05 05:56:55,988 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:56:55,988 - INFO - Loading safetensors checkpoint shards:  12% Completed | 2/17 [00:01<00:12,  1.23it/s]
+2026-01-05 05:56:55,988 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:56:55,988 - INFO - Loading safetensors checkpoint shards:  18% Completed | 3/17 [00:01<00:07,  1.80it/s]
+2026-01-05 05:56:56,989 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:56:56,990 - INFO - Loading safetensors checkpoint shards:  24% Completed | 4/17 [00:02<00:08,  1.54it/s]
+2026-01-05 05:56:57,793 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:56:57,793 - INFO - Loading safetensors checkpoint shards:  29% Completed | 5/17 [00:03<00:08,  1.38it/s]
+2026-01-05 05:56:58,596 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:56:58,596 - INFO - Loading safetensors checkpoint shards:  35% Completed | 6/17 [00:04<00:08,  1.30it/s]
+2026-01-05 05:56:59,401 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:56:59,401 - INFO - Loading safetensors checkpoint shards:  41% Completed | 7/17 [00:05<00:08,  1.25it/s]
+2026-01-05 05:57:00,204 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:00,204 - INFO - Loading safetensors checkpoint shards:  47% Completed | 8/17 [00:06<00:07,  1.23it/s]
+2026-01-05 05:57:01,209 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:01,209 - INFO - Loading safetensors checkpoint shards:  53% Completed | 9/17 [00:06<00:06,  1.18it/s]
+2026-01-05 05:57:02,014 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:02,014 - INFO - Loading safetensors checkpoint shards:  59% Completed | 10/17 [00:07<00:06,  1.16it/s]
+2026-01-05 05:57:03,019 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:03,019 - INFO - Loading safetensors checkpoint shards:  65% Completed | 11/17 [00:08<00:05,  1.15it/s]
+2026-01-05 05:57:03,823 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:03,823 - INFO - Loading safetensors checkpoint shards:  71% Completed | 12/17 [00:09<00:04,  1.14it/s]
+2026-01-05 05:57:04,627 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:04,628 - INFO - Loading safetensors checkpoint shards:  76% Completed | 13/17 [00:10<00:03,  1.15it/s]
+2026-01-05 05:57:05,430 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:05,430 - INFO - Loading safetensors checkpoint shards:  82% Completed | 14/17 [00:11<00:02,  1.18it/s]
+2026-01-05 05:57:06,233 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:06,233 - INFO - Loading safetensors checkpoint shards:  88% Completed | 15/17 [00:12<00:01,  1.19it/s]
+2026-01-05 05:57:07,239 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:07,239 - INFO - Loading safetensors checkpoint shards:  94% Completed | 16/17 [00:12<00:00,  1.20it/s]
+2026-01-05 05:57:07,843 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:57:07 [default_loader.py:262] Loading weights took 13.41 seconds
+2026-01-05 05:57:07,843 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:57:07 [default_loader.py:262] Loading weights took 13.71 seconds
+2026-01-05 05:57:07,843 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:57:07 [default_loader.py:262] Loading weights took 13.89 seconds
+2026-01-05 05:57:07,843 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:07,843 - INFO - Loading safetensors checkpoint shards: 100% Completed | 17/17 [00:13<00:00,  1.21it/s]
+2026-01-05 05:57:07,843 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:07,844 - INFO - Loading safetensors checkpoint shards: 100% Completed | 17/17 [00:13<00:00,  1.24it/s]
+2026-01-05 05:57:07,844 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m
+2026-01-05 05:57:08,445 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:57:07 [default_loader.py:262] Loading weights took 13.89 seconds
+2026-01-05 05:57:08,445 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:57:08 [gpu_model_runner.py:1892] Model loading took 32.8894 GiB and 353.799343 seconds
+2026-01-05 05:57:08,445 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:57:08 [gpu_model_runner.py:1892] Model loading took 32.8894 GiB and 353.885319 seconds
+2026-01-05 05:57:08,445 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:57:08 [gpu_model_runner.py:1892] Model loading took 32.8894 GiB and 353.964942 seconds
+2026-01-05 05:57:09,149 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:57:08 [gpu_model_runner.py:1892] Model loading took 32.8894 GiB and 354.165799 seconds
+2026-01-05 05:57:18,675 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:6968 [0] NCCL INFO Comm config Blocking set to 1
+2026-01-05 05:57:18,675 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:6970 [2] NCCL INFO Comm config Blocking set to 1
+2026-01-05 05:57:18,675 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:6969 [1] NCCL INFO Comm config Blocking set to 1
+2026-01-05 05:57:18,675 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:6971 [3] NCCL INFO Comm config Blocking set to 1
+2026-01-05 05:57:18,675 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Using network Socket
+2026-01-05 05:57:18,675 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Using network Socket
+2026-01-05 05:57:18,675 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Using network Socket
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Using network Socket
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO ncclCommInitRankConfig comm 0x38702fc0 rank 0 nranks 4 cudaDev 0 nvmlDev 0 busId 38000 commId 0xc66ad84521d09392 - Init START
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO ncclCommInitRankConfig comm 0x386c2b60 rank 3 nranks 4 cudaDev 3 nvmlDev 3 busId 3e000 commId 0xc66ad84521d09392 - Init START
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO ncclCommInitRankConfig comm 0x386e3730 rank 2 nranks 4 cudaDev 2 nvmlDev 2 busId 3c000 commId 0xc66ad84521d09392 - Init START
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO ncclCommInitRankConfig comm 0x387073a0 rank 1 nranks 4 cudaDev 1 nvmlDev 1 busId 3a000 commId 0xc66ad84521d09392 - Init START
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Bootstrap timings total 0.000791 (create 0.000028, send 0.000108, recv 0.000377, ring 0.000118, delay 0.000000)
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Bootstrap timings total 0.000837 (create 0.000025, send 0.000100, recv 0.000171, ring 0.000077, delay 0.000000)
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Bootstrap timings total 0.000824 (create 0.000050, send 0.000108, recv 0.000454, ring 0.000069, delay 0.000000)
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Bootstrap timings total 0.000899 (create 0.000034, send 0.000140, recv 0.000306, ring 0.000256, delay 0.000000)
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Setting affinity for GPU 0 to ffff,ffffffff
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO NVLS multicast support is not available on dev 0
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Setting affinity for GPU 2 to ffff,ffffffff
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO NVLS multicast support is not available on dev 2
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Setting affinity for GPU 3 to ffff,ffffffff
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO NVLS multicast support is not available on dev 3
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Setting affinity for GPU 1 to ffff,ffffffff
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO NVLS multicast support is not available on dev 1
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO comm 0x38702fc0 rank 0 nRanks 4 nNodes 1 localRanks 4 localRank 0 MNNVL 0
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO comm 0x387073a0 rank 1 nRanks 4 nNodes 1 localRanks 4 localRank 1 MNNVL 0
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO comm 0x386e3730 rank 2 nRanks 4 nNodes 1 localRanks 4 localRank 2 MNNVL 0
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO comm 0x386c2b60 rank 3 nRanks 4 nNodes 1 localRanks 4 localRank 3 MNNVL 0
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Trees [0] 2/-1/-1->1->0 [1] 2/-1/-1->1->0
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Trees [0] 3/-1/-1->2->1 [1] 3/-1/-1->2->1
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Channel 00/02 : 0 1 2 3
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Trees [0] -1/-1/-1->3->2 [1] -1/-1/-1->3->2
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO P2P Chunksize set to 131072
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO P2P Chunksize set to 131072
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Channel 01/02 : 0 1 2 3
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO P2P Chunksize set to 131072
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] 1/-1/-1->0->-1
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO P2P Chunksize set to 131072
+2026-01-05 05:57:18,676 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Check P2P Type intraNodeP2pSupport 0 directMode 0
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9268 [2] NCCL INFO [Proxy Service UDS] Device 2 CPU core 31
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9266 [3] NCCL INFO [Proxy Service] Device 3 CPU core 3
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9264 [1] NCCL INFO [Proxy Service] Device 1 CPU core 1
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9265 [2] NCCL INFO [Proxy Service] Device 2 CPU core 0
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9270 [3] NCCL INFO [Proxy Service UDS] Device 3 CPU core 9
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9267 [0] NCCL INFO [Proxy Service] Device 0 CPU core 2
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9271 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 9
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9269 [1] NCCL INFO [Proxy Service UDS] Device 1 CPU core 30
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Channel 00 : 1[1] -> 2[2] via SHM/direct/direct
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Channel 00 : 0[0] -> 1[1] via SHM/direct/direct
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Channel 00 : 3[3] -> 0[0] via SHM/direct/direct
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Channel 00 : 2[2] -> 3[3] via SHM/direct/direct
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Channel 01 : 1[1] -> 2[2] via SHM/direct/direct
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Channel 01 : 0[0] -> 1[1] via SHM/direct/direct
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Channel 01 : 3[3] -> 0[0] via SHM/direct/direct
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Channel 01 : 2[2] -> 3[3] via SHM/direct/direct
+2026-01-05 05:57:18,677 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Connected all rings, use ring PXN 0 GDR 1
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Channel 00 : 3[3] -> 2[2] via SHM/direct/direct
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Channel 01 : 3[3] -> 2[2] via SHM/direct/direct
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Channel 00 : 2[2] -> 1[1] via SHM/direct/direct
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Channel 00 : 1[1] -> 0[0] via SHM/direct/direct
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Channel 01 : 2[2] -> 1[1] via SHM/direct/direct
+2026-01-05 05:57:19,177 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Channel 01 : 1[1] -> 0[0] via SHM/direct/direct
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Connected all trees
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Connected all trees
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Connected all trees
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Connected all trees
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9272 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 1
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9275 [3] NCCL INFO [Proxy Progress] Device 3 CPU core 0
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9274 [1] NCCL INFO [Proxy Progress] Device 1 CPU core 4
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9273 [2] NCCL INFO [Proxy Progress] Device 2 CPU core 3
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO CC Off, workFifoBytes 1048576
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO threadThresholds 8/8/64 | 32/8/64 | 512 | 512
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 2 p2p channels per peer
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO ncclCommInitRankConfig comm 0x387073a0 rank 1 nranks 4 cudaDev 1 nvmlDev 1 busId 3a000 commId 0xc66ad84521d09392 - Init COMPLETE
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9261 [1] NCCL INFO Init timings - ncclCommInitRankConfig: rank 1 nranks 4 total 0.09 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.07, rest 0.00)
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO ncclCommInitRankConfig comm 0x386c2b60 rank 3 nranks 4 cudaDev 3 nvmlDev 3 busId 3e000 commId 0xc66ad84521d09392 - Init COMPLETE
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9263 [3] NCCL INFO Init timings - ncclCommInitRankConfig: rank 3 nranks 4 total 0.09 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.07, rest 0.00)
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO ncclCommInitRankConfig comm 0x386e3730 rank 2 nranks 4 cudaDev 2 nvmlDev 2 busId 3c000 commId 0xc66ad84521d09392 - Init COMPLETE
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9262 [2] NCCL INFO Init timings - ncclCommInitRankConfig: rank 2 nranks 4 total 0.09 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.07, rest 0.00)
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO ncclCommInitRankConfig comm 0x38702fc0 rank 0 nranks 4 cudaDev 0 nvmlDev 0 busId 38000 commId 0xc66ad84521d09392 - Init COMPLETE
+2026-01-05 05:57:19,178 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9260 [0] NCCL INFO Init timings - ncclCommInitRankConfig: rank 0 nranks 4 total 0.09 (kernels 0.00, alloc 0.00, bootstrap 0.00, allgathers 0.00, topo 0.01, graphs 0.00, connections 0.07, rest 0.00)
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=2 pid=6970)[0;0m INFO 01-05 05:57:19 [gpu_worker.py:255] Available KV cache memory: 3.52 GiB
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=3 pid=6971)[0;0m INFO 01-05 05:57:19 [gpu_worker.py:255] Available KV cache memory: 3.52 GiB
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=1 pid=6969)[0;0m INFO 01-05 05:57:19 [gpu_worker.py:255] Available KV cache memory: 3.52 GiB
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [1;36m(VllmWorker rank=0 pid=6968)[0;0m INFO 01-05 05:57:19 [gpu_worker.py:255] Available KV cache memory: 3.52 GiB
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:19 [kv_cache_utils.py:833] GPU KV cache size: 46,112 tokens
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:19 [kv_cache_utils.py:837] Maximum concurrency for 2,559 tokens per request: 18.01x
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:19 [kv_cache_utils.py:833] GPU KV cache size: 46,112 tokens
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:19 [kv_cache_utils.py:837] Maximum concurrency for 2,559 tokens per request: 18.01x
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:19 [kv_cache_utils.py:833] GPU KV cache size: 46,112 tokens
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:19 [kv_cache_utils.py:837] Maximum concurrency for 2,559 tokens per request: 18.01x
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:19 [kv_cache_utils.py:833] GPU KV cache size: 46,112 tokens
+2026-01-05 05:57:19,681 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:19 [kv_cache_utils.py:837] Maximum concurrency for 2,559 tokens per request: 18.01x
+2026-01-05 05:57:20,285 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m INFO 01-05 05:57:20 [core.py:193] init engine (profile, create kv cache, warmup model) took 11.65 seconds
+2026-01-05 05:57:21,089 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m 📊 Using local GPU monitoring (single node, no Ray)
+2026-01-05 05:57:21,089 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m 📊 vLLM Config: {'block_size': 16, 'gpu_memory_utilization': 0.85, 'num_gpu_blocks': 2882, 'num_cpu_blocks': None, 'swap_space': 4.0, 'cache_dtype': 'auto', 'kv_cache_dtype': None, 'dtype': 'torch.bfloat16', 'max_model_len': 2559, 'quantization': None, 'quantization_param_path': None, 'enforce_eager': True, 'max_seq_len_to_capture': 2559, 'lmcache_enabled': False, 'kv_transfer_config_enabled': False, 'enable_prefix_caching': None, 'enable_chunked_prefill': None, 'trust_remote_code': None}
+2026-01-05 05:57:25,199 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m
+2026-01-05 05:57:25,199 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Generating test split:   0%|          | 0/100 [00:00<?, ? examples/s]
+2026-01-05 05:57:25,199 - INFO - Generating test split: 100%|██████████| 100/100 [00:00<00:00, 499.27 examples/s]
+2026-01-05 05:57:25,199 - INFO - Generating test split: 100%|██████████| 100/100 [00:00<00:00, 492.72 examples/s]
+2026-01-05 05:57:25,199 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (57163 > 16384). Running this sequence through the model will result in indexing errors
+2026-01-05 05:57:30,114 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m 🔥 Running warmup with 5 samples...
+2026-01-05 05:57:30,114 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m
+2026-01-05 05:57:30,114 - INFO - Adding requests:   0%|          | 0/5 [00:00<?, ?it/s]
+2026-01-05 05:57:30,115 - INFO - Adding requests: 100%|██████████| 5/5 [00:00<00:00, 279.29it/s]
+2026-01-05 05:58:12,280 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m
+2026-01-05 05:58:12,983 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:   0%|          | 0/5 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
+2026-01-05 05:58:12,983 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  20%|██        | 1/5 [00:42<02:48, 42.19s/it, est. speed input: 48.56 toks/s, output: 12.09 toks/s]
+2026-01-05 05:58:12,983 - INFO - Processed prompts: 100%|██████████| 5/5 [00:42<00:00,  6.43s/it, est. speed input: 238.81 toks/s, output: 59.44 toks/s]
+2026-01-05 05:58:12,983 - INFO - Processed prompts: 100%|██████████| 5/5 [00:42<00:00,  6.43s/it, est. speed input: 238.81 toks/s, output: 59.44 toks/s]
+2026-01-05 05:58:12,983 - INFO - Processed prompts: 100%|██████████| 5/5 [00:42<00:00,  8.58s/it, est. speed input: 238.81 toks/s, output: 59.44 toks/s]
+2026-01-05 05:58:12,983 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ✅ Warmup complete, starting actual measurement
+2026-01-05 05:58:13,686 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m
+2026-01-05 05:58:13,686 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Adding requests:   0%|          | 0/30 [00:00<?, ?it/s]
+2026-01-05 05:58:13,686 - INFO - Adding requests: 100%|██████████| 30/30 [00:00<00:00, 296.68it/s]
+2026-01-05 05:58:13,686 - INFO - Adding requests: 100%|██████████| 30/30 [00:00<00:00, 296.27it/s]
+2026-01-05 05:59:38,013 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m
+2026-01-05 05:59:40,221 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:   0%|          | 0/30 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]
+2026-01-05 05:59:46,244 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:   3%|▎         | 1/30 [01:24<40:59, 84.82s/it, est. speed input: 24.16 toks/s, output: 6.01 toks/s]
+2026-01-05 05:59:53,670 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:   7%|▋         | 2/30 [01:27<16:54, 36.22s/it, est. speed input: 47.10 toks/s, output: 11.72 toks/s]
+2026-01-05 06:00:01,208 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  17%|█▋        | 5/30 [01:32<04:52, 11.71s/it, est. speed input: 110.17 toks/s, output: 27.42 toks/s]
+2026-01-05 06:00:01,208 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  30%|███       | 9/30 [01:40<02:06,  6.04s/it, est. speed input: 183.44 toks/s, output: 45.66 toks/s]
+2026-01-05 06:00:11,846 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  43%|████▎     | 13/30 [01:48<01:10,  4.16s/it, est. speed input: 246.63 toks/s, output: 61.39 toks/s]
+2026-01-05 06:00:20,484 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  57%|█████▋    | 17/30 [01:48<00:32,  2.54s/it, est. speed input: 322.19 toks/s, output: 80.19 toks/s]
+2026-01-05 06:00:28,510 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  63%|██████▎   | 19/30 [01:58<00:34,  3.13s/it, est. speed input: 328.24 toks/s, output: 81.70 toks/s]
+2026-01-05 06:00:36,336 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  67%|██████▋   | 20/30 [02:07<00:38,  3.87s/it, est. speed input: 322.07 toks/s, output: 80.16 toks/s]
+2026-01-05 06:00:38,644 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  70%|███████   | 21/30 [02:15<00:41,  4.57s/it, est. speed input: 317.78 toks/s, output: 79.10 toks/s]
+2026-01-05 06:00:38,645 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  73%|███████▎  | 22/30 [02:23<00:41,  5.16s/it, est. speed input: 314.97 toks/s, output: 78.40 toks/s]
+2026-01-05 06:00:38,645 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Processed prompts:  77%|███████▋  | 23/30 [02:25<00:31,  4.55s/it, est. speed input: 324.07 toks/s, output: 80.66 toks/s]
+2026-01-05 06:00:38,645 - INFO - Processed prompts: 100%|██████████| 30/30 [02:25<00:00,  1.47s/it, est. speed input: 422.35 toks/s, output: 105.12 toks/s]
+2026-01-05 06:00:38,645 - INFO - Processed prompts: 100%|██████████| 30/30 [02:25<00:00,  1.47s/it, est. speed input: 422.35 toks/s, output: 105.12 toks/s]
+2026-01-05 06:00:38,645 - INFO - Processed prompts: 100%|██████████| 30/30 [02:25<00:00,  4.85s/it, est. speed input: 422.35 toks/s, output: 105.12 toks/s]
+2026-01-05 06:00:38,645 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m 📊 GPU monitoring: local (single node)
+2026-01-05 06:00:38,645 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m 📈 Time-series saved to /tmp/timeseries_tp4_pp1_in2048_out512.json
+2026-01-05 06:01:10,852 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [rank0]:[W105 06:01:10.855453900 ProcessGroupNCCL.cpp:1479] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+2026-01-05 06:01:10,852 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9728 [0] NCCL INFO misc/socket.cc:64 -> 3
+2026-01-05 06:01:10,852 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9728 [0] NCCL INFO misc/socket.cc:80 -> 3
+2026-01-05 06:01:10,852 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9728 [0] NCCL INFO misc/socket.cc:829 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9267 [0] NCCL INFO misc/socket.cc:881 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9730 [2] NCCL INFO misc/socket.cc:64 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9730 [2] NCCL INFO misc/socket.cc:80 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9730 [2] NCCL INFO misc/socket.cc:829 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9265 [2] NCCL INFO misc/socket.cc:881 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9732 [1] NCCL INFO misc/socket.cc:64 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9732 [1] NCCL INFO misc/socket.cc:80 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9732 [1] NCCL INFO misc/socket.cc:829 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9264 [1] NCCL INFO misc/socket.cc:881 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9734 [3] NCCL INFO misc/socket.cc:64 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9734 [3] NCCL INFO misc/socket.cc:80 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9734 [3] NCCL INFO misc/socket.cc:829 -> 3
+2026-01-05 06:01:10,853 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9266 [3] NCCL INFO misc/socket.cc:881 -> 3
+2026-01-05 06:01:11,754 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6968:9728 [0] NCCL INFO comm 0x38702fc0 rank 0 nranks 4 cudaDev 0 busId 38000 - Abort COMPLETE
+2026-01-05 06:01:11,754 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6970:9730 [2] NCCL INFO comm 0x386e3730 rank 2 nranks 4 cudaDev 2 busId 3c000 - Abort COMPLETE
+2026-01-05 06:01:11,755 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6971:9734 [3] NCCL INFO comm 0x386c2b60 rank 3 nranks 4 cudaDev 3 busId 3e000 - Abort COMPLETE
+2026-01-05 06:01:11,755 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ip-172-31-80-181:6969:9732 [1] NCCL INFO comm 0x387073a0 rank 1 nranks 4 cudaDev 1 busId 3a000 - Abort COMPLETE
+2026-01-05 06:01:11,755 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [rank2]:[W105 06:01:11.406515287 ProcessGroupNCCL.cpp:1479] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+2026-01-05 06:01:11,755 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [rank1]:[W105 06:01:11.412150610 ProcessGroupNCCL.cpp:1479] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+2026-01-05 06:01:11,755 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m [rank3]:[W105 06:01:11.414567249 ProcessGroupNCCL.cpp:1479] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+2026-01-05 06:01:12,258 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Result: {'tp': 4, 'pp': 1, 'max_input_length': 2048, 'max_output_length': 512, 'model': 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B', 'exp_id': 'tp4_pp1_in2048_out512', 'elapsed_time': 145.643788825, 'total_prompt_tokens': 61470, 'total_output_tokens': 15300, 'requests_per_sec': 0.206, 'input_tokens_per_sec': 422.06, 'output_tokens_per_sec': 105.05, 'total_tokens_per_sec': 527.11, 'status': 'success', 'timeseries_file': '/tmp/timeseries_tp4_pp1_in2048_out512.json', 'instance_type': 'g6e.12xlarge', 'price_per_hour': 4.68, 'num_nodes': 1, 'gpus_per_node': 4, 'total_gpus': 4, 'cost_for_run_usd': 0.1893, 'tokens_per_dollar': 405467.66, 'input_tokens_per_dollar': 324659.33, 'output_tokens_per_dollar': 80808.33, 'llm_model': 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B', 'llm_tensor_parallel_size': 4, 'llm_pipeline_parallel_size': 1, 'llm_max_model_len': 2559, 'llm_trust_remote_code': True, 'llm_distributed_executor_backend': None, 'llm_gpu_memory_utilization': 0.85, 'llm_enforce_eager': True, 'llm_enable_chunked_prefill': False, 'llm_enable_prefix_caching': False, 'llm_kv_transfer_config': None, 'sampling_temperature': 0.8, 'sampling_max_tokens': 512, 'sampling_min_tokens': 512, 'sampling_ignore_eos': True, 'benchmark_num_samples': 30, 'benchmark_dataset': 'emozilla/pg19-test', 'benchmark_prompt_prefix': 'Please summarize the following text: ', 'benchmark_warmup_samples': 5, 'gpu_monitor_sample_interval': 0.5, 'gpu_monitor_type': 'local', 'scheduler_monitor_sample_interval': 0.25, 'gpu_monitor_num_nodes': 1, 'gpu_monitor_num_gpus_monitored': 4, 'gpu_monitor_num_nodes_reported': 1, 'config_block_size': 16, 'config_gpu_memory_utilization': 0.85, 'config_num_gpu_blocks': 2882, 'config_num_cpu_blocks': None, 'config_swap_space': 4.0, 'config_cache_dtype': 'auto', 'config_kv_cache_dtype': None, 'config_dtype': 'torch.bfloat16', 'config_max_model_len': 2559, 'config_quantization': None, 'config_quantization_param_path': None, 'config_enforce_eager': True, 'config_max_seq_len_to_capture': 2559, 'config_lmcache_enabled': False, 'config_kv_transfer_config_enabled': False, 'config_enable_prefix_caching': None, 'config_enable_chunked_prefill': None, 'config_trust_remote_code': None, 'gpu0_mem_gb_avg': 39.62, 'gpu0_mem_gb_max': 39.62, 'gpu0_mem_gb_min': 39.62, 'gpu0_mem_pct_avg': 88.1, 'gpu0_mem_pct_max': 88.1, 'gpu0_mem_pct_min': 88.1, 'gpu0_sm_pct_avg': 98.27, 'gpu0_sm_pct_max': 100, 'gpu0_sm_pct_min': 29, 'gpu0_membw_pct_avg': 50.16, 'gpu0_membw_pct_max': 90, 'gpu0_membw_pct_min': 8, 'gpu1_mem_gb_avg': 39.2, 'gpu1_mem_gb_max': 39.21, 'gpu1_mem_gb_min': 39.2, 'gpu1_mem_pct_avg': 87.1, 'gpu1_mem_pct_max': 87.1, 'gpu1_mem_pct_min': 87.1, 'gpu1_sm_pct_avg': 98.25, 'gpu1_sm_pct_max': 100, 'gpu1_sm_pct_min': 19, 'gpu1_membw_pct_avg': 50.1, 'gpu1_membw_pct_max': 90, 'gpu1_membw_pct_min': 8, 'gpu2_mem_gb_avg': 39.2, 'gpu2_mem_gb_max': 39.21, 'gpu2_mem_gb_min': 39.2, 'gpu2_mem_pct_avg': 87.1, 'gpu2_mem_pct_max': 87.1, 'gpu2_mem_pct_min': 87.1, 'gpu2_sm_pct_avg': 98.2, 'gpu2_sm_pct_max': 100, 'gpu2_sm_pct_min': 26, 'gpu2_membw_pct_avg': 50.12, 'gpu2_membw_pct_max': 91, 'gpu2_membw_pct_min': 8, 'gpu3_mem_gb_avg': 39.2, 'gpu3_mem_gb_max': 39.21, 'gpu3_mem_gb_min': 39.2, 'gpu3_mem_pct_avg': 87.1, 'gpu3_mem_pct_max': 87.1, 'gpu3_mem_pct_min': 87.1, 'gpu3_sm_pct_avg': 98.24, 'gpu3_sm_pct_max': 100, 'gpu3_sm_pct_min': 30, 'gpu3_membw_pct_avg': 50.22, 'gpu3_membw_pct_max': 90, 'gpu3_membw_pct_min': 8, 'avg_sm_util_pct': 98.24, 'max_sm_util_pct': 100, 'avg_mem_bw_util_pct': 50.15, 'max_mem_bw_util_pct': 91, 'avg_mem_util_pct': 87.35, 'max_mem_util_pct': 88.1, 'gpu_samples': 290}
+2026-01-05 06:01:12,258 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m
+2026-01-05 06:01:12,258 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ✅ All done! Results in /tmp/benchmark_results.json
+2026-01-05 06:01:13,665 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + echo 'Cluster ready for benchmarking'
+2026-01-05 06:01:13,665 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m Cluster ready for benchmarking
+2026-01-05 06:01:13,665 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ findmnt -t fuse.rclone --noheading
+2026-01-05 06:01:13,665 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m ++ wc -l
+2026-01-05 06:01:13,665 - INFO - [36m(roofline-tp4-pp1-2048in-512out, pid=3243)[0m + '[' 0 -gt 0 ']'
+2026-01-05 06:01:14,869 - INFO - [0m[32m✓ Job finished (status: SUCCEEDED).[0m[0m
+2026-01-05 06:01:16,077 - INFO - 
+2026-01-05 06:01:16,078 - INFO - 📋 Useful Commands
+2026-01-05 06:01:16,078 - INFO - Job ID: 1
+2026-01-05 06:01:16,078 - INFO - ├── To cancel the job:		sky cancel roofline-tp4-pp1-2048in-512out 1
+2026-01-05 06:01:16,078 - INFO - ├── To stream job logs:		sky logs roofline-tp4-pp1-2048in-512out 1
+2026-01-05 06:01:16,078 - INFO - └── To view job queue:		sky queue roofline-tp4-pp1-2048in-512out
+2026-01-05 06:01:16,078 - INFO - Cluster name: roofline-tp4-pp1-2048in-512out
+2026-01-05 06:01:16,078 - INFO - ├── To log into the head VM:	ssh roofline-tp4-pp1-2048in-512out
+2026-01-05 06:01:16,078 - INFO - ├── To submit a job:		sky exec roofline-tp4-pp1-2048in-512out yaml_file
+2026-01-05 06:01:16,078 - INFO - ├── To stop the cluster:	sky stop roofline-tp4-pp1-2048in-512out
+2026-01-05 06:01:16,078 - INFO - └── To teardown the cluster:	sky down roofline-tp4-pp1-2048in-512out
+2026-01-05 06:01:16,457 - INFO - 📥 Fetching results...
+2026-01-05 06:01:17,186 - INFO - 📈 Fetching timeseries data...
+2026-01-05 06:01:17,565 - INFO - 📁 Renaming directory: tp4-pp1-20260105_054804 -> tp4-pp1-20260105_054804-success
+2026-01-05 06:01:17,566 - INFO - ✅ Results saved to result-2048in_512out/aws-g6e-L40S/tp4-pp1-20260105_054804-success/
+2026-01-05 06:01:17,709 - INFO - 🗑️  Tearing down roofline-tp4-pp1-2048in-512out...

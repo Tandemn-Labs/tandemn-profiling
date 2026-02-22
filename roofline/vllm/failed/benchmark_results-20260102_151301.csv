@@ -1,0 +1,2 @@
+tp,pp,max_input_length,max_output_length,model,status,error
+2,2,8192,2048,deepseek-ai/DeepSeek-R1-Distill-Llama-70B,error,Engine core initialization failed. See root cause above. Failed core proc(s): {'EngineCore_0': 1}
