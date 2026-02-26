@@ -624,6 +624,11 @@ setup: |
     uv pip install "vllm==0.10.0"
   fi
 
+  # Pin transformers to avoid breaking changes in 5.x
+  # (vllm 0.10.0 allows transformers>=5 but it breaks tokenizer backend)
+  echo "=== Pinning transformers==4.57.3 (avoid 5.x breaking changes) ==="
+  uv pip install "transformers==4.57.3"
+
   # Verify PyTorch has CUDA support
   echo "=== PyTorch CUDA Check ==="
   python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.version.cuda:', torch.version.cuda); print('torch.__version__:', torch.__version__); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A')" || echo "PyTorch CUDA check failed!"
@@ -1946,27 +1951,31 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
 
     # Create consolidated result directory with datetime
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    subdir_name = f"tp{tp}-pp{pp}-{timestamp}"
-    
-    # Get instance family and GPU name for directory organization
+
+    # Get instance family, GPU name, and instance type for directory organization
     gpu_config = GPU_CONFIGS[gpu_type]
     instance_family = gpu_config["instance_family"]
-    # Use gpu_type as GPU name (e.g., "L4", "L40S", "A100-40gb", "A100-80gb")
     gpu_name = gpu_type
-    instance_dir = f"aws-{instance_family}-{gpu_name}"
-    
-    # If parent_dir is provided, create subdirectory structure: parent_dir/aws-{instance_family}-{gpu_name}/tp{tp}-pp{pp}-{timestamp}
-    if parent_dir:
-        parent_path = Path(parent_dir)
-        parent_path.mkdir(exist_ok=True)
-        instance_path = parent_path / instance_dir
-        instance_path.mkdir(exist_ok=True)
-        result_dir = instance_path / subdir_name
+    instance_dir = f"aws_{instance_family}_{gpu_name}"
+
+    # Build instance name for directory (e.g., "g5_12xlarge" or "2x_g5_12xlarge")
+    instance_info = gpu_config["pricing"].get(gpus_per_node, {})
+    instance_type = instance_info.get("instance_type", f"{instance_family}.unknown")
+    if num_nodes > 1:
+        instance_name = f"{num_nodes}x_{instance_type}"
     else:
-        # If no parent_dir, create: aws-{instance_family}-{gpu_name}/tp{tp}-pp{pp}-{timestamp}
+        instance_name = instance_type
+    instance_name_safe = instance_name.replace(".", "_")
+
+    subdir_name = f"tp{tp}-pp{pp}-{instance_name_safe}-{timestamp}"
+
+    # Directory structure: results/result-{input_len}in_{output_len}out/aws-{family}-{gpu}/tp{tp}-pp{pp}-{instance}-{timestamp}
+    if parent_dir:
+        instance_path = Path(parent_dir) / instance_dir
+    else:
         instance_path = Path(instance_dir)
-        instance_path.mkdir(exist_ok=True)
-        result_dir = instance_path / subdir_name
+    instance_path.mkdir(parents=True, exist_ok=True)
+    result_dir = instance_path / subdir_name
 
     print(f"\n{'='*70}")
     print(f"Cluster: {cluster_name}")
@@ -2073,9 +2082,9 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
         status_suffix = 'success' if all_succeeded else 'fail'
         
         # Rename directory to include status suffix
-        new_subdir_name = f"tp{tp}-pp{pp}-{timestamp}-{status_suffix}"
+        new_subdir_name = f"tp{tp}-pp{pp}-{instance_name_safe}-{timestamp}-{status_suffix}"
         new_result_dir = instance_path / new_subdir_name
-        
+
         if result_dir != new_result_dir:
             logger.info(f"📁 Renaming directory: {result_dir.name} -> {new_result_dir.name}")
             result_dir.rename(new_result_dir)
@@ -2177,9 +2186,9 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
             status_suffix = 'fail'
         
         # Rename directory to include status suffix
-        new_subdir_name = f"tp{tp}-pp{pp}-{timestamp}-{status_suffix}"
+        new_subdir_name = f"tp{tp}-pp{pp}-{instance_name_safe}-{timestamp}-{status_suffix}"
         new_result_dir = instance_path / new_subdir_name
-        
+
         if result_dir != new_result_dir:
             logger.info(f"📁 Renaming directory: {result_dir.name} -> {new_result_dir.name}")
             result_dir.rename(new_result_dir)
@@ -2328,7 +2337,7 @@ Examples:
     try:
         for (input_len, output_len), cluster_groups in sorted(io_groups.items()):
             # Create parent directory for this input/output length
-            parent_dir = f"result-{input_len}in_{output_len}out"
+            parent_dir = f"results/wrk-{input_len}in_{output_len}out"
             
             # Collect results for this IO group
             io_group_results = []
