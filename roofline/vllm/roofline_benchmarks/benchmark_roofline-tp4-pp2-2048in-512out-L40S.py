@@ -627,7 +627,7 @@ class SchedulerMonitor:
         summary['scheduler_samples'] = len(self.timeseries)
         return summary
 
-# DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
+DISCORD_WEBHOOK = ""
 
 # def send_discord_message(message):
 #     payload = {"content": message}
