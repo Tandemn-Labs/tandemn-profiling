@@ -6,39 +6,21 @@ os.environ["LMCACHE_LOG_LEVEL"] = "INFO"
 import requests
 import json
 import time
-import torch
 import gc
 
-# Initialize CUDA BEFORE importing vLLM to prevent "Error 802: system not yet initialized"
-# vLLM's Flash Attention checks GPU capabilities during import, which requires CUDA to be initialized
-print("🔧 Initializing CUDA before vLLM import...")
-if torch.cuda.is_available():
-    try:
-        # Force CUDA initialization by accessing device properties
-        device_count = torch.cuda.device_count()
-        if device_count > 0:
-            _ = torch.cuda.get_device_properties(0)
-            print(f"   ✅ CUDA initialized: {device_count} GPU(s) available")
-        else:
-            raise RuntimeError("No CUDA devices found")
-    except Exception as e:
-        print(f"   ⚠️  CUDA initialization error: {e}")
-        # Try to reset and retry
-        torch.cuda.empty_cache()
-        import time as time_module
-        time_module.sleep(2)
-        device_count = torch.cuda.device_count()
-        if device_count > 0:
-            _ = torch.cuda.get_device_properties(0)
-            print(f"   ✅ CUDA reinitialized: {device_count} GPU(s) available")
-        else:
-            raise RuntimeError(f"Failed to initialize CUDA: {e}")
-else:
-    raise RuntimeError("CUDA is not available!")
+# DO NOT import torch or call any CUDA functions before vLLM!
+# vLLM 0.10.0's V1 engine uses multiprocessing with fork.
+# If CUDA is initialized before fork, workers fail with:
+#   "Cannot re-initialize CUDA in forked subprocess"
+# Let vLLM handle CUDA initialization internally.
 
 import ray
 from datasets import load_dataset
 from vllm import LLM, SamplingParams
+
+# Import torch AFTER vLLM to avoid "Cannot re-initialize CUDA in forked subprocess" error
+# vLLM 0.10.0's V1 engine uses multiprocessing with fork, and CUDA must not be initialized before fork
+import torch
 
 # Handle API differences between vLLM versions
 try:
@@ -645,11 +627,11 @@ class SchedulerMonitor:
         summary['scheduler_samples'] = len(self.timeseries)
         return summary
 
-DISCORD_WEBHOOK = ""
+# DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
 
-def send_discord_message(message):
-    payload = {"content": message}
-    requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
+# def send_discord_message(message):
+#     payload = {"content": message}
+#     requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
 
 # Clean up existing cache directory
 cache_dir = "/tmp/lmcache_disk"
@@ -660,10 +642,10 @@ os.makedirs(cache_dir, exist_ok=True)
 
 EXPERIMENTS = [
   {
-    "tp": 8,
-    "pp": 1,
-    "max_input_length": 4096,
-    "max_output_length": 1024,
+    "tp": 4,
+    "pp": 2,
+    "max_input_length": 2048,
+    "max_output_length": 512,
     "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B"
   }
 ]
@@ -671,8 +653,8 @@ RESULTS_FILE = "/tmp/benchmark_results.json"
 NUM_SAMPLES = 50
 
 # Cluster pricing information
-INSTANCE_TYPE = "p4de.24xlarge"
-PRICE_PER_HOUR = 40.96
+INSTANCE_TYPE = "g6e.48xlarge"
+PRICE_PER_HOUR = 13.35
 NUM_NODES = 1
 GPUS_PER_NODE = 8
 
@@ -1022,7 +1004,7 @@ def run_benchmark(exp):
         gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
-        send_discord_message(f"✅ Results saved to {exp['tp']}-{exp['pp']}")
+        # send_discord_message(f"✅ Results saved to {exp['tp']}-{exp['pp']}")
 
         # Calculate cost efficiency metrics
         total_tokens = total_prompt_tokens + total_output_tokens
@@ -1110,7 +1092,7 @@ def run_benchmark(exp):
         error_msg = str(e)
         if "CUDA out of memory" in error_msg or "OutOfMemoryError" in error_msg:
             error_msg = f"OOM: {error_msg[:200]}"
-        send_discord_message(f"❌ Cluster {exp['tp']}-{exp['pp']} FAILED: {error_msg}")
+        # send_discord_message(f"❌ Cluster {exp['tp']}-{exp['pp']} FAILED: {error_msg}")
         # if backend == "ray":
         #     restart_ray_cluster()
         

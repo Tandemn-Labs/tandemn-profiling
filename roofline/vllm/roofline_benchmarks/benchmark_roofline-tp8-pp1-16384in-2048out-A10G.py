@@ -631,7 +631,7 @@ class SchedulerMonitor:
         summary['scheduler_samples'] = len(self.timeseries)
         return summary
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
+DISCORD_WEBHOOK = ""
 
 def send_discord_message(message):
     payload = {"content": message}
@@ -654,7 +654,7 @@ EXPERIMENTS = [
   }
 ]
 RESULTS_FILE = "/tmp/benchmark_results.json"
-NUM_SAMPLES = 30
+NUM_SAMPLES = 50
 
 # Cluster pricing information
 INSTANCE_TYPE = "g5.48xlarge"
@@ -840,11 +840,12 @@ def run_benchmark(exp):
         )
 
         # Initialize GPU monitor AFTER LLM creation (Ray is now initialized)
-        # For PP > 1, we should use distributed monitoring. vLLM initializes Ray internally,
+        # For multi-node PP > 1, we should use distributed monitoring. vLLM initializes Ray internally,
         # but we need to explicitly connect to it using RAY_ADDRESS.
+        # For single-node setups (even with Ray), use local monitoring to avoid Ray timeout issues.
         use_distributed = False
         if backend == "ray":
-            print("📡 Attempting distributed GPU monitoring across Ray cluster...")
+            print("📡 Checking Ray cluster for GPU monitoring...")
             try:
                 # vLLM initializes Ray internally, but we need to connect to it explicitly
                 # Get Ray address from environment (set at the top of the script)
@@ -862,8 +863,9 @@ def run_benchmark(exp):
                     # Now check if we can access nodes
                     nodes = ray.nodes()
                     alive_nodes = [n for n in nodes if n.get('Alive', False)]
-                    ray_available = len(alive_nodes) > 0
-                    print(f"   Ray cluster detected: {len(alive_nodes)} alive nodes")
+                    num_nodes = len(alive_nodes)
+                    ray_available = num_nodes > 0
+                    print(f"   Ray cluster detected: {num_nodes} alive node(s)")
                     for idx, node in enumerate(alive_nodes):
                         node_id = node.get('NodeID', 'unknown')
                         print(f"      Node {idx}: {node_id}")
@@ -871,12 +873,21 @@ def run_benchmark(exp):
                     print(f"   Could not access Ray cluster: {ray_check_error}")
                     print(f"   Ray.is_initialized(): {ray.is_initialized() if hasattr(ray, 'is_initialized') else 'N/A'}")
                     print(f"   RAY_ADDRESS: {ray_address}")
+                    num_nodes = 0
                 
                 if ray_available:
-                    # Try to initialize distributed monitor
-                    gpu_monitor = DistributedGPUMonitor(sample_interval=0.5)
-                    use_distributed = True
-                    print("✅ Distributed GPU monitoring initialized successfully")
+                    # Only use distributed monitoring for multi-node setups
+                    # Single-node Ray clusters should use local monitoring to avoid timeout issues
+                    if num_nodes > 1:
+                        print(f"📡 Using distributed GPU monitoring ({num_nodes} nodes)")
+                        # Try to initialize distributed monitor
+                        gpu_monitor = DistributedGPUMonitor(sample_interval=0.5)
+                        use_distributed = True
+                        print("✅ Distributed GPU monitoring initialized successfully")
+                    else:
+                        print(f"📊 Using local GPU monitoring (single-node Ray cluster)")
+                        gpu_monitor = GPUMonitor(sample_interval=0.5)
+                        use_distributed = False
                 else:
                     raise Exception("Ray cluster not accessible")
             except Exception as e:
