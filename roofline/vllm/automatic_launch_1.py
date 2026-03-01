@@ -74,6 +74,10 @@ GPU_CONFIGS = {
 # Default GPU type (for backward compatibility)
 DEFAULT_GPU_TYPE = "L40S"
 
+# S3 model storage defaults (used with --s3-models flag)
+DEFAULT_S3_BUCKET = "tandemn-model-shards"
+DEFAULT_S3_PREFIX = "hf-models"
+
 # VM selection strategies for mapping (TP, PP) -> (gpus_per_node, num_nodes)
 # - prefer_single_node: Strategy 1 then fallback to Strategy 2 (current/default behavior)
 # - fit_tp_then_scale: Always use Strategy 2 (fit TP within a node, then scale nodes)
@@ -337,7 +341,7 @@ def cleanup_old_benchmark_files(work_dir=None):
     
     return removed_count
 
-def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE):
+def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE, s3_models=False):
     lmcache_exports = """
   # Ensure CUDA libraries are in LD_LIBRARY_PATH for PyTorch
   export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
@@ -442,6 +446,15 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
     # Determine if this is an A100 GPU type
     is_a100 = gpu_type.upper().startswith("A100")
 
+    # Build file_mounts block for S3 model loading
+    file_mounts_block = ""
+    if s3_models:
+        unique_models = list(dict.fromkeys(exp['model'] for exp in experiments))
+        mounts = []
+        for model_name in unique_models:
+            mounts.append(f"  /models/{model_name}:\n    source: s3://{DEFAULT_S3_BUCKET}/{DEFAULT_S3_PREFIX}/{model_name}\n    mode: COPY")
+        file_mounts_block = "\nfile_mounts:\n" + "\n".join(mounts) + "\n"
+
     return f"""
 name: {cluster_name}
 resources:
@@ -452,7 +465,7 @@ resources:
   # No region constraint - SkyPilot will try all available AWS regions
   # This helps find capacity when us-east-1 is full (especially during US business hours)
 num_nodes: {num_nodes}
-workdir: .
+workdir: .{file_mounts_block}
 setup: |
   export PYTHONHASHSEED=0
   set -euxo pipefail
@@ -757,7 +770,7 @@ def send_discord_message(message):
     payload = {"content": message}
     requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
 
-def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DEFAULT_GPU_TYPE):
+def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DEFAULT_GPU_TYPE, s3_models=False):
     """Generate Python benchmark script for a set of experiments."""
     exp_list = json.dumps(experiments, indent=2)
 
@@ -771,6 +784,9 @@ def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DE
     else:
         cluster_instance_type = instance_type
     
+    # Model path expression for the generated script
+    model_expr = "f\"/models/{exp['model']}\"" if s3_models else "exp['model']"
+
     return f'''#!/usr/bin/env python3
 import os
 os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
@@ -1585,7 +1601,7 @@ def run_benchmark(exp):
         # )
 
         llm = LLM(
-            model=exp['model'],
+            model={model_expr},
             tensor_parallel_size=exp['tp'],
             pipeline_parallel_size=exp['pp'],
             max_model_len=min(exp['max_input_length'] + exp['max_output_length'] -1, 32768), # -1 because of the eos token removing
@@ -1936,7 +1952,7 @@ if __name__ == "__main__":
     main()
 '''
 
-def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True, gpu_type=DEFAULT_GPU_TYPE):
+def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True, gpu_type=DEFAULT_GPU_TYPE, s3_models=False):
     gpus_per_node, num_nodes = cluster_config
     # Use TP/PP from the first experiment for naming (all experiments in a group have compatible TP/PP)
     tp = experiments[0]['tp']
@@ -2023,11 +2039,11 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
         logger.info(f"🗑️  Removing old script file: {old_script_path.name} (replaced by GPU-type-specific file)")
         old_script_path.unlink()
     
-    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type)
+    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type, s3_models=s3_models)
     yaml_path.write_text(yaml_content)
 
     # 2. Write benchmark script
-    script_content = generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type)
+    script_content = generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type, s3_models=s3_models)
     script_path.write_text(script_content)
 
     # Track active cluster for cleanup on unexpected exit
@@ -2286,10 +2302,12 @@ Examples:
                        help=f'GPU type to use (default: {DEFAULT_GPU_TYPE})')
     parser.add_argument('--vm-strategy', dest='vm_strategy',
                        choices=list(VM_SELECTION_STRATEGIES.keys()),
-                       default='prefer_single_node',
+                       default='fit_tp_then_scale',
                        help='VM selection strategy for TP/PP -> cluster sizing')
     parser.add_argument('--run', action='store_true',
                        help='Actually launch clusters (default: dry run)')
+    parser.add_argument('--s3-models', action='store_true',
+                       help='Load models from S3 instead of HuggingFace (faster, requires prior upload via upload_model_to_s3.py)')
     parser.add_argument('--cleanup', action='store_true',
                        help='Clean up old benchmark files without GPU type in their names')
     
@@ -2343,7 +2361,7 @@ Examples:
             io_group_results = []
             
             for cluster_config, exps in sorted(cluster_groups.items(), key=cluster_sort_key):
-                results = run_cluster_benchmarks(cluster_config, exps, parent_dir=parent_dir, dry_run=dry_run, gpu_type=gpu_type)
+                results = run_cluster_benchmarks(cluster_config, exps, parent_dir=parent_dir, dry_run=dry_run, gpu_type=gpu_type, s3_models=args.s3_models)
                 if results:
                     io_group_results.extend(results)
                     all_results.extend(results)
