@@ -1475,7 +1475,7 @@ os.makedirs(cache_dir, exist_ok=True)
 
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
-NUM_SAMPLES = 50
+MIN_NUM_SAMPLES = 50  # Floor; actual count computed dynamically in run_benchmark() from KV cache concurrency
 
 # Cluster pricing information
 INSTANCE_TYPE = "{cluster_instance_type}"
@@ -1862,7 +1862,7 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
         'output_len_tokens_avg': output_len,
         'output_len_tokens_fixed': output_len,
         'prefill_decode_ratio': _safe_div(input_len, output_len),
-        'num_requests': NUM_SAMPLES,
+        'num_requests': measured_data.get('num_requests', MIN_NUM_SAMPLES),
         'model_size_gb': model_size_gb,
         'params_per_gpu': _safe_div(params_b, gpu_count),
         'model_fits_single_gpu': (model_size_gb <= GPU_MEM_GB) if model_size_gb else None,
@@ -2141,13 +2141,26 @@ def run_benchmark(exp):
         vllm_config = get_vllm_config_info(llm)
         print(f"📊 vLLM Config: {{vllm_config}}")
 
+        # Compute dynamic NUM_SAMPLES from KV cache concurrency
+        _num_gpu_blocks = vllm_config.get('num_gpu_blocks') or 0
+        _block_size = vllm_config.get('block_size') or 16
+        _max_model_len = vllm_config.get('max_model_len') or (exp['max_input_length'] + exp['max_output_length'])
+        if _num_gpu_blocks > 0 and _max_model_len > 0:
+            max_concurrency = (_num_gpu_blocks * _block_size) / _max_model_len
+            NUM_SAMPLES = max(MIN_NUM_SAMPLES, int(4 * max_concurrency))
+            print(f"📊 Dynamic NUM_SAMPLES: {{NUM_SAMPLES}} (max_concurrency={{max_concurrency:.1f}}, 4x={{int(4 * max_concurrency)}})")
+        else:
+            max_concurrency = None
+            NUM_SAMPLES = MIN_NUM_SAMPLES
+            print(f"⚠️  Could not compute concurrency, using default NUM_SAMPLES={{NUM_SAMPLES}}")
+
         tokenizer = llm.get_tokenizer()
         dataset = load_dataset("emozilla/pg19-test", split="test")
 
-        # Prepare prompts
+        # Prepare prompts (recycle dataset entries if NUM_SAMPLES > dataset size)
         prompts = []
-        for i in range(min(NUM_SAMPLES, len(dataset))):
-            text = "Please summarize the following text: " + dataset[i]["text"]
+        for i in range(NUM_SAMPLES):
+            text = "Please summarize the following text: " + dataset[i % len(dataset)]["text"]
             tokens = tokenizer.encode(text, add_special_tokens=False)[:exp['max_input_length']]
             prompts.append(tokenizer.decode(tokens))
 
@@ -2371,6 +2384,7 @@ def run_benchmark(exp):
             'e2e_ms_p50': delta_e2e_pcts.get('e2e_ms_p50'),
             'e2e_ms_p95': delta_e2e_pcts.get('e2e_ms_p95'),
             'e2e_ms_p99': delta_e2e_pcts.get('e2e_ms_p99'),
+            'num_requests': NUM_SAMPLES,
         }}
         canonical = compute_canonical_columns(exp, model_info, vllm_config, measured_data)
 
@@ -2396,6 +2410,8 @@ def run_benchmark(exp):
             'sampling_ignore_eos': True,
             # Benchmark configuration
             'benchmark_num_samples': NUM_SAMPLES,
+            'benchmark_num_samples_source': 'dynamic_4x_concurrency' if max_concurrency else 'default',
+            'benchmark_max_concurrency': round(max_concurrency, 2) if max_concurrency else None,
             'benchmark_dataset': 'emozilla/pg19-test',
             'benchmark_prompt_prefix': 'Please summarize the following text: ',
             'benchmark_warmup_samples': min(5, NUM_SAMPLES),
@@ -2484,10 +2500,12 @@ def run_benchmark(exp):
             'sampling_min_tokens': exp['max_output_length'],
             'sampling_ignore_eos': True,
             # Benchmark configuration
-            'benchmark_num_samples': NUM_SAMPLES,
+            'benchmark_num_samples': NUM_SAMPLES if 'NUM_SAMPLES' in dir() else MIN_NUM_SAMPLES,
+            'benchmark_num_samples_source': 'error_fallback',
+            'benchmark_max_concurrency': max_concurrency if 'max_concurrency' in dir() else None,
             'benchmark_dataset': 'emozilla/pg19-test',
             'benchmark_prompt_prefix': 'Please summarize the following text: ',
-            'benchmark_warmup_samples': min(5, NUM_SAMPLES),
+            'benchmark_warmup_samples': min(5, NUM_SAMPLES if 'NUM_SAMPLES' in dir() else MIN_NUM_SAMPLES),
             # GPU monitoring configuration
             'gpu_monitor_sample_interval': 0.5,
             'gpu_monitor_type': 'distributed' if backend == "ray" else 'local',
