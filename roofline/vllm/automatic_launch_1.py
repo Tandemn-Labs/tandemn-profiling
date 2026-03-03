@@ -377,7 +377,7 @@ def cleanup_old_benchmark_files(work_dir=None):
     
     return removed_count
 
-def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE, s3_models=False):
+def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
     lmcache_exports = """
   # Ensure CUDA libraries are in LD_LIBRARY_PATH for PyTorch
   export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
@@ -494,12 +494,11 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
     return f"""
 name: {cluster_name}
 resources:
-  cloud: aws
+  infra: {cloud}
 {accelerator_spec}{instance_type_constraint}  use_spot: false
   disk_size: 500GB
   memory: "64GB+"
-  # No region constraint - SkyPilot will try all available AWS regions
-  # This helps find capacity when us-east-1 is full (especially during US business hours)
+  # No region constraint - SkyPilot will try all available regions for the chosen cloud
 num_nodes: {num_nodes}
 workdir: .{file_mounts_block}
 setup: |
@@ -806,7 +805,7 @@ def send_discord_message(message):
     payload = {"content": message}
     requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
 
-def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DEFAULT_GPU_TYPE, s3_models=False):
+def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
     """Generate Python benchmark script for a set of experiments."""
     exp_list = json.dumps(experiments, indent=2)
 
@@ -1490,6 +1489,7 @@ GPU_TFLOPS_FP16 = {gpu_tflops_fp16}
 GPU_BANDWIDTH_GBPS = {gpu_bandwidth_gbps}
 GPU_GENERATION = "{gpu_generation}"
 INTERCONNECT = "{interconnect}"
+CLOUD = "{cloud}"
 
 # Detect vllm version at runtime
 try:
@@ -1800,8 +1800,8 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
         'data_source': 'our_experiment',
         'data_source_type': 'measured',
         'precision': 'fp16',
-        'cloud': 'aws',
-        'region': 'us-east-1',
+        'cloud': CLOUD,
+        'region': None,  # SkyPilot auto-selects region
         'task_type': 'batched',
         'request_pattern': 'offline_batch',
         'is_lmcache': None,
@@ -2567,7 +2567,7 @@ if __name__ == "__main__":
     main()
 '''
 
-def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True, gpu_type=DEFAULT_GPU_TYPE, s3_models=False):
+def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
     gpus_per_node, num_nodes = cluster_config
     # Use TP/PP from the first experiment for naming (all experiments in a group have compatible TP/PP)
     tp = experiments[0]['tp']
@@ -2654,11 +2654,11 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
         logger.info(f"🗑️  Removing old script file: {old_script_path.name} (replaced by GPU-type-specific file)")
         old_script_path.unlink()
     
-    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type, s3_models=s3_models)
+    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type, s3_models=s3_models, cloud=cloud)
     yaml_path.write_text(yaml_content)
 
     # 2. Write benchmark script
-    script_content = generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type, s3_models=s3_models)
+    script_content = generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type, s3_models=s3_models, cloud=cloud)
     script_path.write_text(script_content)
 
     # Track active cluster for cleanup on unexpected exit
@@ -2923,6 +2923,10 @@ Examples:
                        help='Actually launch clusters (default: dry run)')
     parser.add_argument('--s3-models', action='store_true',
                        help='Load models from S3 instead of HuggingFace (faster, requires prior upload via upload_model_to_s3.py)')
+    parser.add_argument('--cloud', dest='cloud',
+                       choices=['aws', 'gcp', 'azure'],
+                       default='aws',
+                       help='Cloud provider to launch on (default: aws)')
     parser.add_argument('--cleanup', action='store_true',
                        help='Clean up old benchmark files without GPU type in their names')
     
@@ -2976,7 +2980,7 @@ Examples:
             io_group_results = []
             
             for cluster_config, exps in sorted(cluster_groups.items(), key=cluster_sort_key):
-                results = run_cluster_benchmarks(cluster_config, exps, parent_dir=parent_dir, dry_run=dry_run, gpu_type=gpu_type, s3_models=args.s3_models)
+                results = run_cluster_benchmarks(cluster_config, exps, parent_dir=parent_dir, dry_run=dry_run, gpu_type=gpu_type, s3_models=args.s3_models, cloud=args.cloud)
                 if results:
                     io_group_results.extend(results)
                     all_results.extend(results)
