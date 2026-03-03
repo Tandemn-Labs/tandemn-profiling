@@ -1589,6 +1589,190 @@ def get_model_config_info(model_name_or_path):
     return result
 
 
+def extract_vllm_metrics(llm):
+    """Extract internal Prometheus metrics from vLLM V1 engine.
+
+    vLLM 0.10.0 get_metrics() returns list[Metric] where Metric is a dataclass:
+      - Counter: .name, .labels, .value (int)
+      - Gauge:   .name, .labels, .value (float)
+      - Histogram: .name, .labels, .count (int), .sum (float), .buckets (dict[str,int])
+    Metric names are prefixed with 'vllm:' (e.g. 'vllm:prompt_tokens').
+
+    Returns a dict with counters, histogram averages, percentile estimates,
+    and derived throughput. Returns all-None dict on failure.
+    """
+    result = {{
+        'prompt_tokens_total': None,
+        'generation_tokens_total': None,
+        'avg_prefill_time_s': None,
+        'avg_decode_time_s': None,
+        'avg_e2e_latency_s': None,
+        'avg_ttft_s': None,
+        'avg_tpot_s': None,
+        'avg_prompt_len': None,
+        'avg_gen_len': None,
+        'ttft_ms_p50': None, 'ttft_ms_p95': None, 'ttft_ms_p99': None,
+        'tpot_ms_p50': None, 'tpot_ms_p95': None, 'tpot_ms_p99': None,
+        'e2e_ms_p50': None, 'e2e_ms_p95': None, 'e2e_ms_p99': None,
+        'prefill_toks_per_sec': None,
+        'decode_toks_per_sec': None,
+        # Raw histogram sums/counts for delta computation
+        '_hist_prefill_sum': None, '_hist_prefill_count': None,
+        '_hist_decode_sum': None, '_hist_decode_count': None,
+        '_hist_e2e_sum': None, '_hist_e2e_count': None,
+        '_hist_ttft_sum': None, '_hist_ttft_count': None,
+        '_hist_tpot_sum': None, '_hist_tpot_count': None,
+        '_hist_prompt_len_sum': None, '_hist_prompt_len_count': None,
+        '_hist_gen_len_sum': None, '_hist_gen_len_count': None,
+        # Raw histogram buckets for delta percentile computation
+        '_buckets_ttft': None,
+        '_buckets_tpot': None,
+        '_buckets_e2e': None,
+    }}
+    try:
+        metrics_list = llm.get_metrics()  # returns list[Metric] dataclass instances
+
+        # Build lookup by metric name (first match wins)
+        metrics_by_name = {{}}
+        for m in metrics_list:
+            if m.name not in metrics_by_name:
+                metrics_by_name[m.name] = m
+
+        def _find_metric(name_substr):
+            """Find first metric whose name contains the given substring."""
+            for name, m in metrics_by_name.items():
+                if name_substr in name:
+                    return m
+            return None
+
+        def _histogram_buckets_to_sorted(hist):
+            """Convert Histogram.buckets dict[str,int] to sorted [(float,int)] list."""
+            if hist is None or not hasattr(hist, 'buckets') or not hist.buckets:
+                return []
+            buckets = []
+            for bound_str, count in hist.buckets.items():
+                try:
+                    bound = float('inf') if bound_str == '+Inf' else float(bound_str)
+                    buckets.append((bound, count))
+                except (ValueError, TypeError):
+                    pass
+            return sorted(buckets, key=lambda x: x[0])
+
+        def _histogram_quantile(buckets, quantile):
+            """Estimate a quantile from sorted (bound, cumulative_count) pairs.
+
+            Uses linear interpolation within the bucket where the quantile falls,
+            matching the standard Prometheus histogram_quantile algorithm.
+            """
+            if not buckets:
+                return None
+            total = buckets[-1][1]  # Last bucket (+Inf) has total count
+            if total == 0:
+                return None
+            target = quantile * total
+            prev_bound = 0.0
+            prev_count = 0.0
+            for bound, count in buckets:
+                if bound == float('inf'):
+                    if count >= target and prev_count < target:
+                        return prev_bound
+                    continue
+                if count >= target:
+                    bucket_count = count - prev_count
+                    if bucket_count == 0:
+                        return bound
+                    fraction = (target - prev_count) / bucket_count
+                    return prev_bound + fraction * (bound - prev_bound)
+                prev_bound = bound
+                prev_count = count
+            return prev_bound
+
+        # Extract counters (Counter dataclass: .value is int)
+        prompt_counter = _find_metric('prompt_tokens')
+        gen_counter = _find_metric('generation_tokens')
+        result['prompt_tokens_total'] = prompt_counter.value if prompt_counter and hasattr(prompt_counter, 'value') else None
+        result['generation_tokens_total'] = gen_counter.value if gen_counter and hasattr(gen_counter, 'value') else None
+
+        # Extract histograms (Histogram dataclass: .count, .sum, .buckets)
+        hist_map = {{
+            'prefill': 'request_prefill_time',
+            'decode': 'request_decode_time',
+            'e2e': 'e2e_request_latency',
+            'ttft': 'time_to_first_token',
+            'tpot': 'time_per_output_token',
+            'prompt_len': 'request_prompt_tokens',
+            'gen_len': 'request_generation_tokens',
+        }}
+
+        for short_name, metric_name in hist_map.items():
+            hist = _find_metric(metric_name)
+            if hist is None or not hasattr(hist, 'count'):
+                continue
+            s = hist.sum
+            c = hist.count
+            avg = (s / c) if (c and c > 0) else None
+
+            if short_name == 'prefill':
+                result['avg_prefill_time_s'] = avg
+                result['_hist_prefill_sum'] = s
+                result['_hist_prefill_count'] = c
+            elif short_name == 'decode':
+                result['avg_decode_time_s'] = avg
+                result['_hist_decode_sum'] = s
+                result['_hist_decode_count'] = c
+            elif short_name == 'e2e':
+                result['avg_e2e_latency_s'] = avg
+                result['_hist_e2e_sum'] = s
+                result['_hist_e2e_count'] = c
+            elif short_name == 'ttft':
+                result['avg_ttft_s'] = avg
+                result['_hist_ttft_sum'] = s
+                result['_hist_ttft_count'] = c
+            elif short_name == 'tpot':
+                result['avg_tpot_s'] = avg
+                result['_hist_tpot_sum'] = s
+                result['_hist_tpot_count'] = c
+            elif short_name == 'prompt_len':
+                result['avg_prompt_len'] = avg
+                result['_hist_prompt_len_sum'] = s
+                result['_hist_prompt_len_count'] = c
+            elif short_name == 'gen_len':
+                result['avg_gen_len'] = avg
+                result['_hist_gen_len_sum'] = s
+                result['_hist_gen_len_count'] = c
+
+        # Extract percentiles from histogram buckets (for latency metrics)
+        for short_name, metric_name, ms_prefix in [
+            ('ttft', 'time_to_first_token', 'ttft'),
+            ('tpot', 'time_per_output_token', 'tpot'),
+            ('e2e', 'e2e_request_latency', 'e2e'),
+        ]:
+            hist = _find_metric(metric_name)
+            buckets = _histogram_buckets_to_sorted(hist)
+            result[f'_buckets_{{short_name}}'] = buckets
+            for q, label in [(0.5, 'p50'), (0.95, 'p95'), (0.99, 'p99')]:
+                val = _histogram_quantile(buckets, q)
+                result[f'{{ms_prefix}}_ms_{{label}}'] = round(val * 1000, 3) if val is not None else None
+
+        # Derived throughput (per-request averages)
+        avg_prompt = result.get('avg_prompt_len')
+        avg_prefill_t = result.get('avg_prefill_time_s')
+        if avg_prompt and avg_prefill_t and avg_prefill_t > 0:
+            result['prefill_toks_per_sec'] = round(avg_prompt / avg_prefill_t, 2)
+
+        avg_gen = result.get('avg_gen_len')
+        avg_decode_t = result.get('avg_decode_time_s')
+        if avg_gen and avg_decode_t and avg_decode_t > 0:
+            result['decode_toks_per_sec'] = round((avg_gen - 1) / avg_decode_t, 2)
+
+    except Exception as e:
+        print(f"⚠️  extract_vllm_metrics failed: {{e}}")
+        import traceback
+        traceback.print_exc()
+
+    return result
+
+
 def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
     """Build all 73 canonical schema columns from experiment data."""
     # Basic counts
@@ -1693,17 +1877,17 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
         'cost_per_1m_tokens_prefill_usd': round(price_per_hour * 1e6 / (tps_prefill * 3600), 4) if tps_prefill else None,
         'cost_per_1m_tokens_decode_usd': round(price_per_hour * 1e6 / (tps_decode * 3600), 4) if tps_decode else None,
 
-        # --- Not applicable (latency metrics not measured in offline batch) ---
+        # --- Latency percentiles (from vLLM internal metrics, None if unavailable) ---
         'dp': None,
-        'ttft_ms_p50': None,
-        'ttft_ms_p95': None,
-        'ttft_ms_p99': None,
-        'tpot_ms_p50': None,
-        'tpot_ms_p95': None,
-        'tpot_ms_p99': None,
-        'e2e_ms_p50': None,
-        'e2e_ms_p95': None,
-        'e2e_ms_p99': None,
+        'ttft_ms_p50': measured_data.get('ttft_ms_p50'),
+        'ttft_ms_p95': measured_data.get('ttft_ms_p95'),
+        'ttft_ms_p99': measured_data.get('ttft_ms_p99'),
+        'tpot_ms_p50': measured_data.get('tpot_ms_p50'),
+        'tpot_ms_p95': measured_data.get('tpot_ms_p95'),
+        'tpot_ms_p99': measured_data.get('tpot_ms_p99'),
+        'e2e_ms_p50': measured_data.get('e2e_ms_p50'),
+        'e2e_ms_p95': measured_data.get('e2e_ms_p95'),
+        'e2e_ms_p99': measured_data.get('e2e_ms_p99'),
     }}
     return canonical
 
@@ -1887,7 +2071,8 @@ def run_benchmark(exp):
             # kv_transfer_config=ktc,
             enable_chunked_prefill=False,
             # truncate_prompt_tokens=exp['max_input_length'],
-            enable_prefix_caching=False
+            enable_prefix_caching=False,
+            disable_log_stats=False,  # Enable Prometheus metrics pipeline
         )
 
         # Initialize GPU monitor AFTER LLM creation (Ray is now initialized)
@@ -1979,6 +2164,13 @@ def run_benchmark(exp):
         torch.cuda.synchronize()  # Wait for warmup to complete
         print(f"✅ Warmup complete, starting actual measurement")
 
+        # Snapshot metrics after warmup to exclude warmup from measurements
+        try:
+            warmup_metrics = extract_vllm_metrics(llm)
+        except Exception as e:
+            print(f"⚠️  Could not extract vLLM metrics after warmup: {{e}}")
+            warmup_metrics = {{}}
+
         # Start GPU monitoring
         # If distributed monitoring fails, it will fall back gracefully
         if use_distributed:
@@ -2005,6 +2197,13 @@ def run_benchmark(exp):
         outputs = llm.generate(prompts, sampling_params)
         torch.cuda.synchronize()  # Wait for all GPU work to complete
         elapsed = time.perf_counter() - start
+
+        # Snapshot vLLM metrics after real run
+        try:
+            final_metrics = extract_vllm_metrics(llm)
+        except Exception as e:
+            print(f"⚠️  Could not extract vLLM metrics after run: {{e}}")
+            final_metrics = {{}}
 
         # Stop monitoring and get summaries
         gpu_monitor.stop()
@@ -2069,12 +2268,109 @@ def run_benchmark(exp):
         input_tokens_per_dollar = round(total_prompt_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
         output_tokens_per_dollar = round(total_output_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
 
+        # Compute vLLM-sourced throughput (delta from warmup to exclude warmup tokens)
+        vllm_prompt_toks = None
+        vllm_gen_toks = None
+        if final_metrics.get('prompt_tokens_total') is not None:
+            vllm_prompt_toks = final_metrics['prompt_tokens_total'] - (warmup_metrics.get('prompt_tokens_total') or 0)
+        if final_metrics.get('generation_tokens_total') is not None:
+            vllm_gen_toks = final_metrics['generation_tokens_total'] - (warmup_metrics.get('generation_tokens_total') or 0)
+
+        # Compute delta-based histogram averages (exclude warmup requests)
+        def _delta_hist_avg(final_m, warmup_m, sum_key, count_key):
+            """Compute average from histogram deltas (final - warmup)."""
+            fs = final_m.get(sum_key)
+            fc = final_m.get(count_key)
+            ws = warmup_m.get(sum_key) or 0
+            wc = warmup_m.get(count_key) or 0
+            if fs is not None and fc is not None and (fc - wc) > 0:
+                return (fs - ws) / (fc - wc)
+            return None
+
+        delta_prefill_t = _delta_hist_avg(final_metrics, warmup_metrics, '_hist_prefill_sum', '_hist_prefill_count')
+        delta_decode_t = _delta_hist_avg(final_metrics, warmup_metrics, '_hist_decode_sum', '_hist_decode_count')
+        delta_prompt_len = _delta_hist_avg(final_metrics, warmup_metrics, '_hist_prompt_len_sum', '_hist_prompt_len_count')
+        delta_gen_len = _delta_hist_avg(final_metrics, warmup_metrics, '_hist_gen_len_sum', '_hist_gen_len_count')
+
+        # Compute delta-based per-request throughput
+        delta_prefill_tps = None
+        if delta_prompt_len and delta_prefill_t and delta_prefill_t > 0:
+            delta_prefill_tps = round(delta_prompt_len / delta_prefill_t, 2)
+        delta_decode_tps = None
+        if delta_gen_len and delta_decode_t and delta_decode_t > 0:
+            delta_decode_tps = round((delta_gen_len - 1) / delta_decode_t, 2)
+
+        # Compute delta-based percentiles from histogram bucket subtraction
+        def _delta_percentiles(final_m, warmup_m, bucket_key, ms_prefix):
+            """Compute percentiles from delta histogram buckets."""
+            result_pcts = {{}}
+            fb = final_m.get(bucket_key) or []
+            wb = warmup_m.get(bucket_key) or []
+            if fb:
+                # Subtract warmup bucket counts from final bucket counts
+                wb_dict = dict(wb) if wb else {{}}
+                delta_buckets = []
+                for bound, count in fb:
+                    warmup_count = wb_dict.get(bound, 0)
+                    delta_buckets.append((bound, count - warmup_count))
+                # Estimate percentiles from delta buckets
+                for q, label in [(0.5, 'p50'), (0.95, 'p95'), (0.99, 'p99')]:
+                    val = _histogram_quantile_from_buckets(delta_buckets, q)
+                    result_pcts[f'{{ms_prefix}}_ms_{{label}}'] = round(val * 1000, 3) if val is not None else None
+            else:
+                for label in ['p50', 'p95', 'p99']:
+                    result_pcts[f'{{ms_prefix}}_ms_{{label}}'] = final_metrics.get(f'{{ms_prefix}}_ms_{{label}}')
+            return result_pcts
+
+        def _histogram_quantile_from_buckets(buckets, quantile):
+            """Estimate quantile from (bound, count) pairs."""
+            if not buckets:
+                return None
+            total = buckets[-1][1] if buckets else 0
+            if total <= 0:
+                return None
+            target = quantile * total
+            prev_bound = 0.0
+            prev_count = 0.0
+            for bound, count in buckets:
+                if bound == float('inf'):
+                    if count >= target and prev_count < target:
+                        return prev_bound
+                    continue
+                if count >= target:
+                    bucket_count = count - prev_count
+                    if bucket_count == 0:
+                        return bound
+                    fraction = (target - prev_count) / bucket_count
+                    return prev_bound + fraction * (bound - prev_bound)
+                prev_bound = bound
+                prev_count = count
+            return prev_bound
+
+        delta_ttft_pcts = _delta_percentiles(final_metrics, warmup_metrics, '_buckets_ttft', 'ttft')
+        delta_tpot_pcts = _delta_percentiles(final_metrics, warmup_metrics, '_buckets_tpot', 'tpot')
+        delta_e2e_pcts = _delta_percentiles(final_metrics, warmup_metrics, '_buckets_e2e', 'e2e')
+
+        # Use vLLM token counts if available, else fall back to output-based counts
+        effective_prompt_toks = vllm_prompt_toks if vllm_prompt_toks is not None else total_prompt_tokens
+        effective_gen_toks = vllm_gen_toks if vllm_gen_toks is not None else total_output_tokens
+
         # Build canonical columns
         measured_data = {{
-            'tokens_per_sec_total': round((total_prompt_tokens + total_output_tokens) / elapsed, 2),
-            'tokens_per_sec_prefill': round(total_prompt_tokens / elapsed, 2),
-            'tokens_per_sec_decode': round(total_output_tokens / elapsed, 2),
+            'tokens_per_sec_total': round((effective_prompt_toks + effective_gen_toks) / elapsed, 2),
+            'tokens_per_sec_prefill': delta_prefill_tps or round(effective_prompt_toks / elapsed, 2),
+            'tokens_per_sec_decode': delta_decode_tps or round(effective_gen_toks / elapsed, 2),
             'elapsed_time': elapsed,
+            # Per-request latency from vLLM engine-core timestamps (delta from warmup)
+            'ttft_ms_p50': delta_ttft_pcts.get('ttft_ms_p50'),
+            'ttft_ms_p95': delta_ttft_pcts.get('ttft_ms_p95'),
+            'ttft_ms_p99': delta_ttft_pcts.get('ttft_ms_p99'),
+            'tpot_ms_p50': delta_tpot_pcts.get('tpot_ms_p50'),
+            'tpot_ms_p95': delta_tpot_pcts.get('tpot_ms_p95'),
+            'tpot_ms_p99': delta_tpot_pcts.get('tpot_ms_p99'),
+            'e2e_ms_p50': delta_e2e_pcts.get('e2e_ms_p50'),
+            'e2e_ms_p95': delta_e2e_pcts.get('e2e_ms_p95'),
+            'e2e_ms_p99': delta_e2e_pcts.get('e2e_ms_p99'),
         }}
         canonical = compute_canonical_columns(exp, model_info, vllm_config, measured_data)
 
@@ -2091,6 +2387,7 @@ def run_benchmark(exp):
             'llm_enforce_eager': True,
             'llm_enable_chunked_prefill': False,
             'llm_enable_prefix_caching': False,
+            'llm_disable_log_stats': False,
             'llm_kv_transfer_config': None,  # Currently commented out
             # Sampling parameters
             'sampling_temperature': 0.8,
@@ -2114,12 +2411,14 @@ def run_benchmark(exp):
             **exp,
             'exp_id': exp_id,
             'elapsed_time': elapsed,
-            'total_prompt_tokens': total_prompt_tokens,
-            'total_output_tokens': total_output_tokens,
+            'total_prompt_tokens': effective_prompt_toks,
+            'total_output_tokens': effective_gen_toks,
+            'total_prompt_tokens_from_outputs': total_prompt_tokens,
+            'total_output_tokens_from_outputs': total_output_tokens,
             'requests_per_sec': round(len(outputs) / elapsed, 3),
-            'input_tokens_per_sec': round(total_prompt_tokens / elapsed, 2),
-            'output_tokens_per_sec': round(total_output_tokens / elapsed, 2),
-            'total_tokens_per_sec': round((total_prompt_tokens + total_output_tokens) / elapsed, 2),
+            'input_tokens_per_sec': round(effective_prompt_toks / elapsed, 2),
+            'output_tokens_per_sec': round(effective_gen_toks / elapsed, 2),
+            'total_tokens_per_sec': round((effective_prompt_toks + effective_gen_toks) / elapsed, 2),
             'status': 'success',
             'timeseries_file': timeseries_file,
             # Infrastructure info
@@ -2141,6 +2440,8 @@ def run_benchmark(exp):
             'gpu_monitor_num_nodes_reported': gpu_metrics.get('num_nodes_monitored', 1),
             # vLLM config info (extracted from engine)
             **{{f'config_{{k}}': v for k, v in vllm_config.items()}},
+            # Raw vLLM internal metrics (for debugging/analysis)
+            **{{f'vllm_metrics_{{k}}': v for k, v in final_metrics.items() if not k.startswith('_')}},
             # GPU utilization metrics (summary)
             **gpu_metrics,
             # Scheduler queue metrics (summary)
@@ -2175,6 +2476,7 @@ def run_benchmark(exp):
             'llm_enforce_eager': True,
             'llm_enable_chunked_prefill': False,
             'llm_enable_prefix_caching': False,
+            'llm_disable_log_stats': False,
             'llm_kv_transfer_config': None,  # Currently commented out
             # Sampling parameters
             'sampling_temperature': 0.8,
