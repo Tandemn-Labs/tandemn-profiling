@@ -127,13 +127,14 @@ def get_cluster_info(tp, pp, gpu_type):
     }
 
 
-def render_sweep_plan(models, tp_pp_configs, io_lengths, gpu_types):
+def render_sweep_plan(models, tp_pp_configs, io_lengths, gpu_types, cloud="aws"):
     """Print a human-readable summary of the sweep plan."""
     total_experiments = len(models) * len(tp_pp_configs) * len(io_lengths)
 
     print("\n" + "=" * 80)
     print("  BENCHMARK SWEEP PLAN")
     print("=" * 80)
+    print(f"\n  Cloud: {cloud.upper()}")
 
     print(f"\n  Models ({len(models)}):")
     for m in models:
@@ -240,6 +241,12 @@ Examples:
         "--io", nargs="+", default=None,
         help="Override IO lengths as 'IN,OUT' pairs (e.g., --io 512,128 2048,512)",
     )
+    parser.add_argument(
+        "--cloud", dest="cloud",
+        choices=["aws", "gcp", "azure"],
+        default="aws",
+        help="Cloud provider to launch on (default: aws). Ensures all instances stay on one cloud.",
+    )
 
     args = parser.parse_args()
 
@@ -264,7 +271,7 @@ Examples:
         io_lengths = IO_LENGTHS
 
     # Always show the plan
-    render_sweep_plan(models, tp_pp_configs, io_lengths, gpu_types)
+    render_sweep_plan(models, tp_pp_configs, io_lengths, gpu_types, cloud=args.cloud)
 
     if not args.run and not args.csv_only:
         print("This is a DRY RUN. Add --run to actually launch clusters.")
@@ -306,6 +313,7 @@ Examples:
                         dry_run=False,
                         gpu_type=gpu_type,
                         s3_models=args.s3_models,
+                        cloud=args.cloud,
                     )
                     if results:
                         all_results.extend(results)
