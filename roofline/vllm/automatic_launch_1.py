@@ -22,7 +22,13 @@ GPU_CONFIGS = {
             1: {"instance_type": "g6e.2xlarge", "price_per_hour": 0.99},
             4: {"instance_type": "g6e.12xlarge", "price_per_hour": 4.68},
             8: {"instance_type": "g6e.48xlarge", "price_per_hour": 13.35},
-        }
+        },
+        "canonical_gpu_name": "L40S",
+        "gpu_mem_gb": 48,
+        "gpu_tflops_fp16": 362,
+        "gpu_bandwidth_gbps": 864,
+        "gpu_generation": "Ada Lovelace",
+        "interconnect": "PCIe",
     },
     "L4": {
         "available_gpus": [1, 4, 8],
@@ -31,7 +37,13 @@ GPU_CONFIGS = {
             1: {"instance_type": "g6.2xlarge", "price_per_hour": 0.526},
             4: {"instance_type": "g6.12xlarge", "price_per_hour": 0.752},
             8: {"instance_type": "g6.48xlarge", "price_per_hour": 1.204},
-        }
+        },
+        "canonical_gpu_name": "L4",
+        "gpu_mem_gb": 24,
+        "gpu_tflops_fp16": 121,
+        "gpu_bandwidth_gbps": 300,
+        "gpu_generation": "Ada Lovelace",
+        "interconnect": "PCIe",
     },
     "A10G": {
         "available_gpus": [1, 4, 8],
@@ -40,7 +52,13 @@ GPU_CONFIGS = {
             1: {"instance_type": "g5.2xlarge", "price_per_hour": 1.006},
             4: {"instance_type": "g5.12xlarge", "price_per_hour": 4.096},
             8: {"instance_type": "g5.48xlarge", "price_per_hour": 16.384},
-        }
+        },
+        "canonical_gpu_name": "A10G",
+        "gpu_mem_gb": 24,
+        "gpu_tflops_fp16": 125,
+        "gpu_bandwidth_gbps": 600,
+        "gpu_generation": "Ampere",
+        "interconnect": "PCIe",
     },
     "A100_40gb": {
         "available_gpus": [1, 4, 8],
@@ -49,7 +67,13 @@ GPU_CONFIGS = {
             1: {"instance_type": "p4d.24xlarge", "price_per_hour": 32.77},  # 8 GPUs, but can use 1
             4: {"instance_type": "p4d.24xlarge", "price_per_hour": 32.77},  # 8 GPUs, but can use 4
             8: {"instance_type": "p4d.24xlarge", "price_per_hour": 32.77},  # 8 GPUs (40GB per GPU)
-        }
+        },
+        "canonical_gpu_name": "A100-40GB",
+        "gpu_mem_gb": 40,
+        "gpu_tflops_fp16": 312,
+        "gpu_bandwidth_gbps": 1555,
+        "gpu_generation": "Ampere",
+        "interconnect": "NVLink",
     },
     "A100_80gb": {
         "available_gpus": [1, 4, 8],
@@ -58,7 +82,13 @@ GPU_CONFIGS = {
             1: {"instance_type": "p4de.24xlarge", "price_per_hour": 40.96},  # 8 GPUs, but can use 1
             4: {"instance_type": "p4de.24xlarge", "price_per_hour": 40.96},  # 8 GPUs, but can use 4
             8: {"instance_type": "p4de.24xlarge", "price_per_hour": 40.96},  # 8 GPUs (80GB per GPU)
-        }
+        },
+        "canonical_gpu_name": "A100",
+        "gpu_mem_gb": 80,
+        "gpu_tflops_fp16": 312,
+        "gpu_bandwidth_gbps": 2039,
+        "gpu_generation": "Ampere",
+        "interconnect": "NVLink",
     },
     "H100": {
         "available_gpus": [1, 4, 8],
@@ -67,7 +97,13 @@ GPU_CONFIGS = {
             1: {"instance_type": "p5.48xlarge", "price_per_hour": 98.32},  # 8 GPUs, but can use 1
             4: {"instance_type": "p5.48xlarge", "price_per_hour": 98.32},  # 8 GPUs, but can use 4
             8: {"instance_type": "p5.48xlarge", "price_per_hour": 98.32},  # 8 GPUs
-        }
+        },
+        "canonical_gpu_name": "H100",
+        "gpu_mem_gb": 80,
+        "gpu_tflops_fp16": 989,
+        "gpu_bandwidth_gbps": 3350,
+        "gpu_generation": "Hopper",
+        "interconnect": "NVLink",
     },
 }
 
@@ -787,6 +823,14 @@ def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DE
     # Model path expression for the generated script
     model_expr = "f\"/models/{exp['model']}\"" if s3_models else "exp['model']"
 
+    # GPU hardware specs for canonical columns
+    canonical_gpu_name = gpu_config.get("canonical_gpu_name", gpu_type)
+    gpu_mem_gb = gpu_config["gpu_mem_gb"]
+    gpu_tflops_fp16 = gpu_config["gpu_tflops_fp16"]
+    gpu_bandwidth_gbps = gpu_config["gpu_bandwidth_gbps"]
+    gpu_generation = gpu_config["gpu_generation"]
+    interconnect = gpu_config["interconnect"]
+
     return f'''#!/usr/bin/env python3
 import os
 os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
@@ -1439,6 +1483,230 @@ PRICE_PER_HOUR = {total_price_per_hour}
 NUM_NODES = {num_nodes}
 GPUS_PER_NODE = {gpus_per_node}
 
+# GPU hardware specs (from GPU_CONFIGS)
+GPU_MODEL = "{canonical_gpu_name}"
+GPU_MEM_GB = {gpu_mem_gb}
+GPU_TFLOPS_FP16 = {gpu_tflops_fp16}
+GPU_BANDWIDTH_GBPS = {gpu_bandwidth_gbps}
+GPU_GENERATION = "{gpu_generation}"
+INTERCONNECT = "{interconnect}"
+
+# Detect vllm version at runtime
+try:
+    import vllm as _vllm_mod
+    RUNTIME_STACK = f"vllm {{_vllm_mod.__version__}}"
+except Exception:
+    RUNTIME_STACK = "vllm"
+
+
+def get_model_config_info(model_name_or_path):
+    """Load HuggingFace model config and extract architecture info."""
+    result = {{
+        'model_architecture': None,
+        'params_billion': None,
+        'model_config_json': None,
+        'vocab_size': None,
+        'num_attention_heads': None,
+        'num_key_value_heads': None,
+        'is_moe': None,
+        'num_experts_active': None,
+    }}
+    try:
+        import os as _os
+        from transformers import AutoConfig
+
+        # Try local path first (for S3 models), then HF hub name
+        config = None
+        for path_candidate in [model_name_or_path]:
+            try:
+                config = AutoConfig.from_pretrained(path_candidate, trust_remote_code=True)
+                break
+            except Exception:
+                continue
+
+        if config is None:
+            print(f"⚠️  Could not load model config for {{model_name_or_path}}")
+            return result
+
+        config_dict = config.to_dict()
+        result['model_config_json'] = json.dumps(config_dict, default=str)
+
+        # Architecture
+        if hasattr(config, 'architectures') and config.architectures:
+            result['model_architecture'] = config.architectures[0]
+
+        # Basic dimensions
+        hidden = getattr(config, 'hidden_size', None)
+        layers = getattr(config, 'num_hidden_layers', None)
+        vocab = getattr(config, 'vocab_size', None)
+        intermediate = getattr(config, 'intermediate_size', None)
+        num_heads = getattr(config, 'num_attention_heads', None)
+        num_kv_heads = getattr(config, 'num_key_value_heads', num_heads)
+
+        result['vocab_size'] = vocab
+        result['num_attention_heads'] = num_heads
+        result['num_key_value_heads'] = num_kv_heads
+
+        # MoE detection
+        num_experts = getattr(config, 'num_local_experts', None) or getattr(config, 'num_experts', None)
+        num_experts_active = getattr(config, 'num_experts_per_tok', None) or getattr(config, 'num_selected_experts', None)
+        result['is_moe'] = num_experts is not None and num_experts > 1
+        result['num_experts_active'] = num_experts_active
+
+        # Parameter estimation
+        # 1. Try exact count from safetensors index
+        params_b = None
+        if _os.path.isdir(model_name_or_path):
+            index_file = _os.path.join(model_name_or_path, 'model.safetensors.index.json')
+            if _os.path.exists(index_file):
+                try:
+                    with open(index_file) as _f:
+                        idx = json.load(_f)
+                    total_bytes = idx.get('metadata', {{}}).get('total_size')
+                    if total_bytes:
+                        params_b = round(int(total_bytes) / 2 / 1e9, 2)  # fp16 = 2 bytes
+                except Exception:
+                    pass
+
+        # 2. Fallback: estimate from config dimensions
+        if params_b is None and all(v is not None for v in [hidden, layers, vocab, intermediate]):
+            kv_dim = (hidden // num_heads * num_kv_heads) if (num_heads and num_kv_heads) else hidden
+            embed_params = vocab * hidden * 2  # input + output embeddings
+            attn_params = layers * (hidden * hidden + 2 * hidden * kv_dim + hidden * hidden)
+            ffn_params = layers * 3 * hidden * intermediate  # gate, up, down (SwiGLU)
+            if num_experts and num_experts > 1:
+                ffn_params = ffn_params * num_experts  # MoE: multiply by total experts
+            total_params = embed_params + attn_params + ffn_params
+            params_b = round(total_params / 1e9, 2)
+
+        result['params_billion'] = params_b
+
+    except Exception as e:
+        print(f"⚠️  get_model_config_info failed: {{e}}")
+        import traceback
+        traceback.print_exc()
+
+    return result
+
+
+def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
+    """Build all 73 canonical schema columns from experiment data."""
+    # Basic counts
+    gpu_count = NUM_NODES * GPUS_PER_NODE
+    params_b = model_info.get('params_billion')
+    model_size_gb = round(params_b * 2, 2) if params_b else None  # fp16 = 2 bytes/param
+    tps_total = measured_data.get('tokens_per_sec_total', 0)
+    tps_prefill = measured_data.get('tokens_per_sec_prefill', 0)
+    tps_decode = measured_data.get('tokens_per_sec_decode', 0)
+    elapsed = measured_data.get('elapsed_time', 0)
+    price_per_hour = PRICE_PER_HOUR
+    input_len = exp.get('max_input_length', 0)
+    output_len = exp.get('max_output_length', 0)
+    num_heads = model_info.get('num_attention_heads')
+    num_kv_heads = model_info.get('num_key_value_heads')
+
+    # Safe division helper
+    def _safe_div(a, b):
+        if a is None or b is None or b == 0:
+            return None
+        return round(a / b, 4)
+
+    canonical = {{
+        # --- Hardcoded (12) ---
+        'data_source': 'our_experiment',
+        'data_source_type': 'measured',
+        'precision': 'fp16',
+        'cloud': 'aws',
+        'region': 'us-east-1',
+        'task_type': 'batched',
+        'request_pattern': 'offline_batch',
+        'is_lmcache': None,
+        'is_continuous_batching': None,
+        'kv_offload_target': None,
+        'cuda_graphs': None,
+        'spec_decode': None,
+
+        # --- From experiment config ---
+        'model_name': exp.get('model'),
+        'tp': exp.get('tp'),
+        'pp': exp.get('pp'),
+
+        # --- From injected cluster constants ---
+        'instance_type': INSTANCE_TYPE,
+        'price_per_instance_hour_usd': price_per_hour,
+        'num_nodes': NUM_NODES,
+        'gpus_per_node': GPUS_PER_NODE,
+        'gpu_model': GPU_MODEL,
+        'gpu_mem_gb': GPU_MEM_GB,
+
+        # --- GPU spec constants ---
+        'interconnect': INTERCONNECT,
+        'gpu_bandwidth_gbps': GPU_BANDWIDTH_GBPS,
+        'gpu_tflops_fp16': GPU_TFLOPS_FP16,
+        'gpu_generation': GPU_GENERATION,
+
+        # --- Runtime detection ---
+        'runtime_stack': RUNTIME_STACK,
+
+        # --- From HF model config ---
+        'model_architecture': model_info.get('model_architecture'),
+        'params_billion': params_b,
+        'model_config_json': model_info.get('model_config_json'),
+        'vocab_size': model_info.get('vocab_size'),
+        'is_moe': model_info.get('is_moe'),
+        'num_experts_active': model_info.get('num_experts_active'),
+
+        # --- Measured ---
+        'tokens_per_sec_total': tps_total,
+        'tokens_per_sec_prefill': tps_prefill,
+        'tokens_per_sec_decode': tps_decode,
+        'total_cost_usd': round(price_per_hour * elapsed / 3600, 6) if elapsed else None,
+
+        # --- From vLLM engine config ---
+        'max_num_seqs': vllm_config.get('max_num_seqs') if vllm_config else None,
+        'batch_size': vllm_config.get('max_num_seqs') if vllm_config else None,
+
+        # --- Simple derivations ---
+        'gpu_count_total': gpu_count,
+        'tokens_per_sec_per_gpu': _safe_div(tps_total, gpu_count),
+        'input_len_tokens_min': input_len,
+        'input_len_tokens_max': input_len,
+        'input_len_tokens_avg': input_len,
+        'input_len_tokens_fixed': input_len,
+        'output_len_tokens_min': output_len,
+        'output_len_tokens_max': output_len,
+        'output_len_tokens_avg': output_len,
+        'output_len_tokens_fixed': output_len,
+        'prefill_decode_ratio': _safe_div(input_len, output_len),
+        'num_requests': NUM_SAMPLES,
+        'model_size_gb': model_size_gb,
+        'params_per_gpu': _safe_div(params_b, gpu_count),
+        'model_fits_single_gpu': (model_size_gb <= GPU_MEM_GB) if model_size_gb else None,
+        'vram_headroom_gb': round(GPU_MEM_GB * gpu_count - model_size_gb, 2) if model_size_gb else None,
+        'attention_heads_per_kv_head': _safe_div(num_heads, num_kv_heads),
+        'bandwidth_per_param': _safe_div(GPU_BANDWIDTH_GBPS * exp.get('tp', 1), params_b),
+        'flops_per_param': _safe_div(GPU_TFLOPS_FP16 * exp.get('tp', 1), params_b),
+        'kv_heads_per_tp': _safe_div(num_kv_heads, exp.get('tp', 1)),
+        'crosses_node_boundary': NUM_NODES > 1,
+        'price_per_gpu_hour_usd': _safe_div(price_per_hour, gpu_count),
+        'cost_per_1m_tokens_total_usd': round(price_per_hour * 1e6 / (tps_total * 3600), 4) if tps_total else None,
+        'cost_per_1m_tokens_prefill_usd': round(price_per_hour * 1e6 / (tps_prefill * 3600), 4) if tps_prefill else None,
+        'cost_per_1m_tokens_decode_usd': round(price_per_hour * 1e6 / (tps_decode * 3600), 4) if tps_decode else None,
+
+        # --- Not applicable (latency metrics not measured in offline batch) ---
+        'dp': None,
+        'ttft_ms_p50': None,
+        'ttft_ms_p95': None,
+        'ttft_ms_p99': None,
+        'tpot_ms_p50': None,
+        'tpot_ms_p95': None,
+        'tpot_ms_p99': None,
+        'e2e_ms_p50': None,
+        'e2e_ms_p95': None,
+        'e2e_ms_p99': None,
+    }}
+    return canonical
+
 
 def get_vllm_config_info(llm):
     """Extract all configuration info from vLLM engine."""
@@ -1583,6 +1851,12 @@ def run_benchmark(exp):
     # Determine if multi-node (using Ray)
     backend = "ray" if (exp['pp'] > 1) else None
     gpu_monitor = None  # Will be initialized after LLM creation
+
+    # Load model config info for canonical columns (safe — returns None values on failure)
+    model_path = {model_expr}
+    model_info = get_model_config_info(model_path)
+    if model_info.get('model_architecture') is None:
+        model_info = get_model_config_info(exp['model'])
 
     try:
         # if backend == "ray":
@@ -1795,6 +2069,15 @@ def run_benchmark(exp):
         input_tokens_per_dollar = round(total_prompt_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
         output_tokens_per_dollar = round(total_output_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
 
+        # Build canonical columns
+        measured_data = {{
+            'tokens_per_sec_total': round((total_prompt_tokens + total_output_tokens) / elapsed, 2),
+            'tokens_per_sec_prefill': round(total_prompt_tokens / elapsed, 2),
+            'tokens_per_sec_decode': round(total_output_tokens / elapsed, 2),
+            'elapsed_time': elapsed,
+        }}
+        canonical = compute_canonical_columns(exp, model_info, vllm_config, measured_data)
+
         # Collect all configuration
         benchmark_config = {{
             # LLM initialization parameters
@@ -1862,8 +2145,10 @@ def run_benchmark(exp):
             **gpu_metrics,
             # Scheduler queue metrics (summary)
             **scheduler_metrics,
+            # Canonical schema columns (all 73 columns for LLM placement solver)
+            **canonical,
         }}
-        
+
     except Exception as e:
         # Stop GPU monitor on error (if it was initialized)
         if gpu_monitor is not None:
@@ -1908,6 +2193,14 @@ def run_benchmark(exp):
             'scheduler_monitor_sample_interval': 0.25,
         }}
         
+        # Build partial canonical columns for error case (no measured data)
+        error_canonical = compute_canonical_columns(exp, model_info, {{}}, {{
+            'tokens_per_sec_total': 0,
+            'tokens_per_sec_prefill': 0,
+            'tokens_per_sec_decode': 0,
+            'elapsed_time': 0,
+        }})
+
         result = {{
             **exp,
             'status': 'error',
@@ -1920,6 +2213,8 @@ def run_benchmark(exp):
             'total_gpus': NUM_NODES * GPUS_PER_NODE,
             # Benchmark configuration
             **benchmark_config,
+            # Partial canonical columns (no measured data)
+            **error_canonical,
         }}
         
         # Force GPU cleanup on error
