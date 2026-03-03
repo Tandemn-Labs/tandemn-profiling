@@ -2371,8 +2371,8 @@ def run_benchmark(exp):
         # Build canonical columns
         measured_data = {{
             'tokens_per_sec_total': round((effective_prompt_toks + effective_gen_toks) / elapsed, 2),
-            'tokens_per_sec_prefill': delta_prefill_tps or round(effective_prompt_toks / elapsed, 2),
-            'tokens_per_sec_decode': delta_decode_tps or round(effective_gen_toks / elapsed, 2),
+            'tokens_per_sec_prefill': round(effective_prompt_toks / elapsed, 2),  # wall-clock: input tokens / elapsed
+            'tokens_per_sec_decode': round(effective_gen_toks / elapsed, 2),  # wall-clock: output tokens / elapsed
             'elapsed_time': elapsed,
             # Per-request latency from vLLM engine-core timestamps (delta from warmup)
             'ttft_ms_p50': delta_ttft_pcts.get('ttft_ms_p50'),
