@@ -293,34 +293,6 @@ def load_experiments(csv_path):
             })
     return experiments
 
-def group_by_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE, vm_strategy="prefer_single_node"):
-    groups = defaultdict(list)
-    for exp in experiments:
-        gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type, vm_strategy=vm_strategy)
-        key = (gpus_per_node, num_nodes)
-        groups[key].append(exp)
-    return dict(groups)
-
-def group_by_input_output_then_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE, vm_strategy="prefer_single_node"):
-    """Group experiments first by input/output length, then by cluster config."""
-    # First level: group by input/output length
-    io_groups = defaultdict(list)
-    for exp in experiments:
-        io_key = (exp['max_input_length'], exp['max_output_length'])
-        io_groups[io_key].append(exp)
-    
-    # Second level: within each IO group, group by cluster config
-    result = {}
-    for io_key, io_exps in io_groups.items():
-        cluster_groups = defaultdict(list)
-        for exp in io_exps:
-            gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type, vm_strategy=vm_strategy)
-            cluster_key = (gpus_per_node, num_nodes)
-            cluster_groups[cluster_key].append(exp)
-        result[io_key] = dict(cluster_groups)
-    
-    return result
-
 def group_by_cluster_then_io(experiments, gpu_type=DEFAULT_GPU_TYPE, vm_strategy="prefer_single_node"):
     """Group experiments: same cluster config runs multiple I/O shapes.
     
@@ -393,48 +365,29 @@ def cleanup_old_benchmark_files(work_dir=None):
     return removed_count
 
 def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
-    lmcache_exports = """
+    env_exports = """
   # Ensure CUDA libraries are in LD_LIBRARY_PATH for PyTorch
   export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
-  
-  # LMCache environment variables (must be set before Ray workers start)
-  export LMCACHE_USE_EXPERIMENTAL="True"
-  export LMCACHE_CHUNK_SIZE="256"
-  export LMCACHE_LOCAL_CPU="True"
-  export LMCACHE_MAX_LOCAL_CPU_SIZE="40.0"
-  export LMCACHE_SAVE_UNFULL_CHUNK="True"
-  # export VLLM_USE_RAY_COMPILED_DAG_CHANNEL_TYPE="shm"
-  # export VLLM_USE_RAY_WRAPPED_PP_COMM=1
-  export LMCACHE_ENABLE_ASYNC_LOADING="False"
-  export LMCACHE_REMOTE_SERDE="cachegen"
-  export LMCACHE_USE_LAYERWISE="True"
-  export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR="True"
+
+  # NCCL settings for multi-GPU/multi-node
   export NCCL_P2P_DISABLE=0
-  # export NCCL_P2P_LEVEL=SYS
-  # export NCCL_ALGO=Tree
-  # export NCCL_MIN_NCHANNELS=4
   export NCCL_TIMEOUT=3600
   export TORCH_NCCL_BLOCKING_WAIT=1
   export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
   export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
   export TORCH_DISTRIBUTED_DEBUG=DETAIL
   export NCCL_DEBUG=INFO
-  # export LMCACHE_LOOKUP_TIMEOUT_MS="12000"
-  # export LMCACHE_LOCAL_DISK="/tmp/lmcache_disk"
-  # export LMCACHE_MAX_LOCAL_DISK_SIZE="100"
-  # export LMCACHE_DISK_PERSISTENCE="True"
-  # export LMCACHE_LOG_LEVEL="INFO"
 """
 
     # Check if any experiment needs Ray (PP > 1)
     needs_ray = any(exp['pp'] > 1 for exp in experiments)
 
-    ray_run = f"""{lmcache_exports}
+    ray_run = f"""{env_exports}
   python roofline_benchmarks/benchmark_{cluster_name}.py
     """
     if num_nodes > 1:
         # Multi-node: use Sky's Ray cluster startup script
-        ray_run = f"""{lmcache_exports}
+        ray_run = f"""{env_exports}
   # Start Ray cluster across all nodes
   export RAY_CMD="uv run ray"
   export RAY_DASHBOARD_HOST=0.0.0.0
@@ -454,7 +407,7 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
         """
     elif needs_ray:
         # Single-node but needs Ray for pipeline parallelism
-        ray_run = f"""{lmcache_exports}
+        ray_run = f"""{env_exports}
   # Start Ray on single node for pipeline parallelism
   export RAY_DASHBOARD_HOST=0.0.0.0
   export RAY_HEAD_PORT=6379
@@ -697,46 +650,7 @@ setup: |
   python3 -c "import torch; print('torch.cuda.is_available():', torch.cuda.is_available()); print('torch.version.cuda:', torch.version.cuda); print('torch.__version__:', torch.__version__); print('torch.cuda.device_count():', torch.cuda.device_count() if torch.cuda.is_available() else 'N/A')" || echo "PyTorch CUDA check failed!"
   echo "==========================="
   
-  # ========================================================================
-  # LMCACHE DISABLED FOR DEBUGGING CUDA ISSUES
-  # LMCache may be overwriting torch with CPU-only version causing CUDA errors
-  # Re-enable once CUDA is working on A100
-  # ========================================================================
-  # # Install LMCache v0.2.1 (compatible with vLLM 0.7.x)
-  # # See: https://docs.lmcache.ai/getting_started/installation.html
-  # # Note: v0.2.2 doesn't exist! Available v0.2.x tags: v0.2.0, v0.2.1
-  # # Using --no-build-isolation to ensure torch version compatibility
-  # rm -rf lmcache
-  # git clone https://github.com/lmcache/lmcache.git
-  # cd lmcache
-  # git checkout v0.2.1
-  # # Set CUDA architecture explicitly to avoid auto-detection (which may fail during setup)
-  # # A100 = 8.0, L40S = 8.9, L4 = 7.5, H100 = 9.0
-  # export TORCH_CUDA_ARCH_LIST="8.0;8.9;7.5;9.0"
-  # export FORCE_CUDA="1"
-  # uv pip install . --no-build-isolation || {{
-  #   # Fallback: try with just A100 arch (most common)
-  #   export TORCH_CUDA_ARCH_LIST="8.0"
-  #   uv pip install . --no-build-isolation
-  # }}
-  # cd ..
-
-  # # ========================================================================
-  # # CRITICAL FIX: LMCache dependencies overwrite torch with CPU-only version!
-  # # The log showed: - torch==2.5.1+cu121  ->  + torch==2.7.0 (CPU-only)
-  # # We MUST force reinstall CUDA-enabled torch AFTER LMCache installation
-  # # Using cu121 for A100 driver 535.x compatibility
-  # # ========================================================================
-  # echo "=== CRITICAL: Reinstalling PyTorch with CUDA 12.1 (after LMCache) ==="
-  # uv pip install --force-reinstall --index-url https://download.pytorch.org/whl/cu121 \
-  #   "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
-
-  # # Verify torch is now CUDA-enabled
-  # echo "=== Verifying torch CUDA after reinstall ==="
-  # python3 -c "import torch; print('torch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('CUDA version:', torch.version.cuda)"
-
-  echo "=== LMCACHE DISABLED - Skipping LMCache installation ==="
-  mkdir -p /tmp/lmcache_disk
+  echo "=== Setup complete ==="
 
 run: |
   set -euxo pipefail
@@ -2462,30 +2376,3 @@ Examples:
 
 if __name__ == "__main__":
     main()
-
-
-    # some notes
-    # without lmcache, vllm v0.10.2 worked for tp4,pp3 (almost?)
-    # now testing with vllm v0.11.0 and no lmcache (this also worked)
-    # have to test with vllm v0.11.0 and lmcache v0.3.9 (trying this now) (didnt work, one exp worked, rest didnt, mostly due to ray dag)
-    # have to test with vllm v0.11.0 and lmcache v0.3.10 (same issue)
-    # have to test with vllm v0.13.0 and lmcache v0.3.10 (same issue) (this issue is interesting - layers not found? wtf?)
-    # there is something called as a lmcache mp connector, will check into that as well
-    # need to check if ray restarts help withn vllmv0.11 and v0.3.9 (does not help)
-    # my suspicion is that i had not put the time between two llm establishments and cleanup_dist_env_and_memory was not used (this HELPS!)
-    # export VLLM_USE_RAY_WRAPPED_PP_COMM=0 maybe trying this helps? (same as all)
-    # have to test with vllm v0.13.0 and lmcache v0.3.11 (latest versions, and building from source????)
-    # this seems like another flag to try enable_async_loading: True (didnt do anything significiant)
-    # vllm with v0.10.2 is NOT WORKING for pp=4 tp=4, maybe thats also an issue, 
-    # will try offloading connector as well
-
-    # TP=4/PP=4 worked with vllm v0.10.0 and max_gpu_util = 0.85 and 
-    # export NCCL_P2P_DISABLE=1
-    # export NCCL_TIMEOUT=1800
-    # export TORCH_NCCL_BLOCKING_WAIT=1
-    # export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
-    # export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
-    # export TORCH_DISTRIBUTED_DEBUG=DETAIL  
-    # export NCCL_DEBUG=INFO 
-
-    # trying lmcache w it (didnt work tbh)
