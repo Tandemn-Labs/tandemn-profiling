@@ -321,6 +321,21 @@ def group_by_input_output_then_cluster(experiments, gpu_type=DEFAULT_GPU_TYPE, v
     
     return result
 
+def group_by_cluster_then_io(experiments, gpu_type=DEFAULT_GPU_TYPE, vm_strategy="prefer_single_node"):
+    """Group experiments: same cluster config runs multiple I/O shapes.
+    
+    Groups by (gpus_per_node, num_nodes, tp, pp, model) so that a single
+    server instance can serve all I/O shapes for the same model/parallelism config.
+    
+    Returns: {(gpus_per_node, num_nodes, tp, pp, model): [experiments]}
+    """
+    groups = defaultdict(list)
+    for exp in experiments:
+        gpus_per_node, num_nodes = get_cluster_config(exp['tp'], exp['pp'], gpu_type, vm_strategy=vm_strategy)
+        key = (gpus_per_node, num_nodes, exp['tp'], exp['pp'], exp['model'])
+        groups[key].append(exp)
+    return dict(groups)
+
 def cleanup_old_benchmark_files(work_dir=None):
     """
     Remove old benchmark files that don't have GPU type in their names.
@@ -649,7 +664,7 @@ setup: |
   source .venv/bin/activate
 
   # Install dependencies
-  uv pip install "datasets" "requests" "pynvml"
+  uv pip install "datasets" "requests" "pynvml" "aiohttp"
 
   # ========================================================================
   # vLLM + PyTorch Installation - GPU-specific versions
@@ -806,7 +821,13 @@ def send_discord_message(message):
     requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
 
 def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
-    """Generate Python benchmark script for a set of experiments."""
+    """Generate Python benchmark script for a set of experiments.
+    
+    Generates a server-mode orchestrator that:
+    1. Starts vLLM OpenAI-compatible server as subprocess
+    2. Runs benchmark_client.py for each I/O shape
+    3. Collects metrics from Prometheus /metrics endpoint
+    """
     exp_list = json.dumps(experiments, indent=2)
 
     # Calculate cluster pricing info
@@ -819,8 +840,13 @@ def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DE
     else:
         cluster_instance_type = instance_type
     
-    # Model path expression for the generated script
-    model_expr = "f\"/models/{exp['model']}\"" if s3_models else "exp['model']"
+    # Model path expressions for the generated script
+    if s3_models:
+        model_path_line = 'model_path = f"/models/" + exp[\'model\']'
+        global_model_path_line = 'MODEL_PATH = f"/models/" + EXPERIMENTS[0][\'model\']'
+    else:
+        model_path_line = "model_path = exp['model']"
+        global_model_path_line = "MODEL_PATH = EXPERIMENTS[0]['model']"
 
     # GPU hardware specs for canonical columns
     canonical_gpu_name = gpu_config.get("canonical_gpu_name", gpu_type)
@@ -831,51 +857,37 @@ def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DE
     interconnect = gpu_config["interconnect"]
 
     return f'''#!/usr/bin/env python3
+"""Server-mode benchmark orchestrator.
+
+Starts a vLLM OpenAI-compatible server, then runs benchmark_client.py
+for each I/O shape. Metrics come from Prometheus /metrics endpoint.
+"""
 import os
 os.environ["RAY_ADDRESS"] = "127.0.0.1:6379"
-os.environ["LMCACHE_LOG_LEVEL"] = "INFO"
 
-import requests
 import json
 import time
 import gc
-
-# DO NOT import torch or call any CUDA functions before vLLM!
-# vLLM 0.10.0's V1 engine uses multiprocessing with fork.
-# If CUDA is initialized before fork, workers fail with:
-#   "Cannot re-initialize CUDA in forked subprocess"
-# Let vLLM handle CUDA initialization internally.
-
-import ray
-from datasets import load_dataset
-from vllm import LLM, SamplingParams
-
-# Import torch AFTER vLLM to avoid "Cannot re-initialize CUDA in forked subprocess" error
-# vLLM 0.10.0's V1 engine uses multiprocessing with fork, and CUDA must not be initialized before fork
-import torch
-
-# Handle API differences between vLLM versions
-try:
-    from vllm.config import KVTransferConfig
-except ImportError:
-    KVTransferConfig = None
-
-try:
-    from vllm.distributed import cleanup_dist_env_and_memory
-except ImportError:
-    # Fallback for older vLLM versions
-    def cleanup_dist_env_and_memory(shutdown_ray=True):
-        import gc
-        import torch
-        gc.collect()
-        torch.cuda.empty_cache()
-        if shutdown_ray:
-            ray.shutdown()
-
-import shutil
+import re
+import sys
 import subprocess
 import threading
+import urllib.request
 from collections import defaultdict
+from pathlib import Path
+
+import ray
+import torch
+import requests as req_lib
+
+# Prometheus parser (copied to same directory as this script)
+from prometheus_parser import (
+    parse_prometheus_text,
+    compute_deltas,
+    histogram_quantile,
+    extract_throughput_metrics,
+    extract_latency_percentiles,
+)
 
 # ============================================================================
 # Distributed GPU Monitoring with Ray Actors
@@ -978,7 +990,6 @@ class GPUMonitorActor:
         """Return the Ray node ID where this actor is running."""
         try:
             import ray
-            # Get the current node's resource ID
             node_id = ray.get_runtime_context().get_node_id()
             return node_id
         except:
@@ -999,29 +1010,24 @@ class DistributedGPUMonitor:
     def __init__(self, sample_interval: float = 0.5):
         self.sample_interval = sample_interval
         self.actors = []
-        self.node_map = {{}}  # node_id -> actor
+        self.node_map = {{}}
 
     def start(self):
         """Deploy actors on all Ray nodes and start monitoring."""
-        # Get all Ray nodes
         nodes = ray.nodes()
         alive_nodes = [n for n in nodes if n.get('Alive', False)]
 
         print(f"📡 Found {{len(alive_nodes)}} Ray nodes for GPU monitoring")
 
-        # Try using placement group to ensure one actor per node
-        # If that fails, fall back to creating actors without pinning
         try:
             from ray.util.placement_group import placement_group, remove_placement_group
             from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy
             
-            # Create a placement group with one bundle per node
             bundles = [{{"CPU": 0.1}} for _ in alive_nodes]
             pg = placement_group(bundles, strategy="STRICT_SPREAD")
-            ray.get(pg.ready(), timeout=60.0)  # Increased timeout for heavy Ray load
+            ray.get(pg.ready(), timeout=60.0)
             print(f"   Created placement group with {{len(bundles)}} bundles")
             
-            # Create actors using placement group
             for idx, node in enumerate(alive_nodes):
                 node_id = f"node{{idx}}"
                 node_ip = node.get('NodeManagerAddress', 'unknown')
@@ -1046,7 +1052,6 @@ class DistributedGPUMonitor:
             print(f"   Placement group approach failed: {{pg_error}}")
             print(f"   Falling back to simple actor creation (no pinning)...")
             
-            # Fallback: create actors without pinning, let Ray schedule them
             for idx, node in enumerate(alive_nodes):
                 node_id = f"node{{idx}}"
                 node_ip = node.get('NodeManagerAddress', 'unknown')
@@ -1060,9 +1065,8 @@ class DistributedGPUMonitor:
                     self.node_map[node_id] = actor
                     print(f"  ✓ Deployed monitor actor (will query node location)")
                     
-                    # Try to get the Ray node where the actor is actually running
                     try:
-                        ray_node_id = ray.get(actor.get_ray_node_id.remote(), timeout=15.0)  # Increased timeout
+                        ray_node_id = ray.get(actor.get_ray_node_id.remote(), timeout=15.0)
                         print(f"     Actor running on Ray node: {{ray_node_id}}")
                     except Exception as node_check_err:
                         print(f"     Could not determine actor node: {{node_check_err}}")
@@ -1071,34 +1075,28 @@ class DistributedGPUMonitor:
                     import traceback
                     traceback.print_exc()
 
-        # Start all actors with individual timeouts to avoid hanging
-        # Use longer timeouts when Ray is under heavy load (e.g., from vLLM)
         print(f"   Starting monitoring on {{len(self.actors)}} nodes...")
         started_count = 0
         for idx, actor in enumerate(self.actors):
             try:
-                # Start each actor individually with timeout
-                # Increased timeout to handle Ray being busy with vLLM operations
                 print(f"   Starting monitor on node{{idx}}...")
                 future = actor.start.remote()
-                ray.get(future, timeout=30.0)  # Increased from 10s to 30s for heavy Ray load
+                ray.get(future, timeout=30.0)
                 started_count += 1
                 print(f"   ✓ Started monitor on node{{idx}}")
             except Exception as e:
                 print(f"   ✗ Failed to start monitor on node{{idx}}: {{e}}")
                 import traceback
                 traceback.print_exc()
-                # Continue with other actors
         
         if started_count > 0:
             print(f"📊 GPU monitoring started on {{started_count}}/{{len(self.actors)}} nodes")
-            return True  # Success
+            return True
         else:
             print(f"⚠️  Warning: No actors started successfully. Falling back to local monitoring.")
-            # Clear actors so fallback works
             self.actors = []
-            self.node_map = {{}}  # Empty dict - escaped for f-string
-            return False  # Failed - should fall back to local
+            self.node_map = {{}}
+            return False
 
     def stop(self):
         """Stop all monitor actors."""
@@ -1110,10 +1108,8 @@ class DistributedGPUMonitor:
         if not self.actors:
             return []
 
-        # Collect from all actors
         all_series = ray.get([actor.get_timeseries.remote() for actor in self.actors])
 
-        # Merge time-series by timestamp
         merged = {{}}
         for series in all_series:
             for sample in series:
@@ -1124,7 +1120,6 @@ class DistributedGPUMonitor:
                     if key != 't':
                         merged[t][key] = value
 
-        # Sort by timestamp and return as list
         return [merged[t] for t in sorted(merged.keys())]
 
     def get_summary(self):
@@ -1141,14 +1136,12 @@ class DistributedGPUMonitor:
                 if key != 't':
                     metrics[key].append(value)
 
-        # Per-GPU summaries
         for key, values in metrics.items():
             if values:
                 summary[f'{{key}}_avg'] = round(sum(values) / len(values), 2)
                 summary[f'{{key}}_max'] = round(max(values), 2)
                 summary[f'{{key}}_min'] = round(min(values), 2)
 
-        # Aggregate across all GPUs
         all_sm_util = []
         all_mem_bw_util = []
         all_mem_util = []
@@ -1179,13 +1172,13 @@ class DistributedGPUMonitor:
 # Local GPU Monitoring (fallback for single-node)
 # ============================================================================
 
-# GPU Monitoring class using pynvml
 class GPUMonitor:
     """Background GPU metrics collector using pynvml."""
 
     def __init__(self, sample_interval=0.5):
         self.sample_interval = sample_interval
-        self.timeseries = []  # List of {{timestamp, gpu0_*, gpu1_*, ...}}
+
+        self.timeseries = []
         self._start_time = None
         self._stop_event = threading.Event()
         self._thread = None
@@ -1228,15 +1221,13 @@ class GPUMonitor:
                 try:
                     handle = pynvml.nvmlDeviceGetHandleByIndex(i)
 
-                    # Memory usage
                     mem_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
                     mem_used_gb = mem_info.used / (1024**3)
                     mem_util_pct = (mem_info.used / mem_info.total) * 100
 
-                    # GPU utilization (SM utilization)
                     util = pynvml.nvmlDeviceGetUtilizationRates(handle)
-                    gpu_util_pct = util.gpu  # SM utilization
-                    mem_bw_util_pct = util.memory  # Memory bandwidth utilization
+                    gpu_util_pct = util.gpu
+                    mem_bw_util_pct = util.memory
 
                     sample[f'gpu{{i}}_mem_gb'] = round(mem_used_gb, 2)
                     sample[f'gpu{{i}}_mem_pct'] = round(mem_util_pct, 1)
@@ -1246,7 +1237,7 @@ class GPUMonitor:
                 except Exception:
                     pass
 
-            if len(sample) > 1:  # More than just timestamp
+            if len(sample) > 1:
                 self.timeseries.append(sample)
 
             self._stop_event.wait(self.sample_interval)
@@ -1262,21 +1253,18 @@ class GPUMonitor:
 
         summary = {{}}
 
-        # Collect values per metric
         metrics = defaultdict(list)
         for sample in self.timeseries:
             for key, value in sample.items():
                 if key != 't':
                     metrics[key].append(value)
 
-        # Per-GPU summaries
         for key, values in metrics.items():
             if values:
                 summary[f'{{key}}_avg'] = round(sum(values) / len(values), 2)
                 summary[f'{{key}}_max'] = round(max(values), 2)
                 summary[f'{{key}}_min'] = round(min(values), 2)
 
-        # Aggregate across all GPUs
         all_sm_util = []
         all_mem_bw_util = []
         all_mem_util = []
@@ -1302,179 +1290,93 @@ class GPUMonitor:
         return summary
 
 
-class SchedulerMonitor:
-    """Monitor vLLM scheduler queue depths and KV cache during generation."""
+# ============================================================================
+def _find_gauge(gauges, base_name, default=0):
+    """Find gauge value by base name, ignoring label suffixes."""
+    if base_name in gauges:
+        return gauges[base_name]
+    for key, val in gauges.items():
+        stripped = key.split("{{")[0] if "{{" in key else key
+        if stripped == base_name:
+            return val
+    return default
 
-    def __init__(self, llm, sample_interval=0.25):
-        self.llm = llm
-        self.sample_interval = sample_interval
+# MetricsPoller — replaces SchedulerMonitor
+# ============================================================================
+
+class MetricsPoller:
+    """Poll /metrics endpoint periodically for timeseries data."""
+
+    def __init__(self, base_url="http://localhost:8000", interval=0.5):
+        self.base_url = base_url
+        self.interval = interval
         self.timeseries = []
-        self._start_time = None
-        self._stop_event = threading.Event()
+        self._stop = threading.Event()
         self._thread = None
+        self._start_time = None
 
     def start(self):
-        self._stop_event.clear()
+        self._stop.clear()
         self.timeseries = []
         self._start_time = time.time()
-        self._thread = threading.Thread(target=self._monitor_loop, daemon=True)
+        self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
 
-    def stop(self):
-        if self._thread is None:
-            return
-        self._stop_event.set()
-        self._thread.join(timeout=2.0)
-        self._thread = None
-
-    def _get_scheduler_metrics(self, engine, sample):
-        """Extract scheduler queue depths from various vLLM versions."""
-        scheduler = getattr(engine, 'scheduler', None)
-        if scheduler is None:
-            return
-
-        # vLLM v0.10+ uses a list of schedulers (one per virtual engine)
-        if isinstance(scheduler, list):
-            total_running = 0
-            total_waiting = 0
-            total_swapped = 0
-            for sched in scheduler:
-                if hasattr(sched, 'running'):
-                    total_running += len(sched.running)
-                if hasattr(sched, 'waiting'):
-                    total_waiting += len(sched.waiting)
-                if hasattr(sched, 'swapped'):
-                    total_swapped += len(sched.swapped)
-            sample['running'] = total_running
-            sample['waiting'] = total_waiting
-            sample['swapped'] = total_swapped
-        # Single scheduler (older vLLM versions)
-        elif hasattr(scheduler, 'running'):
-            sample['running'] = len(scheduler.running)
-            if hasattr(scheduler, 'waiting'):
-                sample['waiting'] = len(scheduler.waiting)
-            if hasattr(scheduler, 'swapped'):
-                sample['swapped'] = len(scheduler.swapped)
-
-    def _get_kv_cache_metrics(self, engine, sample):
-        """Extract KV cache utilization from vLLM."""
-        # Try to access cache engine / block manager
-        # vLLM stores KV cache info in different places depending on version
-
-        # Method 1: scheduler[0].block_manager (vLLM v0.10+)
-        scheduler = getattr(engine, 'scheduler', None)
-        if scheduler is not None:
-            scheds = scheduler if isinstance(scheduler, list) else [scheduler]
-            for sched in scheds:
-                block_mgr = getattr(sched, 'block_manager', None)
-                if block_mgr is not None:
-                    # Try to get GPU block usage
-                    if hasattr(block_mgr, 'get_num_free_gpu_blocks'):
-                        free_gpu = block_mgr.get_num_free_gpu_blocks()
-                        total_gpu = getattr(block_mgr, 'num_total_gpu_blocks',
-                                          getattr(block_mgr, 'num_gpu_blocks', None))
-                        if total_gpu is not None:
-                            used_gpu = total_gpu - free_gpu
-                            sample['kv_cache_used_blocks'] = used_gpu
-                            sample['kv_cache_total_blocks'] = total_gpu
-                            sample['kv_cache_util_pct'] = round(100 * used_gpu / total_gpu, 1) if total_gpu > 0 else 0
-                        break
-                    # Alternative: gpu_allocator
-                    gpu_alloc = getattr(block_mgr, 'gpu_allocator', None)
-                    if gpu_alloc is not None:
-                        if hasattr(gpu_alloc, 'get_num_free_blocks'):
-                            free_gpu = gpu_alloc.get_num_free_blocks()
-                            total_gpu = getattr(gpu_alloc, 'num_blocks', None)
-                            if total_gpu is not None:
-                                used_gpu = total_gpu - free_gpu
-                                sample['kv_cache_used_blocks'] = used_gpu
-                                sample['kv_cache_total_blocks'] = total_gpu
-                                sample['kv_cache_util_pct'] = round(100 * used_gpu / total_gpu, 1) if total_gpu > 0 else 0
-                            break
-
-        # Method 2: cache_engine (some versions)
-        cache_engine = getattr(engine, 'cache_engine', None)
-        if cache_engine is not None and 'kv_cache_used_blocks' not in sample:
-            # Try various attributes
-            for attr in ['gpu_cache', 'cache']:
-                cache = getattr(cache_engine, attr, None)
-                if cache is not None and hasattr(cache, '__len__'):
-                    sample['kv_cache_layers'] = len(cache)
-                    break
-
-    def _monitor_loop(self):
-        while not self._stop_event.is_set():
+    def _loop(self):
+        while not self._stop.is_set():
             try:
-                timestamp = time.time()
-                relative_time = timestamp - self._start_time
-                sample = {{'t': round(relative_time, 3)}}
+                resp = urllib.request.urlopen(f"{{self.base_url}}/metrics", timeout=5)
+                text = resp.read().decode()
+                parsed = parse_prometheus_text(text)
+                sample = {{
+                    "t": round(time.time() - self._start_time, 3),
+                    "running": _find_gauge(parsed["gauges"], "vllm:num_requests_running", 0),
+                    "waiting": _find_gauge(parsed["gauges"], "vllm:num_requests_waiting", 0),
+                    "swapped": _find_gauge(parsed["gauges"], "vllm:num_requests_swapped", 0),
+                    "kv_cache_util_pct": round(_find_gauge(parsed["gauges"], "vllm:gpu_cache_usage_perc", 0) * 100, 1),
+                }}
+                self.timeseries.append(sample)
+            except Exception:
+                pass
+            self._stop.wait(self.interval)
 
-                engine = self.llm.llm_engine
-
-                # Get scheduler queue depths
-                self._get_scheduler_metrics(engine, sample)
-
-                # Get KV cache utilization
-                self._get_kv_cache_metrics(engine, sample)
-
-                # Try to get number of unfinished requests
-                if hasattr(engine, '_request_tracker'):
-                    tracker = engine._request_tracker
-                    if hasattr(tracker, 'get_num_unfinished_requests'):
-                        sample['unfinished'] = tracker.get_num_unfinished_requests()
-
-                if len(sample) > 1:  # More than just timestamp
-                    self.timeseries.append(sample)
-
-            except Exception as e:
-                # Log first error for debugging
-                if not self.timeseries:
-                    print(f"⚠️  SchedulerMonitor error: {{e}}")
-
-            self._stop_event.wait(self.sample_interval)
+    def stop(self):
+        self._stop.set()
+        if self._thread:
+            self._thread.join(2.0)
 
     def get_timeseries(self):
-        """Return raw time-series data for plotting."""
         return self.timeseries
 
     def get_summary(self):
-        """Return summary statistics of scheduler queue depths."""
         if not self.timeseries:
             return {{}}
-
         summary = {{}}
-
-        # Collect all unique keys
         all_keys = set()
         for sample in self.timeseries:
             all_keys.update(sample.keys())
         all_keys.discard('t')
-
         for key in all_keys:
             values = [s.get(key, 0) for s in self.timeseries if key in s]
             if values:
                 summary[f'{{key}}_avg'] = round(sum(values) / len(values), 2)
                 summary[f'{{key}}_max'] = max(values)
-
         summary['scheduler_samples'] = len(self.timeseries)
         return summary
 
+
+# ============================================================================
+# Constants
+# ============================================================================
+
 DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463127774414770227/PX_asJ7IXfvQrff6vCW-yGL9k7pBk1v2ZMmRyzUdMNS3mht3pDVO8ligaclUAAFItbvz"
-
-def send_discord_message(message):
-    payload = {{"content": message}}
-    requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
-
-# Clean up existing cache directory
-cache_dir = "/tmp/lmcache_disk"
-if os.path.exists(cache_dir):
-    shutil.rmtree(cache_dir)
-
-os.makedirs(cache_dir, exist_ok=True)
 
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
-MIN_NUM_SAMPLES = 50  # Floor; actual count computed dynamically in run_benchmark() from KV cache concurrency
+MIN_NUM_SAMPLES = 50
+SERVER_PORT = 8000
+SERVER_URL = f"http://localhost:{{SERVER_PORT}}"
+MAX_MODEL_LEN = max(e['max_input_length'] + e['max_output_length'] for e in EXPERIMENTS)
 
 # Cluster pricing information
 INSTANCE_TYPE = "{cluster_instance_type}"
@@ -1491,12 +1393,21 @@ GPU_GENERATION = "{gpu_generation}"
 INTERCONNECT = "{interconnect}"
 CLOUD = "{cloud}"
 
+# Will be set after parsing server logs
+NUM_GPU_BLOCKS = 0
+BLOCK_SIZE = 16
+
 # Detect vllm version at runtime
 try:
     import vllm as _vllm_mod
     RUNTIME_STACK = f"vllm {{_vllm_mod.__version__}}"
 except Exception:
     RUNTIME_STACK = "vllm"
+
+
+def send_discord_message(message):
+    payload = {{"content": message}}
+    req_lib.post(DISCORD_WEBHOOK, json=payload, timeout=10)
 
 
 def get_model_config_info(model_name_or_path):
@@ -1515,7 +1426,6 @@ def get_model_config_info(model_name_or_path):
         import os as _os
         from transformers import AutoConfig
 
-        # Try local path first (for S3 models), then HF hub name
         config = None
         for path_candidate in [model_name_or_path]:
             try:
@@ -1531,11 +1441,9 @@ def get_model_config_info(model_name_or_path):
         config_dict = config.to_dict()
         result['model_config_json'] = json.dumps(config_dict, default=str)
 
-        # Architecture
         if hasattr(config, 'architectures') and config.architectures:
             result['model_architecture'] = config.architectures[0]
 
-        # Basic dimensions
         hidden = getattr(config, 'hidden_size', None)
         layers = getattr(config, 'num_hidden_layers', None)
         vocab = getattr(config, 'vocab_size', None)
@@ -1547,14 +1455,11 @@ def get_model_config_info(model_name_or_path):
         result['num_attention_heads'] = num_heads
         result['num_key_value_heads'] = num_kv_heads
 
-        # MoE detection
         num_experts = getattr(config, 'num_local_experts', None) or getattr(config, 'num_experts', None)
         num_experts_active = getattr(config, 'num_experts_per_tok', None) or getattr(config, 'num_selected_experts', None)
         result['is_moe'] = num_experts is not None and num_experts > 1
         result['num_experts_active'] = num_experts_active
 
-        # Parameter estimation
-        # 1. Try exact count from safetensors index
         params_b = None
         if _os.path.isdir(model_name_or_path):
             index_file = _os.path.join(model_name_or_path, 'model.safetensors.index.json')
@@ -1564,18 +1469,17 @@ def get_model_config_info(model_name_or_path):
                         idx = json.load(_f)
                     total_bytes = idx.get('metadata', {{}}).get('total_size')
                     if total_bytes:
-                        params_b = round(int(total_bytes) / 2 / 1e9, 2)  # fp16 = 2 bytes
+                        params_b = round(int(total_bytes) / 2 / 1e9, 2)
                 except Exception:
                     pass
 
-        # 2. Fallback: estimate from config dimensions
         if params_b is None and all(v is not None for v in [hidden, layers, vocab, intermediate]):
             kv_dim = (hidden // num_heads * num_kv_heads) if (num_heads and num_kv_heads) else hidden
-            embed_params = vocab * hidden * 2  # input + output embeddings
+            embed_params = vocab * hidden * 2
             attn_params = layers * (hidden * hidden + 2 * hidden * kv_dim + hidden * hidden)
-            ffn_params = layers * 3 * hidden * intermediate  # gate, up, down (SwiGLU)
+            ffn_params = layers * 3 * hidden * intermediate
             if num_experts and num_experts > 1:
-                ffn_params = ffn_params * num_experts  # MoE: multiply by total experts
+                ffn_params = ffn_params * num_experts
             total_params = embed_params + attn_params + ffn_params
             params_b = round(total_params / 1e9, 2)
 
@@ -1589,196 +1493,11 @@ def get_model_config_info(model_name_or_path):
     return result
 
 
-def extract_vllm_metrics(llm):
-    """Extract internal Prometheus metrics from vLLM V1 engine.
-
-    vLLM 0.10.0 get_metrics() returns list[Metric] where Metric is a dataclass:
-      - Counter: .name, .labels, .value (int)
-      - Gauge:   .name, .labels, .value (float)
-      - Histogram: .name, .labels, .count (int), .sum (float), .buckets (dict[str,int])
-    Metric names are prefixed with 'vllm:' (e.g. 'vllm:prompt_tokens').
-
-    Returns a dict with counters, histogram averages, percentile estimates,
-    and derived throughput. Returns all-None dict on failure.
-    """
-    result = {{
-        'prompt_tokens_total': None,
-        'generation_tokens_total': None,
-        'avg_prefill_time_s': None,
-        'avg_decode_time_s': None,
-        'avg_e2e_latency_s': None,
-        'avg_ttft_s': None,
-        'avg_tpot_s': None,
-        'avg_prompt_len': None,
-        'avg_gen_len': None,
-        'ttft_ms_p50': None, 'ttft_ms_p95': None, 'ttft_ms_p99': None,
-        'tpot_ms_p50': None, 'tpot_ms_p95': None, 'tpot_ms_p99': None,
-        'e2e_ms_p50': None, 'e2e_ms_p95': None, 'e2e_ms_p99': None,
-        'prefill_toks_per_sec': None,
-        'decode_toks_per_sec': None,
-        # Raw histogram sums/counts for delta computation
-        '_hist_prefill_sum': None, '_hist_prefill_count': None,
-        '_hist_decode_sum': None, '_hist_decode_count': None,
-        '_hist_e2e_sum': None, '_hist_e2e_count': None,
-        '_hist_ttft_sum': None, '_hist_ttft_count': None,
-        '_hist_tpot_sum': None, '_hist_tpot_count': None,
-        '_hist_prompt_len_sum': None, '_hist_prompt_len_count': None,
-        '_hist_gen_len_sum': None, '_hist_gen_len_count': None,
-        # Raw histogram buckets for delta percentile computation
-        '_buckets_ttft': None,
-        '_buckets_tpot': None,
-        '_buckets_e2e': None,
-    }}
-    try:
-        metrics_list = llm.get_metrics()  # returns list[Metric] dataclass instances
-
-        # Build lookup by metric name (first match wins)
-        metrics_by_name = {{}}
-        for m in metrics_list:
-            if m.name not in metrics_by_name:
-                metrics_by_name[m.name] = m
-
-        def _find_metric(name_substr):
-            """Find first metric whose name contains the given substring."""
-            for name, m in metrics_by_name.items():
-                if name_substr in name:
-                    return m
-            return None
-
-        def _histogram_buckets_to_sorted(hist):
-            """Convert Histogram.buckets dict[str,int] to sorted [(float,int)] list."""
-            if hist is None or not hasattr(hist, 'buckets') or not hist.buckets:
-                return []
-            buckets = []
-            for bound_str, count in hist.buckets.items():
-                try:
-                    bound = float('inf') if bound_str == '+Inf' else float(bound_str)
-                    buckets.append((bound, count))
-                except (ValueError, TypeError):
-                    pass
-            return sorted(buckets, key=lambda x: x[0])
-
-        def _histogram_quantile(buckets, quantile):
-            """Estimate a quantile from sorted (bound, cumulative_count) pairs.
-
-            Uses linear interpolation within the bucket where the quantile falls,
-            matching the standard Prometheus histogram_quantile algorithm.
-            """
-            if not buckets:
-                return None
-            total = buckets[-1][1]  # Last bucket (+Inf) has total count
-            if total == 0:
-                return None
-            target = quantile * total
-            prev_bound = 0.0
-            prev_count = 0.0
-            for bound, count in buckets:
-                if bound == float('inf'):
-                    if count >= target and prev_count < target:
-                        return prev_bound
-                    continue
-                if count >= target:
-                    bucket_count = count - prev_count
-                    if bucket_count == 0:
-                        return bound
-                    fraction = (target - prev_count) / bucket_count
-                    return prev_bound + fraction * (bound - prev_bound)
-                prev_bound = bound
-                prev_count = count
-            return prev_bound
-
-        # Extract counters (Counter dataclass: .value is int)
-        prompt_counter = _find_metric('prompt_tokens')
-        gen_counter = _find_metric('generation_tokens')
-        result['prompt_tokens_total'] = prompt_counter.value if prompt_counter and hasattr(prompt_counter, 'value') else None
-        result['generation_tokens_total'] = gen_counter.value if gen_counter and hasattr(gen_counter, 'value') else None
-
-        # Extract histograms (Histogram dataclass: .count, .sum, .buckets)
-        hist_map = {{
-            'prefill': 'request_prefill_time',
-            'decode': 'request_decode_time',
-            'e2e': 'e2e_request_latency',
-            'ttft': 'time_to_first_token',
-            'tpot': 'time_per_output_token',
-            'prompt_len': 'request_prompt_tokens',
-            'gen_len': 'request_generation_tokens',
-        }}
-
-        for short_name, metric_name in hist_map.items():
-            hist = _find_metric(metric_name)
-            if hist is None or not hasattr(hist, 'count'):
-                continue
-            s = hist.sum
-            c = hist.count
-            avg = (s / c) if (c and c > 0) else None
-
-            if short_name == 'prefill':
-                result['avg_prefill_time_s'] = avg
-                result['_hist_prefill_sum'] = s
-                result['_hist_prefill_count'] = c
-            elif short_name == 'decode':
-                result['avg_decode_time_s'] = avg
-                result['_hist_decode_sum'] = s
-                result['_hist_decode_count'] = c
-            elif short_name == 'e2e':
-                result['avg_e2e_latency_s'] = avg
-                result['_hist_e2e_sum'] = s
-                result['_hist_e2e_count'] = c
-            elif short_name == 'ttft':
-                result['avg_ttft_s'] = avg
-                result['_hist_ttft_sum'] = s
-                result['_hist_ttft_count'] = c
-            elif short_name == 'tpot':
-                result['avg_tpot_s'] = avg
-                result['_hist_tpot_sum'] = s
-                result['_hist_tpot_count'] = c
-            elif short_name == 'prompt_len':
-                result['avg_prompt_len'] = avg
-                result['_hist_prompt_len_sum'] = s
-                result['_hist_prompt_len_count'] = c
-            elif short_name == 'gen_len':
-                result['avg_gen_len'] = avg
-                result['_hist_gen_len_sum'] = s
-                result['_hist_gen_len_count'] = c
-
-        # Extract percentiles from histogram buckets (for latency metrics)
-        for short_name, metric_name, ms_prefix in [
-            ('ttft', 'time_to_first_token', 'ttft'),
-            ('tpot', 'time_per_output_token', 'tpot'),
-            ('e2e', 'e2e_request_latency', 'e2e'),
-        ]:
-            hist = _find_metric(metric_name)
-            buckets = _histogram_buckets_to_sorted(hist)
-            result[f'_buckets_{{short_name}}'] = buckets
-            for q, label in [(0.5, 'p50'), (0.95, 'p95'), (0.99, 'p99')]:
-                val = _histogram_quantile(buckets, q)
-                result[f'{{ms_prefix}}_ms_{{label}}'] = round(val * 1000, 3) if val is not None else None
-
-        # Derived throughput (per-request averages)
-        avg_prompt = result.get('avg_prompt_len')
-        avg_prefill_t = result.get('avg_prefill_time_s')
-        if avg_prompt and avg_prefill_t and avg_prefill_t > 0:
-            result['prefill_toks_per_sec'] = round(avg_prompt / avg_prefill_t, 2)
-
-        avg_gen = result.get('avg_gen_len')
-        avg_decode_t = result.get('avg_decode_time_s')
-        if avg_gen and avg_decode_t and avg_decode_t > 0:
-            result['decode_toks_per_sec'] = round((avg_gen - 1) / avg_decode_t, 2)
-
-    except Exception as e:
-        print(f"⚠️  extract_vllm_metrics failed: {{e}}")
-        import traceback
-        traceback.print_exc()
-
-    return result
-
-
 def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
     """Build all 73 canonical schema columns from experiment data."""
-    # Basic counts
     gpu_count = NUM_NODES * GPUS_PER_NODE
     params_b = model_info.get('params_billion')
-    model_size_gb = round(params_b * 2, 2) if params_b else None  # fp16 = 2 bytes/param
+    model_size_gb = round(params_b * 2, 2) if params_b else None
     tps_total = measured_data.get('tokens_per_sec_total', 0)
     tps_prefill = measured_data.get('tokens_per_sec_prefill', 0)
     tps_decode = measured_data.get('tokens_per_sec_decode', 0)
@@ -1789,19 +1508,17 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
     num_heads = model_info.get('num_attention_heads')
     num_kv_heads = model_info.get('num_key_value_heads')
 
-    # Safe division helper
     def _safe_div(a, b):
         if a is None or b is None or b == 0:
             return None
         return round(a / b, 4)
 
     canonical = {{
-        # --- Hardcoded (12) ---
         'data_source': 'our_experiment',
         'data_source_type': 'measured',
         'precision': 'fp16',
         'cloud': CLOUD,
-        'region': None,  # SkyPilot auto-selects region
+        'region': None,
         'task_type': 'batched',
         'request_pattern': 'offline_batch',
         'is_lmcache': None,
@@ -1810,12 +1527,10 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
         'cuda_graphs': None,
         'spec_decode': None,
 
-        # --- From experiment config ---
         'model_name': exp.get('model'),
         'tp': exp.get('tp'),
         'pp': exp.get('pp'),
 
-        # --- From injected cluster constants ---
         'instance_type': INSTANCE_TYPE,
         'price_per_instance_hour_usd': price_per_hour,
         'num_nodes': NUM_NODES,
@@ -1823,16 +1538,13 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
         'gpu_model': GPU_MODEL,
         'gpu_mem_gb': GPU_MEM_GB,
 
-        # --- GPU spec constants ---
         'interconnect': INTERCONNECT,
         'gpu_bandwidth_gbps': GPU_BANDWIDTH_GBPS,
         'gpu_tflops_fp16': GPU_TFLOPS_FP16,
         'gpu_generation': GPU_GENERATION,
 
-        # --- Runtime detection ---
         'runtime_stack': RUNTIME_STACK,
 
-        # --- From HF model config ---
         'model_architecture': model_info.get('model_architecture'),
         'params_billion': params_b,
         'model_config_json': model_info.get('model_config_json'),
@@ -1840,17 +1552,14 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
         'is_moe': model_info.get('is_moe'),
         'num_experts_active': model_info.get('num_experts_active'),
 
-        # --- Measured ---
         'tokens_per_sec_total': tps_total,
         'tokens_per_sec_prefill': tps_prefill,
         'tokens_per_sec_decode': tps_decode,
         'total_cost_usd': round(price_per_hour * elapsed / 3600, 6) if elapsed else None,
 
-        # --- From vLLM engine config ---
         'max_num_seqs': vllm_config.get('max_num_seqs') if vllm_config else None,
         'batch_size': vllm_config.get('max_num_seqs') if vllm_config else None,
 
-        # --- Simple derivations ---
         'gpu_count_total': gpu_count,
         'tokens_per_sec_per_gpu': _safe_div(tps_total, gpu_count),
         'input_len_tokens_min': input_len,
@@ -1877,7 +1586,6 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
         'cost_per_1m_tokens_prefill_usd': round(price_per_hour * 1e6 / (tps_prefill * 3600), 4) if tps_prefill else None,
         'cost_per_1m_tokens_decode_usd': round(price_per_hour * 1e6 / (tps_decode * 3600), 4) if tps_decode else None,
 
-        # --- Latency percentiles (from vLLM internal metrics, None if unavailable) ---
         'dp': None,
         'ttft_ms_p50': measured_data.get('ttft_ms_p50'),
         'ttft_ms_p95': measured_data.get('ttft_ms_p95'),
@@ -1892,549 +1600,287 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
     return canonical
 
 
-def get_vllm_config_info(llm):
-    """Extract all configuration info from vLLM engine."""
-    config_info = {{}}
-    try:
-        # Access the LLM engine's configuration
-        engine = llm.llm_engine
+# ============================================================================
+# Server Management
+# ============================================================================
 
-        # Cache config (KV cache settings)
-        if hasattr(engine, 'cache_config'):
-            cache_cfg = engine.cache_config
-            config_info['block_size'] = getattr(cache_cfg, 'block_size', None)
-            config_info['gpu_memory_utilization'] = getattr(cache_cfg, 'gpu_memory_utilization', None)
-            config_info['num_gpu_blocks'] = getattr(cache_cfg, 'num_gpu_blocks', None)
-            config_info['num_cpu_blocks'] = getattr(cache_cfg, 'num_cpu_blocks', None)
-            config_info['swap_space'] = getattr(cache_cfg, 'swap_space', None)
-            config_info['cache_dtype'] = getattr(cache_cfg, 'cache_dtype', None)
-            config_info['kv_cache_dtype'] = getattr(cache_cfg, 'kv_cache_dtype', None)
+def scrape_metrics(base_url=None):
+    """Scrape /metrics endpoint from vLLM server."""
+    if base_url is None:
+        base_url = SERVER_URL
+    resp = urllib.request.urlopen(f"{{base_url}}/metrics", timeout=10)
+    return resp.read().decode()
 
-        # Scheduler config (concurrency settings)
-        if hasattr(engine, 'scheduler_config'):
-            sched_cfg = engine.scheduler_config
-            # Extract scheduler config attributes
-            config_info['max_num_seqs'] = getattr(sched_cfg, 'max_num_seqs', None)
-            config_info['max_num_batched_tokens'] = getattr(sched_cfg, 'max_num_batched_tokens', None)
-            config_info['max_model_len'] = getattr(sched_cfg, 'max_model_len', None)
-            config_info['chunked_prefill_enabled'] = getattr(sched_cfg, 'chunked_prefill_enabled', None)
-            config_info['max_paddings'] = getattr(sched_cfg, 'max_paddings', None)
-            config_info['delay_factor'] = getattr(sched_cfg, 'delay_factor', None)
-            config_info['chunked_prefill_size'] = getattr(sched_cfg, 'chunked_prefill_size', None)
-            config_info['max_seq_len'] = getattr(sched_cfg, 'max_seq_len', None)
-            config_info['policy'] = getattr(sched_cfg, 'policy', None)
-            config_info['long_prefill_token_threshold'] = getattr(sched_cfg, 'long_prefill_token_threshold', None)
-            config_info['max_long_partial_prefills'] = getattr(sched_cfg, 'max_long_partial_prefills', None)
-        
-        # Also check scheduler instance (not just config) for runtime values
-        if hasattr(engine, 'scheduler'):
-            scheduler = engine.scheduler
-            # Try to get runtime scheduler values if config doesn't have them
-            if config_info.get('max_num_seqs') is None:
-                config_info['max_num_seqs'] = getattr(scheduler, 'max_num_seqs', None)
-            if config_info.get('max_num_batched_tokens') is None:
-                config_info['max_num_batched_tokens'] = getattr(scheduler, 'max_num_batched_tokens', None)
-        
-        # Ensure these keys exist even if scheduler_config doesn't exist or attributes are missing
-        if 'max_num_seqs' not in config_info:
-            config_info['max_num_seqs'] = None
-        if 'max_num_batched_tokens' not in config_info:
-            config_info['max_num_batched_tokens'] = None
 
-        # Model config
-        if hasattr(engine, 'model_config'):
-            model_cfg = engine.model_config
-            config_info['dtype'] = str(getattr(model_cfg, 'dtype', None))
-            config_info['max_model_len'] = getattr(model_cfg, 'max_model_len', None)
-            config_info['quantization'] = getattr(model_cfg, 'quantization', None)
-            config_info['quantization_param_path'] = getattr(model_cfg, 'quantization_param_path', None)
-            config_info['enforce_eager'] = getattr(model_cfg, 'enforce_eager', None)
-            config_info['max_seq_len_to_capture'] = getattr(model_cfg, 'max_seq_len_to_capture', None)
+def start_vllm_server(model_path, tp, pp, max_model_len, log_path="/tmp/vllm_server.log"):
+    """Start vLLM OpenAI-compatible server as a subprocess."""
+    cmd = [
+        sys.executable, "-m", "vllm.entrypoints.openai.api_server",
+        "--model", model_path,
+        "--tensor-parallel-size", str(tp),
+        "--pipeline-parallel-size", str(pp),
+        "--max-model-len", str(max_model_len),
+        "--gpu-memory-utilization", "0.85",
+        "--enforce-eager",
+        "--disable-log-requests",
+        "--port", str(SERVER_PORT),
+    ]
+    if pp > 1:
+        cmd += ["--distributed-executor-backend", "ray"]
+    print(f"🚀 Starting vLLM server: {{' '.join(cmd)}}")
+    log_file = open(log_path, "w")
+    proc = subprocess.Popen(cmd, stdout=log_file, stderr=subprocess.STDOUT)
+    return proc, log_file
 
-        # Parallel config
-        if hasattr(engine, 'parallel_config'):
-            parallel_cfg = engine.parallel_config
-            config_info['tensor_parallel_size'] = getattr(parallel_cfg, 'tensor_parallel_size', None)
-            config_info['pipeline_parallel_size'] = getattr(parallel_cfg, 'pipeline_parallel_size', None)
-            config_info['world_size'] = getattr(parallel_cfg, 'world_size', None)
-            config_info['rank'] = getattr(parallel_cfg, 'rank', None)
 
-        # Decoding config
-        if hasattr(engine, 'decoding_config'):
-            decoding_cfg = engine.decoding_config
-            config_info['use_chunked_prefill'] = getattr(decoding_cfg, 'use_chunked_prefill', None)
-            # Prefer decoding_config value, but keep scheduler_config value if decoding_config doesn't have it
-            decoding_max_batched = getattr(decoding_cfg, 'max_num_batched_tokens', None)
-            if decoding_max_batched is not None:
-                config_info['max_num_batched_tokens'] = decoding_max_batched
-            # If not set yet, ensure it's at least None
-            if 'max_num_batched_tokens' not in config_info:
-                config_info['max_num_batched_tokens'] = None
-
-        # Check for LMCache configuration
+def wait_for_health(server_proc, timeout=600):
+    """Wait for server /health to return 200. Returns True on success."""
+    print(f"⏳ Waiting for server health (timeout={{timeout}}s)...")
+    for attempt in range(timeout * 2):  # Check every 0.5s
+        # Check if server process died
+        if server_proc.poll() is not None:
+            print(f"❌ Server process died with exit code {{server_proc.returncode}}")
+            return False
         try:
-            from lmcache.integration.vllm.utils import ENGINE_NAME
-            from lmcache.v1.cache_engine import LMCacheEngineBuilder
-            if hasattr(LMCacheEngineBuilder, 'get_engine'):
-                lmcache_engine = LMCacheEngineBuilder.get_engine(ENGINE_NAME)
-                if lmcache_engine:
-                    config_info['lmcache_enabled'] = True
-                    # Try to get LMCache config
-                    if hasattr(lmcache_engine, 'config'):
-                        lmcache_cfg = lmcache_engine.config
-                        config_info['lmcache_chunk_size'] = getattr(lmcache_cfg, 'chunk_size', None)
-                        config_info['lmcache_local_cpu'] = getattr(lmcache_cfg, 'local_cpu', None)
-                        config_info['lmcache_max_local_cpu_size'] = getattr(lmcache_cfg, 'max_local_cpu_size', None)
-                        config_info['lmcache_use_layerwise'] = getattr(lmcache_cfg, 'use_layerwise', None)
-                        config_info['lmcache_enable_lazy_memory_allocator'] = getattr(lmcache_cfg, 'enable_lazy_memory_allocator', None)
-                    # Check environment variables
-                    import os
-                    config_info['lmcache_use_experimental'] = os.environ.get('LMCACHE_USE_EXPERIMENTAL', None)
-                    config_info['lmcache_enable_async_loading'] = os.environ.get('LMCACHE_ENABLE_ASYNC_LOADING', None)
-                    config_info['lmcache_remote_serde'] = os.environ.get('LMCACHE_REMOTE_SERDE', None)
-                else:
-                    config_info['lmcache_enabled'] = False
-            else:
-                config_info['lmcache_enabled'] = False
+            resp = urllib.request.urlopen(f"{{SERVER_URL}}/health", timeout=2)
+            if resp.status == 200:
+                print(f"✅ Server healthy after {{attempt * 0.5:.1f}}s")
+                return True
         except Exception:
-            config_info['lmcache_enabled'] = False
+            pass
+        time.sleep(0.5)
+    return False
 
-        # Check for KV transfer config (LMCache connector)
-        if hasattr(llm, 'llm_engine') and hasattr(engine, 'cache_config'):
-            cache_cfg = engine.cache_config
-            if hasattr(cache_cfg, 'kv_transfer_config') and cache_cfg.kv_transfer_config:
-                ktc = cache_cfg.kv_transfer_config
-                config_info['kv_transfer_config_enabled'] = True
-                config_info['kv_connector'] = getattr(ktc, 'kv_connector', None)
-                config_info['kv_role'] = getattr(ktc, 'kv_role', None)
-                config_info['kv_buffer_device'] = getattr(ktc, 'kv_buffer_device', None)
-                if hasattr(ktc, 'kv_connector_extra_config'):
-                    config_info['kv_connector_extra_config'] = ktc.kv_connector_extra_config
-            else:
-                config_info['kv_transfer_config_enabled'] = False
 
-        # LLM initialization parameters (from the LLM object)
-        config_info['enable_prefix_caching'] = getattr(llm, 'enable_prefix_caching', None)
-        config_info['enable_chunked_prefill'] = getattr(llm, 'enable_chunked_prefill', None)
-        config_info['trust_remote_code'] = getattr(llm, 'trust_remote_code', None)
+def parse_gpu_blocks(log_path="/tmp/vllm_server.log", timeout=30):
+    """Parse server log for GPU blocks info. Returns (num_gpu_blocks, block_size)."""
+    num_gpu_blocks = None
+    block_size = 16  # default
 
-    except Exception as e:
-        print(f"⚠️  Could not extract vLLM config: {{e}}")
-        import traceback
-        traceback.print_exc()
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            with open(log_path, "r") as f:
+                content = f.read()
+            m = re.search(r'# GPU blocks:\\s*(\\d+)', content)
+            if m:
+                num_gpu_blocks = int(m.group(1))
+                bs_match = re.search(r'block_size[=:\\s]+(\\d+)', content)
+                if bs_match:
+                    block_size = int(bs_match.group(1))
+                print(f"📊 Parsed from server log: num_gpu_blocks={{num_gpu_blocks}}, block_size={{block_size}}")
+                return num_gpu_blocks, block_size
+        except FileNotFoundError:
+            pass
+        time.sleep(1.0)
+    print("⚠️  Could not parse GPU blocks from server log")
+    return None, block_size
 
-    return config_info
 
-def run_benchmark(exp):
-    """Run single benchmark experiment."""
+# ============================================================================
+# Benchmark Runner
+# ============================================================================
+
+def run_single_benchmark(exp, target_concurrency, server_proc):
+    """Run benchmark for a single I/O shape against the running server."""
+    global NUM_GPU_BLOCKS, BLOCK_SIZE
+
+    input_len = exp['max_input_length']
+    output_len = exp['max_output_length']
+    {model_path_line}
+    exp_id = f"tp{{exp['tp']}}_pp{{exp['pp']}}_in{{input_len}}_out{{output_len}}"
+
     print(f"\\n{{'='*70}}")
-    print(f"Running: TP={{exp['tp']}}, PP={{exp['pp']}}, "
-          f"input={{exp['max_input_length']}}, output={{exp['max_output_length']}}")
+    print(f"Running: TP={{exp['tp']}}, PP={{exp['pp']}}, input={{input_len}}, output={{output_len}}")
+    print(f"Target concurrency: {{target_concurrency}}")
     print("="*70)
 
-    # Determine if multi-node (using Ray)
-    backend = "ray" if (exp['pp'] > 1) else None
-    gpu_monitor = None  # Will be initialized after LLM creation
-
-    # Load model config info for canonical columns (safe — returns None values on failure)
-    model_path = {model_expr}
+    # Load model config info for canonical columns
     model_info = get_model_config_info(model_path)
     if model_info.get('model_architecture') is None:
         model_info = get_model_config_info(exp['model'])
 
-    try:
-        # if backend == "ray":
-        #     restart_ray_cluster()
+    NUM_REQUESTS = max(MIN_NUM_SAMPLES, int(4 * target_concurrency))
 
-        # # Enable LMCache for KV cache management
-        ktc = KVTransferConfig(
-            kv_connector="LMCacheConnectorV1",
-            kv_role="kv_both",
-            kv_buffer_device="cpu"
-        )
-        # ktc = KVTransferConfig(
-        #     kv_connector="OffloadingConnector",
-        #     kv_role="kv_both",
-        #     kv_connector_extra_config={{"block_size":64,"num_cpu_blocks":1000}}
-        # )
+    # GPU monitoring setup
+    gpu_monitor = None
+    use_distributed = False
+    backend = "ray" if exp['pp'] > 1 else None
 
-        llm = LLM(
-            model={model_expr},
-            tensor_parallel_size=exp['tp'],
-            pipeline_parallel_size=exp['pp'],
-            max_model_len=min(exp['max_input_length'] + exp['max_output_length'] -1, 32768), # -1 because of the eos token removing
-            trust_remote_code=True,
-            distributed_executor_backend=backend,
-            gpu_memory_utilization=0.85,
-            # quantization="awq",
-            enforce_eager=True,
-            # kv_transfer_config=ktc,
-            enable_chunked_prefill=False,
-            # truncate_prompt_tokens=exp['max_input_length'],
-            enable_prefix_caching=False,
-            disable_log_stats=False,  # Enable Prometheus metrics pipeline
-        )
-
-        # Initialize GPU monitor AFTER LLM creation (Ray is now initialized)
-        # For multi-node PP > 1, we should use distributed monitoring. vLLM initializes Ray internally,
-        # but we need to explicitly connect to it using RAY_ADDRESS.
-        # For single-node setups (even with Ray), use local monitoring to avoid Ray timeout issues.
-        use_distributed = False
-        if backend == "ray":
-            print("📡 Checking Ray cluster for GPU monitoring...")
-            try:
-                # vLLM initializes Ray internally, but we need to connect to it explicitly
-                # Get Ray address from environment (set at the top of the script)
-                ray_address = os.environ.get("RAY_ADDRESS", "127.0.0.1:6379")
-                
-                # Try to connect to Ray cluster explicitly
-                ray_available = False
-                try:
-                    # If Ray is not initialized, try to connect to the existing cluster
-                    if not ray.is_initialized():
-                        print(f"   Connecting to Ray cluster at {{ray_address}}...")
-                        ray.init(address=ray_address, ignore_reinit_error=True, log_to_driver=False)
-                        print(f"   ✅ Connected to Ray cluster")
-                    
-                    # Now check if we can access nodes
-                    nodes = ray.nodes()
-                    alive_nodes = [n for n in nodes if n.get('Alive', False)]
-                    num_nodes = len(alive_nodes)
-                    ray_available = num_nodes > 0
-                    print(f"   Ray cluster detected: {{num_nodes}} alive node(s)")
-                    for idx, node in enumerate(alive_nodes):
-                        node_id = node.get('NodeID', 'unknown')
-                        print(f"      Node {{idx}}: {{node_id}}")
-                except Exception as ray_check_error:
-                    print(f"   Could not access Ray cluster: {{ray_check_error}}")
-                    print(f"   Ray.is_initialized(): {{ray.is_initialized() if hasattr(ray, 'is_initialized') else 'N/A'}}")
-                    print(f"   RAY_ADDRESS: {{ray_address}}")
-                    num_nodes = 0
-                
-                if ray_available:
-                    # Only use distributed monitoring for multi-node setups
-                    # Single-node Ray clusters should use local monitoring to avoid timeout issues
-                    if num_nodes > 1:
-                        print(f"📡 Using distributed GPU monitoring ({{num_nodes}} nodes)")
-                        # Try to initialize distributed monitor
-                        gpu_monitor = DistributedGPUMonitor(sample_interval=0.5)
-                        use_distributed = True
-                        print("✅ Distributed GPU monitoring initialized successfully")
-                    else:
-                        print(f"📊 Using local GPU monitoring (single-node Ray cluster)")
-                        gpu_monitor = GPUMonitor(sample_interval=0.5)
-                        use_distributed = False
-                else:
-                    raise Exception("Ray cluster not accessible")
-            except Exception as e:
-                print(f"⚠️  Failed to initialize distributed GPU monitor: {{e}}")
-                import traceback
-                traceback.print_exc()
-                print("📊 Falling back to local GPU monitoring")
-                gpu_monitor = GPUMonitor(sample_interval=0.5)
-                use_distributed = False
-        else:
-            print("📊 Using local GPU monitoring (single node, no Ray)")
-            gpu_monitor = GPUMonitor(sample_interval=0.5)
-
-        # Extract vLLM configuration info (KV cache, scheduler settings)
-        vllm_config = get_vllm_config_info(llm)
-        print(f"📊 vLLM Config: {{vllm_config}}")
-
-        # Compute dynamic NUM_SAMPLES from KV cache concurrency
-        _num_gpu_blocks = vllm_config.get('num_gpu_blocks') or 0
-        _block_size = vllm_config.get('block_size') or 16
-        _max_model_len = vllm_config.get('max_model_len') or (exp['max_input_length'] + exp['max_output_length'])
-        if _num_gpu_blocks > 0 and _max_model_len > 0:
-            max_concurrency = (_num_gpu_blocks * _block_size) / _max_model_len
-            NUM_SAMPLES = max(MIN_NUM_SAMPLES, int(4 * max_concurrency))
-            print(f"📊 Dynamic NUM_SAMPLES: {{NUM_SAMPLES}} (max_concurrency={{max_concurrency:.1f}}, 4x={{int(4 * max_concurrency)}})")
-        else:
-            max_concurrency = None
-            NUM_SAMPLES = MIN_NUM_SAMPLES
-            print(f"⚠️  Could not compute concurrency, using default NUM_SAMPLES={{NUM_SAMPLES}}")
-
-        tokenizer = llm.get_tokenizer()
-        dataset = load_dataset("emozilla/pg19-test", split="test")
-
-        # Prepare prompts (recycle dataset entries if NUM_SAMPLES > dataset size)
-        prompts = []
-        for i in range(NUM_SAMPLES):
-            text = "Please summarize the following text: " + dataset[i % len(dataset)]["text"]
-            tokens = tokenizer.encode(text, add_special_tokens=False)[:exp['max_input_length']]
-            prompts.append(tokenizer.decode(tokens))
-
-        sampling_params = SamplingParams(
-            temperature=0.8,
-            max_tokens=exp['max_output_length'],
-            min_tokens=exp['max_output_length'],
-            ignore_eos=True,
-        )
-
-        # Warmup run to trigger kernel compilation and initialization
-        print(f"🔥 Running warmup with {{min(5, len(prompts))}} samples...")
-        _ = llm.generate(prompts[:min(5, len(prompts))], sampling_params)
-        torch.cuda.synchronize()  # Wait for warmup to complete
-        print(f"✅ Warmup complete, starting actual measurement")
-
-        # Snapshot metrics after warmup to exclude warmup from measurements
+    if backend == "ray":
         try:
-            warmup_metrics = extract_vllm_metrics(llm)
+            if not ray.is_initialized():
+                ray.init(
+                    address=os.environ.get("RAY_ADDRESS", "127.0.0.1:6379"),
+                    ignore_reinit_error=True,
+                    log_to_driver=False,
+                )
+            nodes = ray.nodes()
+            alive_nodes = [n for n in nodes if n.get('Alive', False)]
+            if len(alive_nodes) > 1:
+                print(f"📡 Using distributed GPU monitoring ({{len(alive_nodes)}} nodes)")
+                gpu_monitor = DistributedGPUMonitor(sample_interval=0.5)
+                use_distributed = True
+            else:
+                print(f"📊 Using local GPU monitoring (single-node Ray cluster)")
+                gpu_monitor = GPUMonitor(sample_interval=0.5)
         except Exception as e:
-            print(f"⚠️  Could not extract vLLM metrics after warmup: {{e}}")
-            warmup_metrics = {{}}
+            print(f"⚠️  Ray GPU monitor failed: {{e}}")
+            gpu_monitor = GPUMonitor(sample_interval=0.5)
+    else:
+        print("📊 Using local GPU monitoring (single node, no Ray)")
+        gpu_monitor = GPUMonitor(sample_interval=0.5)
 
-        # Start GPU monitoring
-        # If distributed monitoring fails, it will fall back gracefully
+    try:
+        # Check server is still alive
+        if server_proc.poll() is not None:
+            raise RuntimeError(f"Server died before benchmark (exit code {{server_proc.returncode}})")
+
+        # 1. Warmup via benchmark_client.py
+        print(f"🔥 Running warmup (5 requests)...")
+        warmup_cmd = [
+            sys.executable, "roofline_benchmarks/benchmark_client.py",
+            "--base-url", SERVER_URL,
+            "--model", MODEL_PATH,
+            "--input-len", str(input_len),
+            "--output-len", str(output_len),
+            "--num-requests", "5",
+            "--target-concurrency", "2",
+            "--warmup-requests", "0",
+            "--output", "/tmp/warmup_results.json",
+        ]
+        subprocess.run(warmup_cmd, check=True)
+        print("✅ Warmup complete")
+
+        # 2. Scrape /metrics after warmup
+        warmup_text = scrape_metrics()
+        warmup_parsed = parse_prometheus_text(warmup_text)
+
+        # 3. Start GPU monitoring
         if use_distributed:
-            try:
-                success = gpu_monitor.start()
-                if not success or (hasattr(gpu_monitor, 'actors') and len(gpu_monitor.actors) == 0):
-                    print("⚠️  Distributed monitoring failed, falling back to local")
-                    raise Exception("Distributed monitoring not available")
-            except Exception as monitor_error:
-                print(f"⚠️  Failed to start distributed GPU monitoring: {{monitor_error}}")
-                print("📊 Falling back to local GPU monitoring")
+            success = gpu_monitor.start()
+            if not success or (hasattr(gpu_monitor, 'actors') and len(gpu_monitor.actors) == 0):
+                print("⚠️  Distributed monitoring failed, falling back to local")
                 gpu_monitor = GPUMonitor(sample_interval=0.5)
                 use_distributed = False
                 gpu_monitor.start()
         else:
             gpu_monitor.start()
 
-        # Start scheduler monitoring (queue depths)
-        scheduler_monitor = SchedulerMonitor(llm, sample_interval=0.25)
-        scheduler_monitor.start()
+        # 4. Start MetricsPoller (replaces SchedulerMonitor)
+        metrics_poller = MetricsPoller(base_url=SERVER_URL, interval=0.5)
+        metrics_poller.start()
 
-        # Run and measure
-        start = time.perf_counter()
-        outputs = llm.generate(prompts, sampling_params)
-        torch.cuda.synchronize()  # Wait for all GPU work to complete
-        elapsed = time.perf_counter() - start
+        # 5. Run real benchmark
+        print(f"📊 Running benchmark: {{NUM_REQUESTS}} requests, concurrency={{target_concurrency}}")
+        client_output = f"/tmp/client_results_{{exp_id}}.json"
+        bench_cmd = [
+            sys.executable, "roofline_benchmarks/benchmark_client.py",
+            "--base-url", SERVER_URL,
+            "--model", MODEL_PATH,
+            "--input-len", str(input_len),
+            "--output-len", str(output_len),
+            "--num-requests", str(NUM_REQUESTS),
+            "--target-concurrency", str(target_concurrency),
+            "--warmup-requests", "0",
+            "--output", client_output,
+        ]
+        bench_start = time.perf_counter()
+        subprocess.run(bench_cmd, check=True)
+        elapsed = time.perf_counter() - bench_start
 
-        # Snapshot vLLM metrics after real run
-        try:
-            final_metrics = extract_vllm_metrics(llm)
-        except Exception as e:
-            print(f"⚠️  Could not extract vLLM metrics after run: {{e}}")
-            final_metrics = {{}}
+        # 6. Scrape /metrics after benchmark
+        final_text = scrape_metrics()
+        final_parsed = parse_prometheus_text(final_text)
 
-        # Stop monitoring and get summaries
+        # 7. Stop monitoring
         gpu_monitor.stop()
-        scheduler_monitor.stop()
+        metrics_poller.stop()
+
         gpu_metrics = gpu_monitor.get_summary()
-        scheduler_metrics = scheduler_monitor.get_summary()
-        
-        # Log monitoring info for debugging
+        scheduler_metrics = metrics_poller.get_summary()
+
+        # 8. Compute deltas
+        deltas = compute_deltas(warmup_parsed, final_parsed)
+
+        # 9. Load client results
+        with open(client_output) as f:
+            client_data = json.load(f)
+
+        wall_clock = client_data.get("wall_clock_s", elapsed)
+
+        # 10. Extract throughput from server-side Prometheus counters (NOT client-side)
+        throughput = extract_throughput_metrics(deltas, wall_clock)
+        latency_pcts = extract_latency_percentiles(deltas)
+
+        # Log monitoring info
         if use_distributed and hasattr(gpu_monitor, 'actors'):
             print(f"📊 GPU monitoring: {{len(gpu_monitor.actors)}} nodes monitored")
-            if 'num_nodes_monitored' in gpu_metrics:
-                print(f"📊 GPU monitoring: {{gpu_metrics['num_nodes_monitored']}} nodes reported in summary")
         else:
             print(f"📊 GPU monitoring: local (single node)")
 
-        # Count tokens (vLLM native way)
-        total_prompt_tokens = sum(len(o.prompt_token_ids or []) for o in outputs)
-        total_output_tokens = sum(
-            sum(len(c.token_ids) for c in o.outputs) for o in outputs
-        )
+        # 11. Build vllm_config (from server startup info)
+        vllm_config = {{
+            'max_num_seqs': 256,  # vLLM default
+            'max_model_len': MAX_MODEL_LEN,
+            'block_size': BLOCK_SIZE,
+            'num_gpu_blocks': NUM_GPU_BLOCKS,
+        }}
 
-        # Generate experiment ID for timeseries file
-        exp_id = f"tp{{exp['tp']}}_pp{{exp['pp']}}_in{{exp['max_input_length']}}_out{{exp['max_output_length']}}"
+        # 12. Build measured_data for compute_canonical_columns
+        measured_data = {{
+            'tokens_per_sec_total': throughput['tokens_per_sec_total'],
+            'tokens_per_sec_prefill': throughput['tokens_per_sec_prefill'],
+            'tokens_per_sec_decode': throughput['tokens_per_sec_decode'],
+            'elapsed_time': wall_clock,
+            'ttft_ms_p50': latency_pcts.get('ttft_ms_p50'),
+            'ttft_ms_p95': latency_pcts.get('ttft_ms_p95'),
+            'ttft_ms_p99': latency_pcts.get('ttft_ms_p99'),
+            'tpot_ms_p50': latency_pcts.get('tpot_ms_p50'),
+            'tpot_ms_p95': latency_pcts.get('tpot_ms_p95'),
+            'tpot_ms_p99': latency_pcts.get('tpot_ms_p99'),
+            'e2e_ms_p50': latency_pcts.get('e2e_ms_p50'),
+            'e2e_ms_p95': latency_pcts.get('e2e_ms_p95'),
+            'e2e_ms_p99': latency_pcts.get('e2e_ms_p99'),
+            'num_requests': NUM_REQUESTS,
+        }}
+        canonical = compute_canonical_columns(exp, model_info, vllm_config, measured_data)
+
+        # 13. Save timeseries
         timeseries_file = f"/tmp/timeseries_{{exp_id}}.json"
-
-        # Save time-series data to separate file
         timeseries_data = {{
             'exp_id': exp_id,
             'config': exp,
-            'elapsed_time': elapsed,
+            'elapsed_time': wall_clock,
             'gpu_timeseries': gpu_monitor.get_timeseries(),
-            'scheduler_timeseries': scheduler_monitor.get_timeseries(),
+            'scheduler_timeseries': metrics_poller.get_timeseries(),
         }}
         with open(timeseries_file, 'w') as f:
             json.dump(timeseries_data, f)
         print(f"📈 Time-series saved to {{timeseries_file}}")
 
-        time.sleep(30)
-        # Cleanup BEFORE creating result
-        cleanup_dist_env_and_memory(shutdown_ray=False) #DO  NOT SHUT DOWN RAY
-        # Clean up lmcache backend
-        try:
-            from lmcache.integration.vllm.utils import ENGINE_NAME
-            from lmcache.v1.cache_engine import LMCacheEngineBuilder
-            LMCacheEngineBuilder.destroy(ENGINE_NAME)
-        except:
-            # if backend == "ray":
-            #     restart_ray_cluster()
-            pass
+        send_discord_message(f"✅ Results for tp{{exp['tp']}}-pp{{exp['pp']}} in{{input_len}}-out{{output_len}}")
 
-        # Force GPU cleanup
-        gc.collect()
-        torch.cuda.empty_cache()
-        torch.cuda.synchronize()
-        send_discord_message(f"✅ Results saved to {{exp['tp']}}-{{exp['pp']}}")
-
-        # Calculate cost efficiency metrics
-        total_tokens = total_prompt_tokens + total_output_tokens
-        elapsed_hours = elapsed / 3600
+        # Build result
+        effective_prompt_toks = throughput['total_prompt_tokens']
+        effective_gen_toks = throughput['total_generation_tokens']
+        total_tokens = effective_prompt_toks + effective_gen_toks
+        elapsed_hours = wall_clock / 3600
         cost_for_run = PRICE_PER_HOUR * elapsed_hours
         tokens_per_dollar = round(total_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
-        input_tokens_per_dollar = round(total_prompt_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
-        output_tokens_per_dollar = round(total_output_tokens / cost_for_run, 2) if cost_for_run > 0 else 0
+        input_tokens_per_dollar = round(effective_prompt_toks / cost_for_run, 2) if cost_for_run > 0 else 0
+        output_tokens_per_dollar = round(effective_gen_toks / cost_for_run, 2) if cost_for_run > 0 else 0
 
-        # Compute vLLM-sourced throughput (delta from warmup to exclude warmup tokens)
-        vllm_prompt_toks = None
-        vllm_gen_toks = None
-        if final_metrics.get('prompt_tokens_total') is not None:
-            vllm_prompt_toks = final_metrics['prompt_tokens_total'] - (warmup_metrics.get('prompt_tokens_total') or 0)
-        if final_metrics.get('generation_tokens_total') is not None:
-            vllm_gen_toks = final_metrics['generation_tokens_total'] - (warmup_metrics.get('generation_tokens_total') or 0)
-
-        # Compute delta-based histogram averages (exclude warmup requests)
-        def _delta_hist_avg(final_m, warmup_m, sum_key, count_key):
-            """Compute average from histogram deltas (final - warmup)."""
-            fs = final_m.get(sum_key)
-            fc = final_m.get(count_key)
-            ws = warmup_m.get(sum_key) or 0
-            wc = warmup_m.get(count_key) or 0
-            if fs is not None and fc is not None and (fc - wc) > 0:
-                return (fs - ws) / (fc - wc)
-            return None
-
-        delta_prefill_t = _delta_hist_avg(final_metrics, warmup_metrics, '_hist_prefill_sum', '_hist_prefill_count')
-        delta_decode_t = _delta_hist_avg(final_metrics, warmup_metrics, '_hist_decode_sum', '_hist_decode_count')
-        delta_prompt_len = _delta_hist_avg(final_metrics, warmup_metrics, '_hist_prompt_len_sum', '_hist_prompt_len_count')
-        delta_gen_len = _delta_hist_avg(final_metrics, warmup_metrics, '_hist_gen_len_sum', '_hist_gen_len_count')
-
-        # Compute delta-based per-request throughput
-        delta_prefill_tps = None
-        if delta_prompt_len and delta_prefill_t and delta_prefill_t > 0:
-            delta_prefill_tps = round(delta_prompt_len / delta_prefill_t, 2)
-        delta_decode_tps = None
-        if delta_gen_len and delta_decode_t and delta_decode_t > 0:
-            delta_decode_tps = round((delta_gen_len - 1) / delta_decode_t, 2)
-
-        # Compute delta-based percentiles from histogram bucket subtraction
-        def _delta_percentiles(final_m, warmup_m, bucket_key, ms_prefix):
-            """Compute percentiles from delta histogram buckets."""
-            result_pcts = {{}}
-            fb = final_m.get(bucket_key) or []
-            wb = warmup_m.get(bucket_key) or []
-            if fb:
-                # Subtract warmup bucket counts from final bucket counts
-                wb_dict = dict(wb) if wb else {{}}
-                delta_buckets = []
-                for bound, count in fb:
-                    warmup_count = wb_dict.get(bound, 0)
-                    delta_buckets.append((bound, count - warmup_count))
-                # Estimate percentiles from delta buckets
-                for q, label in [(0.5, 'p50'), (0.95, 'p95'), (0.99, 'p99')]:
-                    val = _histogram_quantile_from_buckets(delta_buckets, q)
-                    result_pcts[f'{{ms_prefix}}_ms_{{label}}'] = round(val * 1000, 3) if val is not None else None
-            else:
-                for label in ['p50', 'p95', 'p99']:
-                    result_pcts[f'{{ms_prefix}}_ms_{{label}}'] = final_metrics.get(f'{{ms_prefix}}_ms_{{label}}')
-            return result_pcts
-
-        def _histogram_quantile_from_buckets(buckets, quantile):
-            """Estimate quantile from (bound, count) pairs."""
-            if not buckets:
-                return None
-            total = buckets[-1][1] if buckets else 0
-            if total <= 0:
-                return None
-            target = quantile * total
-            prev_bound = 0.0
-            prev_count = 0.0
-            for bound, count in buckets:
-                if bound == float('inf'):
-                    if count >= target and prev_count < target:
-                        return prev_bound
-                    continue
-                if count >= target:
-                    bucket_count = count - prev_count
-                    if bucket_count == 0:
-                        return bound
-                    fraction = (target - prev_count) / bucket_count
-                    return prev_bound + fraction * (bound - prev_bound)
-                prev_bound = bound
-                prev_count = count
-            return prev_bound
-
-        delta_ttft_pcts = _delta_percentiles(final_metrics, warmup_metrics, '_buckets_ttft', 'ttft')
-        delta_tpot_pcts = _delta_percentiles(final_metrics, warmup_metrics, '_buckets_tpot', 'tpot')
-        delta_e2e_pcts = _delta_percentiles(final_metrics, warmup_metrics, '_buckets_e2e', 'e2e')
-
-        # Use vLLM token counts if available, else fall back to output-based counts
-        effective_prompt_toks = vllm_prompt_toks if vllm_prompt_toks is not None else total_prompt_tokens
-        effective_gen_toks = vllm_gen_toks if vllm_gen_toks is not None else total_output_tokens
-
-        # Build canonical columns
-        measured_data = {{
-            'tokens_per_sec_total': round((effective_prompt_toks + effective_gen_toks) / elapsed, 2),
-            'tokens_per_sec_prefill': round(effective_prompt_toks / elapsed, 2),  # wall-clock: input tokens / elapsed
-            'tokens_per_sec_decode': round(effective_gen_toks / elapsed, 2),  # wall-clock: output tokens / elapsed
-            'elapsed_time': elapsed,
-            # Per-request latency from vLLM engine-core timestamps (delta from warmup)
-            'ttft_ms_p50': delta_ttft_pcts.get('ttft_ms_p50'),
-            'ttft_ms_p95': delta_ttft_pcts.get('ttft_ms_p95'),
-            'ttft_ms_p99': delta_ttft_pcts.get('ttft_ms_p99'),
-            'tpot_ms_p50': delta_tpot_pcts.get('tpot_ms_p50'),
-            'tpot_ms_p95': delta_tpot_pcts.get('tpot_ms_p95'),
-            'tpot_ms_p99': delta_tpot_pcts.get('tpot_ms_p99'),
-            'e2e_ms_p50': delta_e2e_pcts.get('e2e_ms_p50'),
-            'e2e_ms_p95': delta_e2e_pcts.get('e2e_ms_p95'),
-            'e2e_ms_p99': delta_e2e_pcts.get('e2e_ms_p99'),
-            'num_requests': NUM_SAMPLES,
-        }}
-        canonical = compute_canonical_columns(exp, model_info, vllm_config, measured_data)
-
-        # Collect all configuration
-        benchmark_config = {{
-            # LLM initialization parameters
-            'llm_model': exp['model'],
-            'llm_tensor_parallel_size': exp['tp'],
-            'llm_pipeline_parallel_size': exp['pp'],
-            'llm_max_model_len': min(exp['max_input_length'] + exp['max_output_length'] - 1, 32768),
-            'llm_trust_remote_code': True,
-            'llm_distributed_executor_backend': backend,
-            'llm_gpu_memory_utilization': 0.85,
-            'llm_enforce_eager': True,
-            'llm_enable_chunked_prefill': False,
-            'llm_enable_prefix_caching': False,
-            'llm_disable_log_stats': False,
-            'llm_kv_transfer_config': None,  # Currently commented out
-            # Sampling parameters
-            'sampling_temperature': 0.8,
-            'sampling_max_tokens': exp['max_output_length'],
-            'sampling_min_tokens': exp['max_output_length'],
-            'sampling_ignore_eos': True,
-            # Benchmark configuration
-            'benchmark_num_samples': NUM_SAMPLES,
-            'benchmark_num_samples_source': 'dynamic_4x_concurrency' if max_concurrency else 'default',
-            'benchmark_max_concurrency': round(max_concurrency, 2) if max_concurrency else None,
-            'benchmark_dataset': 'emozilla/pg19-test',
-            'benchmark_prompt_prefix': 'Please summarize the following text: ',
-            'benchmark_warmup_samples': min(5, NUM_SAMPLES),
-            # GPU monitoring configuration
-            'gpu_monitor_sample_interval': 0.5,
-            'gpu_monitor_type': 'distributed' if use_distributed else 'local',
-            # Scheduler monitoring configuration
-            'scheduler_monitor_sample_interval': 0.25,
-        }}
-
-        # Build result with all metrics (summary only, timeseries in separate file)
         result = {{
             **exp,
             'exp_id': exp_id,
-            'elapsed_time': elapsed,
+            'elapsed_time': wall_clock,
             'total_prompt_tokens': effective_prompt_toks,
             'total_output_tokens': effective_gen_toks,
-            'total_prompt_tokens_from_outputs': total_prompt_tokens,
-            'total_output_tokens_from_outputs': total_output_tokens,
-            'requests_per_sec': round(len(outputs) / elapsed, 3),
-            'input_tokens_per_sec': round(effective_prompt_toks / elapsed, 2),
-            'output_tokens_per_sec': round(effective_gen_toks / elapsed, 2),
-            'total_tokens_per_sec': round((effective_prompt_toks + effective_gen_toks) / elapsed, 2),
+            'requests_per_sec': round(NUM_REQUESTS / wall_clock, 3) if wall_clock > 0 else 0,
+            'input_tokens_per_sec': throughput['tokens_per_sec_prefill'],
+            'output_tokens_per_sec': throughput['tokens_per_sec_decode'],
+            'total_tokens_per_sec': throughput['tokens_per_sec_total'],
             'status': 'success',
             'timeseries_file': timeseries_file,
             # Infrastructure info
@@ -2443,128 +1889,143 @@ def run_benchmark(exp):
             'num_nodes': NUM_NODES,
             'gpus_per_node': GPUS_PER_NODE,
             'total_gpus': NUM_NODES * GPUS_PER_NODE,
-            # Cost efficiency metrics
+            # Cost efficiency
             'cost_for_run_usd': round(cost_for_run, 4),
             'tokens_per_dollar': tokens_per_dollar,
             'input_tokens_per_dollar': input_tokens_per_dollar,
             'output_tokens_per_dollar': output_tokens_per_dollar,
-            # Benchmark configuration
-            **benchmark_config,
-            # GPU monitoring details (added after metrics are collected)
+            # Benchmark config
+            'benchmark_num_requests': NUM_REQUESTS,
+            'benchmark_target_concurrency': target_concurrency,
+            'gpu_monitor_type': 'distributed' if use_distributed else 'local',
             'gpu_monitor_num_nodes': len(gpu_monitor.actors) if (use_distributed and hasattr(gpu_monitor, 'actors')) else 1,
-            'gpu_monitor_num_gpus_monitored': len([k for k in gpu_metrics.keys() if '_sm_pct_avg' in k or (k.endswith('_sm_pct_avg') and not k.startswith('avg_'))]),
             'gpu_monitor_num_nodes_reported': gpu_metrics.get('num_nodes_monitored', 1),
-            # vLLM config info (extracted from engine)
-            **{{f'config_{{k}}': v for k, v in vllm_config.items()}},
-            # Raw vLLM internal metrics (for debugging/analysis)
-            **{{f'vllm_metrics_{{k}}': v for k, v in final_metrics.items() if not k.startswith('_')}},
             # GPU utilization metrics (summary)
             **gpu_metrics,
-            # Scheduler queue metrics (summary)
+            # Scheduler/metrics poller metrics (summary)
             **scheduler_metrics,
-            # Canonical schema columns (all 73 columns for LLM placement solver)
+            # Canonical schema columns
             **canonical,
         }}
+        return result
 
     except Exception as e:
-        # Stop GPU monitor on error (if it was initialized)
         if gpu_monitor is not None:
             gpu_monitor.stop()
 
         import traceback
+        traceback.print_exc()
         error_msg = str(e)
         if "CUDA out of memory" in error_msg or "OutOfMemoryError" in error_msg:
             error_msg = f"OOM: {{error_msg[:200]}}"
-        send_discord_message(f"❌ Cluster {{exp['tp']}}-{{exp['pp']}} FAILED: {{error_msg}}")
-        # if backend == "ray":
-        #     restart_ray_cluster()
-        
-        # Collect configuration even for error case
-        benchmark_config = {{
-            # LLM initialization parameters
-            'llm_model': exp['model'],
-            'llm_tensor_parallel_size': exp['tp'],
-            'llm_pipeline_parallel_size': exp['pp'],
-            'llm_max_model_len': min(exp['max_input_length'] + exp['max_output_length'] - 1, 32768),
-            'llm_trust_remote_code': True,
-            'llm_distributed_executor_backend': backend,
-            'llm_gpu_memory_utilization': 0.85,
-            'llm_enforce_eager': True,
-            'llm_enable_chunked_prefill': False,
-            'llm_enable_prefix_caching': False,
-            'llm_disable_log_stats': False,
-            'llm_kv_transfer_config': None,  # Currently commented out
-            # Sampling parameters
-            'sampling_temperature': 0.8,
-            'sampling_max_tokens': exp['max_output_length'],
-            'sampling_min_tokens': exp['max_output_length'],
-            'sampling_ignore_eos': True,
-            # Benchmark configuration
-            'benchmark_num_samples': NUM_SAMPLES if 'NUM_SAMPLES' in dir() else MIN_NUM_SAMPLES,
-            'benchmark_num_samples_source': 'error_fallback',
-            'benchmark_max_concurrency': max_concurrency if 'max_concurrency' in dir() else None,
-            'benchmark_dataset': 'emozilla/pg19-test',
-            'benchmark_prompt_prefix': 'Please summarize the following text: ',
-            'benchmark_warmup_samples': min(5, NUM_SAMPLES if 'NUM_SAMPLES' in dir() else MIN_NUM_SAMPLES),
-            # GPU monitoring configuration
-            'gpu_monitor_sample_interval': 0.5,
-            'gpu_monitor_type': 'distributed' if backend == "ray" else 'local',
-            # Scheduler monitoring configuration
-            'scheduler_monitor_sample_interval': 0.25,
-        }}
-        
-        # Build partial canonical columns for error case (no measured data)
+        send_discord_message(f"❌ Benchmark {{exp_id}} FAILED: {{error_msg}}")
+
         error_canonical = compute_canonical_columns(exp, model_info, {{}}, {{
             'tokens_per_sec_total': 0,
             'tokens_per_sec_prefill': 0,
             'tokens_per_sec_decode': 0,
             'elapsed_time': 0,
         }})
-
-        result = {{
+        return {{
             **exp,
+            'exp_id': exp_id,
             'status': 'error',
             'error': error_msg,
-            # Infrastructure info
             'instance_type': INSTANCE_TYPE,
             'price_per_hour': PRICE_PER_HOUR,
             'num_nodes': NUM_NODES,
             'gpus_per_node': GPUS_PER_NODE,
             'total_gpus': NUM_NODES * GPUS_PER_NODE,
-            # Benchmark configuration
-            **benchmark_config,
-            # Partial canonical columns (no measured data)
             **error_canonical,
         }}
-        
-        # Force GPU cleanup on error
-        try:
-            cleanup_dist_env_and_memory(shutdown_ray=False) #DO  NOT SHUT DOWN RAY
-            # if 'llm' in locals():
-                # del llm
-            gc.collect()
-            torch.cuda.empty_cache()
-            torch.cuda.synchronize()
-        except:
-            pass
-    return result
 
-def main():
+
+# ============================================================================
+# Main
+# ============================================================================
+
+{global_model_path_line}
+TP = EXPERIMENTS[0]['tp']
+PP = EXPERIMENTS[0]['pp']
+
+# Start vLLM server
+SERVER_LOG = "/tmp/vllm_server.log"
+server_proc, server_log_file = start_vllm_server(MODEL_PATH, TP, PP, MAX_MODEL_LEN, SERVER_LOG)
+
+try:
+    # Wait for server health
+    if not wait_for_health(server_proc, timeout=600):
+        if server_proc.poll() is not None:
+            with open(SERVER_LOG) as f:
+                log_tail = f.read()[-3000:]
+            print(f"Server log (last 3000 chars):\\n{{log_tail}}")
+            if "OutOfMemoryError" in log_tail or "CUDA out of memory" in log_tail:
+                error = f"OOM: Model too large for {{GPUS_PER_NODE * NUM_NODES}}x {{GPU_MODEL}}"
+            else:
+                error = f"Server crashed with exit code {{server_proc.returncode}}"
+        else:
+            error = "Server failed to respond within 600s"
+        # Mark ALL experiments as failed
+        results = []
+        for exp in EXPERIMENTS:
+            {model_path_line}
+            model_info = get_model_config_info(model_path)
+            error_canonical = compute_canonical_columns(exp, model_info, {{}}, {{
+                'tokens_per_sec_total': 0,
+                'tokens_per_sec_prefill': 0,
+                'tokens_per_sec_decode': 0,
+                'elapsed_time': 0,
+            }})
+            results.append({{
+                **exp,
+                'status': 'error',
+                'error': error,
+                'instance_type': INSTANCE_TYPE,
+                'price_per_hour': PRICE_PER_HOUR,
+                'num_nodes': NUM_NODES,
+                'gpus_per_node': GPUS_PER_NODE,
+                'total_gpus': NUM_NODES * GPUS_PER_NODE,
+                **error_canonical,
+            }})
+        with open(RESULTS_FILE, 'w') as f:
+            json.dump(results, f, indent=2)
+        send_discord_message(f"❌ Server failed to start: {{error}}")
+        sys.exit(1)
+
+    # Parse GPU blocks from server log
+    NUM_GPU_BLOCKS, BLOCK_SIZE = parse_gpu_blocks(SERVER_LOG, timeout=30)
+    if NUM_GPU_BLOCKS and MAX_MODEL_LEN > 0:
+        target_concurrency = int((NUM_GPU_BLOCKS * BLOCK_SIZE) / MAX_MODEL_LEN)
+        target_concurrency = max(1, target_concurrency)
+        print(f"📊 target_concurrency = {{target_concurrency}} ({{NUM_GPU_BLOCKS}} blocks × {{BLOCK_SIZE}} / {{MAX_MODEL_LEN}})")
+    else:
+        target_concurrency = 32
+        NUM_GPU_BLOCKS = NUM_GPU_BLOCKS or 0
+        print(f"⚠️  Using default target_concurrency={{target_concurrency}}")
+
+    # Run each experiment
     results = []
     for i, exp in enumerate(EXPERIMENTS):
-        # if i in [0,1,2,3]:
-        #     continue
-        result = run_benchmark(exp)
+        result = run_single_benchmark(exp, target_concurrency, server_proc)
         results.append(result)
-        print(f"Result: {{result}}")
+        print(f"Result: {{result.get('status')}}")
         # Save incrementally
         with open(RESULTS_FILE, 'w') as f:
             json.dump(results, f, indent=2)
-    
+
     print(f"\\n✅ All done! Results in {{RESULTS_FILE}}")
 
-if __name__ == "__main__":
-    main()
+finally:
+    # Kill server
+    print("🛑 Stopping vLLM server...")
+    server_proc.terminate()
+    try:
+        server_proc.wait(timeout=30)
+    except subprocess.TimeoutExpired:
+        server_proc.kill()
+        server_proc.wait()
+    server_log_file.close()
+    print("✅ Server stopped")
 '''
 
 def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
@@ -2572,13 +2033,10 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
     # Use TP/PP from the first experiment for naming (all experiments in a group have compatible TP/PP)
     tp = experiments[0]['tp']
     pp = experiments[0]['pp']
-    # Include input/output length in cluster name to avoid conflicts across IO groups
-    input_len = experiments[0]['max_input_length']
-    output_len = experiments[0]['max_output_length']
-    # Include GPU type in cluster name to avoid conflicts when using different GPU types
+    # Cluster name: no I/O in name since one cluster serves multiple I/O shapes
     # Normalize GPU type for use in filenames (replace special chars)
     gpu_type_safe = gpu_type.replace("_", "-").replace("/", "-")
-    cluster_name = f"roofline-tp{tp}-pp{pp}-{input_len}in-{output_len}out-{gpu_type_safe}"
+    cluster_name = f"roofline-tp{tp}-pp{pp}-{gpu_type_safe}"
 
     # Create consolidated result directory with datetime
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -2639,27 +2097,24 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
     yaml_path = work_dir / f"{cluster_name}.yaml"
     script_path = work_dir / f"benchmark_{cluster_name}.py"
     
-    # Clean up old files without GPU type in name (if they match this config)
-    # This prevents confusion from old files that might have different GPU types
-    old_yaml_pattern = f"roofline-tp{tp}-pp{pp}-{input_len}in-{output_len}out.yaml"
-    old_script_pattern = f"benchmark_roofline-tp{tp}-pp{pp}-{input_len}in-{output_len}out.py"
-    old_yaml_path = work_dir / old_yaml_pattern
-    old_script_path = work_dir / old_script_pattern
-    
-    # Only remove if they exist and don't match the new naming (i.e., no GPU type suffix)
-    if old_yaml_path.exists() and old_yaml_path != yaml_path:
-        logger.info(f"🗑️  Removing old YAML file: {old_yaml_path.name} (replaced by GPU-type-specific file)")
-        old_yaml_path.unlink()
-    if old_script_path.exists() and old_script_path != script_path:
-        logger.info(f"🗑️  Removing old script file: {old_script_path.name} (replaced by GPU-type-specific file)")
-        old_script_path.unlink()
-    
     yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type, s3_models=s3_models, cloud=cloud)
     yaml_path.write_text(yaml_content)
 
     # 2. Write benchmark script
     script_content = generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type, s3_models=s3_models, cloud=cloud)
     script_path.write_text(script_content)
+
+    # 3. Copy static helper files into workdir (uploaded to cluster with sky launch)
+    import shutil
+    src_dir = Path(__file__).parent
+    for helper_file in ["benchmark_client.py", "prometheus_parser.py"]:
+        src = src_dir / helper_file
+        dst = work_dir / helper_file
+        if src.exists():
+            shutil.copy2(src, dst)
+            logger.info(f"📋 Copied {helper_file} to {work_dir}/")
+        else:
+            logger.warning(f"⚠️  {helper_file} not found at {src}")
 
     # Track active cluster for cleanup on unexpected exit
     set_active_cluster(cluster_name)
@@ -2951,43 +2406,35 @@ Examples:
         print("💡 DRY RUN mode - add --run to actually launch clusters")
 
     experiments = load_experiments(csv_path)
-    io_groups = group_by_input_output_then_cluster(experiments, gpu_type, vm_strategy=vm_strategy)
+    cluster_groups = group_by_cluster_then_io(experiments, gpu_type, vm_strategy=vm_strategy)
 
     print(f"📊 Loaded {len(experiments)} experiments")
-    print(f"📦 Grouped by input/output length, then by cluster config:")
-    for (input_len, output_len), cluster_groups in sorted(io_groups.items()):
-        print(f"   {input_len}in/{output_len}out: {len(cluster_groups)} cluster configs")
-        for (gpus, nodes), exps in sorted(cluster_groups.items()):
-            print(f"      {gpus} GPU/node × {nodes} nodes: {len(exps)} experiments")
+    print(f"📦 Grouped by cluster config (server reuse across I/O shapes):")
+    for (gpus, nodes, tp, pp, model), exps in sorted(cluster_groups.items()):
+        io_shapes = set((e['max_input_length'], e['max_output_length']) for e in exps)
+        print(f"   TP={tp}, PP={pp}, {gpus} GPU/node × {nodes} nodes: {len(exps)} experiments ({len(io_shapes)} I/O shapes)")
+        for il, ol in sorted(io_shapes):
+            print(f"      {il}in/{ol}out")
 
     if dry_run:
         print("\n💡 This is a DRY RUN. Add --run to actually launch clusters.")
 
-    # Run each group and collect all results
+    # Run each cluster group and collect all results
     all_results = []
 
-    def cluster_sort_key(item):
-        (gpus_per_node, num_nodes), _ = item
-        # Cost/spot-friendly: TP asc (1,4,8), then PP asc (1..4)
-        return (gpus_per_node, num_nodes)
-
     try:
-        for (input_len, output_len), cluster_groups in sorted(io_groups.items()):
-            # Create parent directory for this input/output length
-            parent_dir = f"results/wrk-{input_len}in_{output_len}out"
+        for (gpus, nodes, tp, pp, model), exps in sorted(cluster_groups.items()):
+            # Parent directory: use results/ with all I/O shapes in one cluster
+            parent_dir = "results"
             
-            # Collect results for this IO group
-            io_group_results = []
-            
-            for cluster_config, exps in sorted(cluster_groups.items(), key=cluster_sort_key):
-                results = run_cluster_benchmarks(cluster_config, exps, parent_dir=parent_dir, dry_run=dry_run, gpu_type=gpu_type, s3_models=args.s3_models, cloud=args.cloud)
-                if results:
-                    io_group_results.extend(results)
-                    all_results.extend(results)
-            
-            # Note: per-cluster CSVs are already saved inside each cluster's result directory
-            # by run_cluster_benchmarks(). We intentionally do NOT write an extra aggregated
-            # CSV at the IO-group level here to avoid duplicate benchmark_results-*.csv files.
+            cluster_config = (gpus, nodes)
+            results = run_cluster_benchmarks(
+                cluster_config, exps, parent_dir=parent_dir,
+                dry_run=dry_run, gpu_type=gpu_type,
+                s3_models=args.s3_models, cloud=args.cloud,
+            )
+            if results:
+                all_results.extend(results)
     except Exception as e:
         print(f"\n❌ Unexpected error in main: {e}")
         print("   Cleanup will be triggered automatically...")
