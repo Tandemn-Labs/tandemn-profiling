@@ -1351,17 +1351,22 @@ class MetricsPoller:
     def get_summary(self):
         if not self.timeseries:
             return {{}}
+        # Filter to only active samples (where running > 0) to avoid
+        # diluting averages with idle periods before/after the benchmark.
+        active = [s for s in self.timeseries if s.get('running', 0) > 0]
+        source = active if active else self.timeseries
         summary = {{}}
         all_keys = set()
-        for sample in self.timeseries:
+        for sample in source:
             all_keys.update(sample.keys())
         all_keys.discard('t')
         for key in all_keys:
-            values = [s.get(key, 0) for s in self.timeseries if key in s]
+            values = [s.get(key, 0) for s in source if key in s]
             if values:
                 summary[f'{{key}}_avg'] = round(sum(values) / len(values), 2)
                 summary[f'{{key}}_max'] = max(values)
         summary['scheduler_samples'] = len(self.timeseries)
+        summary['scheduler_active_samples'] = len(active)
         return summary
 
 
@@ -1513,16 +1518,30 @@ def compute_canonical_columns(exp, model_info, vllm_config, measured_data):
             return None
         return round(a / b, 4)
 
+    # Detect precision from model config
+    _precision = 'fp16'
+    _mcj = model_info.get('model_config_json')
+    if _mcj:
+        try:
+            _mc = json.loads(_mcj)
+            _dtype = _mc.get('torch_dtype') or _mc.get('dtype') or ''
+            if 'bfloat16' in str(_dtype).lower():
+                _precision = 'bf16'
+            elif 'float32' in str(_dtype).lower():
+                _precision = 'fp32'
+        except Exception:
+            pass
+
     canonical = {{
         'data_source': 'our_experiment',
         'data_source_type': 'measured',
-        'precision': 'fp16',
+        'precision': _precision,
         'cloud': CLOUD,
         'region': None,
         'task_type': 'batched',
         'request_pattern': 'offline_batch',
-        'is_lmcache': None,
-        'is_continuous_batching': None,
+        'is_lmcache': False,
+        'is_continuous_batching': True,
         'kv_offload_target': None,
         'cuda_graphs': None,
         'spec_decode': None,
