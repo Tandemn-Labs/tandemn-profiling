@@ -454,8 +454,18 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
     # This avoids the old driver 535.x / CUDA 12.1 limitation entirely.
     # See AMI/AWS.md and AMI/build-p4d-ami.sh for details.
     image_id_line = ""
+    # A100 on AWS needs cloud+region (not infra) because image_id requires explicit region
+    # Pre-built AMIs: driver 580.105.08, CUDA 12.8, vLLM 0.10.0
+    A100_AMIS = {
+        "us-east-1": "ami-04f8546cd7cc1dcd9",
+    }
+    A100_DEFAULT_REGION = "us-east-1"
+    cloud_line = f"  infra: {cloud}\n"
     if is_a100 and cloud == "aws":
-        image_id_line = "  image_id: ami-04f8546cd7cc1dcd9  # Pre-built: driver 580.105.08, CUDA 12.8, vLLM 0.10.0\n"
+        ami_region = A100_DEFAULT_REGION
+        ami_id = A100_AMIS[ami_region]
+        image_id_line = f"  image_id: {ami_id}  # Pre-built: driver 580.105.08, CUDA 12.8, vLLM 0.10.0\n"
+        cloud_line = f"  cloud: aws\n  region: {ami_region}\n"
 
     # Build file_mounts block for S3 model loading
     file_mounts_block = ""
@@ -469,8 +479,7 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
     return f"""
 name: {cluster_name}
 resources:
-  infra: {cloud}
-{accelerator_spec}{instance_type_constraint}{image_id_line}  use_spot: false
+{cloud_line}{accelerator_spec}{instance_type_constraint}{image_id_line}  use_spot: false
   disk_size: 500GB
   memory: "64GB+"
   # No region constraint - SkyPilot will try all available regions for the chosen cloud
