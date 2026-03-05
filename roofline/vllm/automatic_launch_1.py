@@ -2376,3 +2376,74 @@ Examples:
 
 if __name__ == "__main__":
     main()
+
+
+# =============================================================================
+# LMCACHE REFERENCE — Removed in Phase 5 cleanup, preserved here for future use.
+# LMCache (https://docs.lmcache.ai) is a KV cache sharing/offloading layer for
+# vLLM. We tested v0.2.1 and v0.3.x with vLLM 0.7–0.13 but hit persistent
+# Ray DAG issues with pipeline parallelism (PP>1). Re-enable when upstream
+# stabilizes.
+# =============================================================================
+#
+# --- 1. Environment variables (add to env_exports in generate_yaml) ----------
+#
+#   export LMCACHE_USE_EXPERIMENTAL="True"
+#   export LMCACHE_CHUNK_SIZE="256"
+#   export LMCACHE_LOCAL_CPU="True"
+#   export LMCACHE_MAX_LOCAL_CPU_SIZE="40.0"
+#   export LMCACHE_SAVE_UNFULL_CHUNK="True"
+#   export LMCACHE_ENABLE_ASYNC_LOADING="False"
+#   export LMCACHE_REMOTE_SERDE="cachegen"
+#   export LMCACHE_USE_LAYERWISE="True"
+#   export LMCACHE_ENABLE_LAZY_MEMORY_ALLOCATOR="True"
+#
+# Optional / experimental:
+#   export LMCACHE_LOOKUP_TIMEOUT_MS="12000"
+#   export LMCACHE_LOCAL_DISK="/tmp/lmcache_disk"
+#   export LMCACHE_MAX_LOCAL_DISK_SIZE="100"
+#   export LMCACHE_DISK_PERSISTENCE="True"
+#   export LMCACHE_LOG_LEVEL="INFO"
+#
+# --- 2. Installation (add to setup: block in YAML) --------------------------
+#
+#   # Install LMCache v0.2.1 (compatible with vLLM 0.7.x)
+#   # See: https://docs.lmcache.ai/getting_started/installation.html
+#   # Note: v0.2.2 doesn't exist! Available v0.2.x tags: v0.2.0, v0.2.1
+#   rm -rf lmcache
+#   git clone https://github.com/lmcache/lmcache.git
+#   cd lmcache
+#   git checkout v0.2.1
+#   # CUDA arch: A100=8.0, L40S=8.9, L4=7.5, H100=9.0
+#   export TORCH_CUDA_ARCH_LIST="8.0;8.9;7.5;9.0"
+#   export FORCE_CUDA="1"
+#   uv pip install . --no-build-isolation || {
+#     export TORCH_CUDA_ARCH_LIST="8.0"
+#     uv pip install . --no-build-isolation
+#   }
+#   cd ..
+#
+#   # ⚠️ CRITICAL: LMCache deps overwrite torch with CPU-only version!
+#   # Must force-reinstall CUDA torch AFTER LMCache. Use cu121 for A100 driver
+#   # 535.x compatibility.
+#   uv pip install --force-reinstall --index-url https://download.pytorch.org/whl/cu121 \
+#     "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
+#
+#   # Verify CUDA is back:
+#   python3 -c "import torch; print('CUDA:', torch.cuda.is_available(), torch.version.cuda)"
+#
+#   mkdir -p /tmp/lmcache_disk
+#
+# --- 3. Testing notes -------------------------------------------------------
+#
+# - vLLM v0.10.2 without LMCache: worked for TP4/PP3
+# - vLLM v0.11.0 without LMCache: worked
+# - LMCache v0.3.9 + vLLM v0.11.0: one experiment worked, rest failed (Ray DAG)
+# - LMCache v0.3.10 + vLLM v0.11.0: same Ray DAG issue
+# - LMCache v0.3.10 + vLLM v0.13.0: "layers not found" error
+# - Ray restarts did NOT help; cleanup_dist_env_and_memory() between runs DID help
+# - VLLM_USE_RAY_WRAPPED_PP_COMM=0 did not help
+# - enable_async_loading: True — no significant effect
+# - TP4/PP4 worked only with vLLM v0.10.0, max_gpu_util=0.85, NCCL_P2P_DISABLE=1
+# - LMCache with TP4/PP4: did not work
+# =============================================================================
