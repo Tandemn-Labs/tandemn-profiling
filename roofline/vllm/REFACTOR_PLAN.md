@@ -690,7 +690,7 @@ If the server dies between experiments, previous experiments' results are preser
 - [ ] Verify results.json schema is compatible
 - [ ] Verify timeseries_*.json schema is compatible
 - [ ] Run on L40S (vLLM 0.10.0) — primary target
-- [ ] Run on A100 (vLLM 0.7.3) — verify `/metrics` endpoint exists in 0.7.3
+- [ ] Run on A100 (vLLM 0.10.0 via pre-built AMI) — verify /metrics works
 - [ ] Compare throughput numbers old vs new (expect new to be HIGHER due to no thrashing)
 - [ ] Verify preemption count from `/metrics` is ~0 (confirms no thrashing)
 

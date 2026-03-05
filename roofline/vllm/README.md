@@ -81,8 +81,8 @@ Benchmarking framework for profiling distributed LLM inference with [vLLM](https
 |---|---|---|---|
 | L40S | g6e.48xlarge | 8 | 0.10.0 |
 | A10G | g5.48xlarge | 8 | 0.10.0 |
-| A100-80GB | p4de.24xlarge | 8 | 0.7.3 |
-| A100-40GB | p4d.24xlarge | 8 | 0.7.3 |
+| A100-80GB | p4de.24xlarge | 8 | 0.10.0 (AMI: driver 580, CUDA 12.8) |
+| A100-40GB | p4d.24xlarge | 8 | 0.10.0 (AMI: driver 580, CUDA 12.8) |
 | H100 | p5.48xlarge | 8 | 0.10.0 |
 
 ---
