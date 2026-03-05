@@ -450,6 +450,13 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
     # Determine if this is an A100 GPU type
     is_a100 = gpu_type.upper().startswith("A100")
 
+    # A100 on AWS: use pre-built AMI with driver 580.105.08 + CUDA 12.8 + vLLM 0.10.0
+    # This avoids the old driver 535.x / CUDA 12.1 limitation entirely.
+    # See AMI/AWS.md and AMI/build-p4d-ami.sh for details.
+    image_id_line = ""
+    if is_a100 and cloud == "aws":
+        image_id_line = "  image_id: ami-04f8546cd7cc1dcd9  # Pre-built: driver 580.105.08, CUDA 12.8, vLLM 0.10.0\n"
+
     # Build file_mounts block for S3 model loading
     file_mounts_block = ""
     if s3_models:
@@ -463,7 +470,7 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
 name: {cluster_name}
 resources:
   infra: {cloud}
-{accelerator_spec}{instance_type_constraint}  use_spot: false
+{accelerator_spec}{instance_type_constraint}{image_id_line}  use_spot: false
   disk_size: 500GB
   memory: "64GB+"
   # No region constraint - SkyPilot will try all available regions for the chosen cloud
@@ -620,23 +627,20 @@ setup: |
   uv pip install "datasets" "requests" "pynvml" "aiohttp"
 
   # ========================================================================
-  # vLLM + PyTorch Installation - GPU-specific versions
+  # vLLM + PyTorch Installation
   # ========================================================================
-  # A100 (p4d/p4de): driver 535.x only supports CUDA 12.1, needs vLLM 0.7.3 + torch 2.5.1
-  # L40S/L4/others: driver 550.x+ supports CUDA 12.4, can use vLLM 0.10.0 + torch 2.7.1
+  # All GPUs use vLLM 0.10.0 + CUDA 12.8. A100 uses a pre-built AMI with
+  # driver 580.105.08 (see AMI/AWS.md), so no version downgrade is needed.
   # ========================================================================
 
   if [ "$IS_A100" = "true" ]; then
-    # A100-specific: older driver requires cu121 and older vLLM
-    echo "=== Installing PyTorch 2.5.1 with CUDA 12.1 (for A100 driver 535.x) ==="
-    uv pip install --index-url https://download.pytorch.org/whl/cu121 \
-      "torch==2.5.1" "torchvision==0.20.1" "torchaudio==2.5.1"
-
-    echo "=== Installing vLLM 0.7.3 (for A100 with torch 2.5.x) ==="
-    uv pip install --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cu121 "vllm==0.7.3"
+    # A100 with pre-built AMI: vLLM is already installed at /opt/vllm-env
+    # Just install into our venv to ensure benchmark dependencies are available
+    echo "=== Installing vLLM 0.10.0 (A100 with pre-built AMI, driver 580.x, CUDA 12.8) ==="
+    uv pip install "vllm==0.10.0"
   else
-    # L40S/L4/others: use latest stable vLLM with default PyTorch
-    echo "=== Installing vLLM 0.10.0 (latest stable for L40S/L4/other GPUs) ==="
+    # L40S/L4/others: install vLLM 0.10.0 with default PyTorch
+    echo "=== Installing vLLM 0.10.0 ==="
     uv pip install "vllm==0.10.0"
   fi
 
