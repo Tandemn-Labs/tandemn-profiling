@@ -229,12 +229,15 @@ def extract_throughput_metrics(deltas, wall_clock_elapsed):
             "total_generation_tokens": gen_toks,
         }
 
+    preemptions = _find_metric(deltas, "vllm:num_preemptions_total", 0.0)
+
     return {
         "tokens_per_sec_total": round((prompt_toks + gen_toks) / wall_clock_elapsed, 2),
         "tokens_per_sec_prefill": round(prompt_toks / wall_clock_elapsed, 2),
         "tokens_per_sec_decode": round(gen_toks / wall_clock_elapsed, 2),
         "total_prompt_tokens": prompt_toks,
         "total_generation_tokens": gen_toks,
+        "num_preemptions": int(preemptions),
     }
 
 
