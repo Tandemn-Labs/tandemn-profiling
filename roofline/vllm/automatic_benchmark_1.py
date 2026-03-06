@@ -69,7 +69,7 @@ IO_LENGTHS = [
     (16384, 2048),
 ]
 
-GPU_TYPES = ["A10G", "L40S", "A100_40gb", "H100"]
+GPU_TYPES = ["A10G", "L40S", "L4", "A100_40gb", "H100"]
 
 # ── Helper functions ──────────────────────────────────────────────────────────
 
@@ -226,8 +226,12 @@ Examples:
         help="Generate experiment CSV(s) and exit without launching",
     )
     parser.add_argument(
-        "--s3-models", action="store_true", default=True,
-        help="Load models from S3 (default: True)",
+        "--s3-models", action="store_true", default=False,
+        help="Load models from S3 instead of HuggingFace",
+    )
+    parser.add_argument(
+        "--hf-models", action="store_true", default=False,
+        help="Load models from HuggingFace Hub (default when --s3-models not set)",
     )
     parser.add_argument(
         "--models", nargs="+", default=None,
