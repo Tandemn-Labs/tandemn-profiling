@@ -1698,7 +1698,8 @@ def run_single_benchmark(exp, target_concurrency, server_proc):
         subprocess.run(warmup_cmd, check=True)
         print("✅ Warmup complete")
 
-        # 2. Scrape /metrics after warmup
+        # 2. Scrape /metrics after warmup (small delay to let Prometheus counters settle)
+        time.sleep(2)
         warmup_text = scrape_metrics()
         warmup_parsed = parse_prometheus_text(warmup_text)
 
@@ -1805,7 +1806,13 @@ def run_single_benchmark(exp, target_concurrency, server_proc):
             json.dump(timeseries_data, f)
         print(f"📈 Time-series saved to {{timeseries_file}}")
 
-        send_discord_message(f"✅ Results for tp{{exp['tp']}}-pp{{exp['pp']}} in{{input_len}}-out{{output_len}}")
+        # Check for preemptions (indicates KV cache thrashing — throughput numbers suspect)
+        num_preemptions = throughput.get('num_preemptions', 0)
+        if num_preemptions > 0:
+            print(f"⚠️  WARNING: {{num_preemptions}} preemptions detected! KV cache was thrashing. Throughput may be degraded.")
+            send_discord_message(f"⚠️ tp{{exp['tp']}}-pp{{exp['pp']}} in{{input_len}}-out{{output_len}}: {{num_preemptions}} preemptions!")
+        else:
+            send_discord_message(f"✅ Results for tp{{exp['tp']}}-pp{{exp['pp']}} in{{input_len}}-out{{output_len}}")
 
         # Build result
         effective_prompt_toks = throughput['total_prompt_tokens']
@@ -1843,6 +1850,7 @@ def run_single_benchmark(exp, target_concurrency, server_proc):
             # Benchmark config
             'benchmark_num_requests': NUM_REQUESTS,
             'benchmark_target_concurrency': target_concurrency,
+            'num_preemptions': num_preemptions,
             'gpu_monitor_type': 'distributed' if use_distributed else 'local',
             'gpu_monitor_num_nodes': len(gpu_monitor.actors) if (use_distributed and hasattr(gpu_monitor, 'actors')) else 1,
             'gpu_monitor_num_nodes_reported': gpu_metrics.get('num_nodes_monitored', 1),
