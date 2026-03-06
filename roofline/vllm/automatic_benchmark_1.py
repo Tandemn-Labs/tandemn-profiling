@@ -32,7 +32,7 @@ from datetime import datetime
 from automatic_launch_1 import (
     GPU_CONFIGS,
     load_experiments,
-    group_by_input_output_then_cluster,
+    group_by_cluster_then_io,
     run_cluster_benchmarks,
     check_orphaned_cluster,
     save_results_csv,
@@ -297,30 +297,25 @@ Examples:
 
         # Load experiments and group them
         experiments = load_experiments(str(csv_path))
-        io_groups = group_by_input_output_then_cluster(experiments, gpu_type)
+        cluster_groups = group_by_cluster_then_io(experiments, gpu_type)
 
         print(f"\n🚀 Running sweep for GPU type: {gpu_type}")
-        print(f"   {len(experiments)} experiments in {sum(len(cg) for cg in io_groups.values())} cluster groups")
-
-        def cluster_sort_key(item):
-            (gpus_per_node, num_nodes), _ = item
-            return (gpus_per_node, num_nodes)
+        print(f"   {len(experiments)} experiments in {len(cluster_groups)} cluster groups")
 
         try:
-            for (input_len, output_len), cluster_groups in sorted(io_groups.items()):
-                parent_dir = f"results/wrk-{input_len}in_{output_len}out"
-
-                for cluster_config, exps in sorted(cluster_groups.items(), key=cluster_sort_key):
-                    results = run_cluster_benchmarks(
-                        cluster_config, exps,
-                        parent_dir=parent_dir,
-                        dry_run=False,
-                        gpu_type=gpu_type,
-                        s3_models=args.s3_models,
-                        cloud=args.cloud,
-                    )
-                    if results:
-                        all_results.extend(results)
+            for (gpus, nodes, tp, pp, model), exps in sorted(cluster_groups.items()):
+                parent_dir = "results"
+                cluster_config = (gpus, nodes)
+                results = run_cluster_benchmarks(
+                    cluster_config, exps,
+                    parent_dir=parent_dir,
+                    dry_run=False,
+                    gpu_type=gpu_type,
+                    s3_models=args.s3_models,
+                    cloud=args.cloud,
+                )
+                if results:
+                    all_results.extend(results)
         except Exception as e:
             print(f"\n❌ Error during {gpu_type} sweep: {e}")
             import traceback
