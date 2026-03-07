@@ -741,7 +741,7 @@ run: |
   echo "Cluster ready for benchmarking"
 """
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463127774414770227/PX_asJ7IXfvQrff6vCW-yGL9k7pBk1v2ZMmRyzUdMNS3mht3pDVO8ligaclUAAFItbvz"
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154453665353768/t85TDEPY3tHwvT3eBmRaUT76FLtKDCjrMlZD3xhj851y0yKOszD2pv8397xdhcjyPGln"
 
 def send_discord_message(message):
     payload = {"content": message}
@@ -1301,7 +1301,7 @@ class MetricsPoller:
 # Constants
 # ============================================================================
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1463127774414770227/PX_asJ7IXfvQrff6vCW-yGL9k7pBk1v2ZMmRyzUdMNS3mht3pDVO8ligaclUAAFItbvz"
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154453665353768/t85TDEPY3tHwvT3eBmRaUT76FLtKDCjrMlZD3xhj851y0yKOszD2pv8397xdhcjyPGln"
 
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
@@ -1599,7 +1599,12 @@ def wait_for_health(server_proc, timeout=600):
 
 
 def parse_gpu_blocks(log_path="/tmp/vllm_server.log", timeout=30):
-    """Parse server log for GPU blocks info. Returns (num_gpu_blocks, block_size)."""
+    """Parse server log for KV cache info. Returns (num_gpu_blocks, block_size).
+
+    vLLM 0.10.0 logs:
+      GPU KV cache size: 516,896 tokens
+      Maximum concurrency for 10,239 tokens per request: 50.48x
+    """
     num_gpu_blocks = None
     block_size = 16  # default
 
@@ -1608,6 +1613,14 @@ def parse_gpu_blocks(log_path="/tmp/vllm_server.log", timeout=30):
         try:
             with open(log_path, "r") as f:
                 content = f.read()
+            # Try vLLM 0.10.0 format: "GPU KV cache size: 516,896 tokens"
+            m = re.search(r'GPU KV cache size:\\s*([\\d,]+)\\s*tokens', content)
+            if m:
+                kv_cache_tokens = int(m.group(1).replace(',', ''))
+                num_gpu_blocks = kv_cache_tokens // block_size
+                print(f"📊 Parsed from server log: KV cache={{kv_cache_tokens}} tokens, num_gpu_blocks={{num_gpu_blocks}}, block_size={{block_size}}")
+                return num_gpu_blocks, block_size
+            # Fallback: older vLLM format "# GPU blocks: XXXX"
             m = re.search(r'# GPU blocks:\\s*(\\d+)', content)
             if m:
                 num_gpu_blocks = int(m.group(1))
