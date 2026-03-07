@@ -1970,9 +1970,39 @@ try:
         NUM_GPU_BLOCKS = NUM_GPU_BLOCKS or 0
         print(f"⚠️  Using default target_concurrency={{target_concurrency}}")
 
-    # Run each experiment
+    # Load any previously completed results (from earlier run on same cluster)
     results = []
+    skip_exp_ids = set()  # experiments to skip (completed or permanently failed)
+    fail_counts = {{}}  # track how many times each experiment has failed
+    MAX_RETRIES = 2
+    if os.path.exists(RESULTS_FILE):
+        try:
+            with open(RESULTS_FILE, 'r') as f:
+                results = json.load(f)
+            for r in results:
+                eid = r.get('exp_id')
+                if not eid:
+                    continue
+                if r.get('status') == 'success':
+                    skip_exp_ids.add(eid)
+                elif r.get('status') == 'error':
+                    fail_counts[eid] = fail_counts.get(eid, 0) + 1
+                    if fail_counts[eid] >= MAX_RETRIES:
+                        skip_exp_ids.add(eid)  # permanently failed after MAX_RETRIES
+            completed = sum(1 for eid in skip_exp_ids if fail_counts.get(eid, 0) < MAX_RETRIES)
+            perm_failed = sum(1 for eid in skip_exp_ids if fail_counts.get(eid, 0) >= MAX_RETRIES)
+            if skip_exp_ids:
+                print(f"📋 Skipping {{len(skip_exp_ids)}} experiments ({{completed}} completed, {{perm_failed}} permanently failed after {{MAX_RETRIES}} retries)")
+        except Exception:
+            results = []
+
+    # Run each experiment (skip completed and permanently failed)
     for i, exp in enumerate(EXPERIMENTS):
+        exp_id = f"tp{{exp['tp']}}_pp{{exp['pp']}}_in{{exp['max_input_length']}}_out{{exp['max_output_length']}}"
+        if exp_id in skip_exp_ids:
+            reason = "already completed" if fail_counts.get(exp_id, 0) < MAX_RETRIES else f"permanently failed after {{MAX_RETRIES}} attempts"
+            print(f"⏭️  Skipping {{exp_id}} ({{reason}})")
+            continue
         result = run_single_benchmark(exp, target_concurrency, server_proc)
         results.append(result)
         print(f"Result: {{result.get('status')}}")
