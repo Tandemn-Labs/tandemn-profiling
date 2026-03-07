@@ -1,2 +1,0 @@
-tensor_degree,pipeline_degree,max_input_length,max_output_length,model
-1,1,128,128,Qwen/Qwen3-0.6B
