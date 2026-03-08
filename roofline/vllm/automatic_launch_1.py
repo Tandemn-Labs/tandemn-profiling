@@ -1568,6 +1568,7 @@ def start_vllm_server(model_path, tp, pp, max_model_len, log_path="/tmp/vllm_ser
         "--max-model-len", str(max_model_len),
         "--gpu-memory-utilization", "0.85",
         "--enforce-eager",
+        "--no-prefix-caching",
         "--disable-log-requests",
         "--port", str(SERVER_PORT),
     ]
