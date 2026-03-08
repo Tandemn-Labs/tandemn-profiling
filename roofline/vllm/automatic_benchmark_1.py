@@ -54,19 +54,13 @@ TP_PP_CONFIGS = [
 ]
 
 IO_LENGTHS = [
-    (128, 128),
-    (128, 2048),
-    (512, 256),
-    (512, 1024),
-    (1024, 512),
-    (1024, 4096),
-    (2048, 512),
-    (4096, 256),
-    (4096, 1024),
-    (8192, 256),
-    (8192, 512),
-    (8192, 2048),
-    (16384, 2048),
+    (128, 128),      # ratio 1.0  — baseline, max concurrency
+    (128, 2048),     # ratio 0.06 — extreme decode (chatbot-like)
+    (512, 1024),     # ratio 0.5  — medium decode-heavy
+    (1024, 512),     # ratio 2.0  — medium balanced
+    (4096, 1024),    # ratio 4.0  — long context, prefill-leaning
+    (8192, 256),     # ratio 32.0 — extreme prefill (RAG/summarization)
+    (16384, 2048),   # ratio 8.0  — maximum context stress test
 ]
 
 GPU_TYPES = ["A10G", "L40S", "L4", "A100_40gb", "H100"]
