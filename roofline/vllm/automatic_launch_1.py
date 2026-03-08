@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 from dataclasses import dataclass
 import subprocess
 from collections import defaultdict
@@ -150,11 +151,14 @@ def setup_logger(log_file_path: Path):
     return logger
 
 # Track active cluster for cleanup on unexpected exit
+# Uses PID-based files so parallel processes don't stomp each other
 _active_cluster = None
-_active_cluster_file = Path("/tmp/.active_benchmark_cluster")
+_active_cluster_dir = Path("/tmp/.benchmark_clusters")
+_active_cluster_dir.mkdir(exist_ok=True)
+_active_cluster_file = _active_cluster_dir / f"cluster_pid{os.getpid()}"
 
 def set_active_cluster(cluster_name):
-    """Set active cluster and persist to file for crash recovery."""
+    """Set active cluster and persist to PID-specific file for crash recovery."""
     global _active_cluster
     _active_cluster = cluster_name
     if cluster_name:
@@ -183,7 +187,6 @@ def cleanup_on_exit():
             print(f"❌ Failed to terminate cluster {cluster}: {e}")
             print(f"   Run manually: sky down -y {cluster}")
         finally:
-            # Clear the file
             if _active_cluster_file.exists():
                 _active_cluster_file.unlink()
 
@@ -194,20 +197,35 @@ def signal_handler(signum, frame):
     sys.exit(1)
 
 def check_orphaned_cluster():
-    """Check if there's an orphaned cluster from a previous crashed run."""
-    if _active_cluster_file.exists():
-        cluster = _active_cluster_file.read_text().strip()
-        print(f"\n⚠️  Found orphaned cluster from previous run: {cluster}")
-        print(f"   This cluster may still be running and costing money!")
-        response = input(f"   Terminate it now? [Y/n]: ").strip().lower()
-        if response != 'n':
-            print(f"   Terminating {cluster}...")
-            subprocess.run(["sky", "down", "-y", cluster])
-            _active_cluster_file.unlink()
-            print(f"   ✅ Done.")
-        else:
-            print(f"   Skipped. Run 'sky down -y {cluster}' manually when ready.")
-            _active_cluster_file.unlink()
+    """Check for orphaned clusters from crashed runs (dead PIDs only).
+
+    Only cleans up clusters whose owning process is no longer running.
+    Never touches clusters owned by live processes (safe for parallel runs).
+    """
+    if not _active_cluster_dir.exists():
+        return
+    for f in _active_cluster_dir.glob("cluster_pid*"):
+        try:
+            pid = int(f.name.split("pid")[1])
+            # Check if the owning process is still alive
+            os.kill(pid, 0)  # signal 0 = check existence, doesn't kill
+            # Process is alive — skip this cluster (it's being used)
+            cluster = f.read_text().strip()
+            print(f"ℹ️  Cluster {cluster} is owned by active process {pid}, skipping")
+        except ProcessLookupError:
+            # Process is dead — this is truly orphaned
+            cluster = f.read_text().strip()
+            print(f"⚠️  Found orphaned cluster {cluster} (owner pid {pid} is dead)")
+            print(f"   Terminating...")
+            try:
+                subprocess.run(["sky", "down", "-y", cluster], timeout=300)
+                print(f"   ✅ Terminated {cluster}")
+            except Exception as e:
+                print(f"   ❌ Failed: {e}. Run: sky down -y {cluster}")
+            f.unlink()
+        except (ValueError, PermissionError):
+            # Bad file or permission issue — clean up
+            f.unlink()
 
 # Register cleanup handlers
 atexit.register(cleanup_on_exit)
