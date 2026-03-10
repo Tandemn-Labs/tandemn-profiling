@@ -1,6 +1,8 @@
 import csv
 import json
 import os
+import time
+import select
 from dataclasses import dataclass
 import subprocess
 from collections import defaultdict
@@ -494,11 +496,20 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
             mounts.append(f"  /models/{model_name}:\n    source: s3://{DEFAULT_S3_BUCKET}/{DEFAULT_S3_PREFIX}/{model_name}\n    mode: COPY")
         file_mounts_block = "\nfile_mounts:\n" + "\n".join(mounts) + "\n"
 
+    # Scale disk for large models (MoE models like 235B need ~470GB for weights alone)
+    model_names = [exp['model'] for exp in experiments]
+    disk_size_gb = 500
+    for mn in model_names:
+        mn_lower = mn.lower()
+        if "235b" in mn_lower or "236b" in mn_lower or "mixtral-8x22b" in mn_lower:
+            disk_size_gb = 1000
+            break
+
     return f"""
 name: {cluster_name}
 resources:
 {cloud_line}{accelerator_spec}{instance_type_constraint}{image_id_line}  use_spot: false
-  disk_size: 500GB
+  disk_size: {disk_size_gb}GB
   memory: "64GB+"
   # No region constraint - SkyPilot will try all available regions for the chosen cloud
 num_nodes: {num_nodes}
@@ -759,7 +770,7 @@ run: |
   echo "Cluster ready for benchmarking"
 """
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154453665353768/t85TDEPY3tHwvT3eBmRaUT76FLtKDCjrMlZD3xhj851y0yKOszD2pv8397xdhcjyPGln"
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
 
 def send_discord_message(message):
     payload = {"content": message}
@@ -1319,7 +1330,7 @@ class MetricsPoller:
 # Constants
 # ============================================================================
 
-DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154453665353768/t85TDEPY3tHwvT3eBmRaUT76FLtKDCjrMlZD3xhj851y0yKOszD2pv8397xdhcjyPGln"
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
 
 EXPERIMENTS = {exp_list}
 RESULTS_FILE = "/tmp/benchmark_results.json"
@@ -1586,7 +1597,7 @@ def start_vllm_server(model_path, tp, pp, max_model_len, log_path="/tmp/vllm_ser
         "--max-model-len", str(max_model_len),
         "--gpu-memory-utilization", "0.85",
         "--enforce-eager",
-        "--no-prefix-caching",
+        "--no-enable-prefix-caching",
         "--disable-log-requests",
         "--port", str(SERVER_PORT),
     ]
@@ -2049,10 +2060,12 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
     # Use TP/PP from the first experiment for naming (all experiments in a group have compatible TP/PP)
     tp = experiments[0]['tp']
     pp = experiments[0]['pp']
-    # Cluster name: no I/O in name since one cluster serves multiple I/O shapes
+    model = experiments[0]['model']
+    # Short model slug for cluster name (e.g., "Qwen/Qwen3-32B" → "qwen3-32b")
+    model_slug = model.split("/")[-1].lower().replace("_", "-").replace(".", "-")[:20]
     # Normalize GPU type for use in filenames (replace special chars)
     gpu_type_safe = gpu_type.replace("_", "-").replace("/", "-")
-    cluster_name = f"roofline-tp{tp}-pp{pp}-{gpu_type_safe}"
+    cluster_name = f"rf-{model_slug}-tp{tp}pp{pp}-{gpu_type_safe}"
 
     # Create consolidated result directory with datetime
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -2150,10 +2163,30 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
             bufsize=1
         )
 
-        # Stream output to both console and log file
-        for line in process.stdout:
-            line = line.rstrip()
-            logger.info(line)
+        # Stream output with watchdog: kill if no output for 30 minutes
+        SKY_OUTPUT_TIMEOUT = 1800  # 30 minutes with no output = hung
+        last_output_time = time.time()
+        while True:
+            ready, _, _ = select.select([process.stdout], [], [], 60)  # check every 60s
+            if ready:
+                line = process.stdout.readline()
+                if not line:  # EOF — process closed stdout
+                    break
+                logger.info(line.rstrip())
+                last_output_time = time.time()
+            else:
+                # No output ready — check if we've exceeded the timeout
+                if time.time() - last_output_time > SKY_OUTPUT_TIMEOUT:
+                    logger.warning(f"⚠️  No output from sky launch for {SKY_OUTPUT_TIMEOUT}s — killing hung process")
+                    process.kill()
+                    process.wait()
+                    raise subprocess.CalledProcessError(-9, "sky launch (watchdog timeout)")
+                # Also check if process has exited
+                if process.poll() is not None:
+                    # Drain any remaining output
+                    for remaining in process.stdout:
+                        logger.info(remaining.rstrip())
+                    break
 
         process.wait()
         if process.returncode != 0:

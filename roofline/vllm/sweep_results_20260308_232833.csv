@@ -1,0 +1,8 @@
+tp,pp,max_input_length,max_output_length,model,status,error
+4,3,128,128,Qwen/Qwen3-235B-A22B,cluster_error,Command 'sky launch' returned non-zero exit status 1.
+4,3,128,2048,Qwen/Qwen3-235B-A22B,cluster_error,Command 'sky launch' returned non-zero exit status 1.
+4,3,512,1024,Qwen/Qwen3-235B-A22B,cluster_error,Command 'sky launch' returned non-zero exit status 1.
+4,3,1024,512,Qwen/Qwen3-235B-A22B,cluster_error,Command 'sky launch' returned non-zero exit status 1.
+4,3,4096,1024,Qwen/Qwen3-235B-A22B,cluster_error,Command 'sky launch' returned non-zero exit status 1.
+4,3,8192,256,Qwen/Qwen3-235B-A22B,cluster_error,Command 'sky launch' returned non-zero exit status 1.
+4,3,16384,2048,Qwen/Qwen3-235B-A22B,cluster_error,Command 'sky launch' returned non-zero exit status 1.

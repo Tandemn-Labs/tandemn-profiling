@@ -1,0 +1,1342 @@
+2026-03-08 07:03:22,052 - INFO - Results will be saved to: results/aws_g6_L4/tp2-pp4-g6_48xlarge-20260308_070322
+2026-03-08 07:03:22,052 - INFO - 📋 Copied benchmark_client.py to roofline_benchmarks/
+2026-03-08 07:03:22,052 - INFO - 📋 Copied prometheus_parser.py to roofline_benchmarks/
+2026-03-08 07:03:22,052 - INFO - 🚀 Launching roofline-tp2-pp4-L4...
+2026-03-08 07:03:22,052 - INFO - YAML to run: roofline_benchmarks/roofline-tp2-pp4-L4.yaml
+2026-03-08 07:03:22,052 - INFO - Running on cluster: roofline-tp2-pp4-L4
+2026-03-08 07:03:22,732 - INFO - YAML to run: roofline_benchmarks/roofline-tp2-pp4-L4.yaml
+2026-03-08 07:03:22,815 - INFO - Running on cluster: roofline-tp2-pp4-L4
+2026-03-08 07:03:23,847 - INFO - Considered resources (1 node):
+2026-03-08 07:03:23,847 - INFO - ------------------------------------------------------------------------------
+2026-03-08 07:03:23,847 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-08 07:03:23,847 - INFO - ------------------------------------------------------------------------------
+2026-03-08 07:03:23,847 - INFO -  AWS (us-east-1)   g6.48xlarge   192     768       L4:8   13.35      [32m   ✔[0m
+2026-03-08 07:03:23,847 - INFO - ------------------------------------------------------------------------------
+2026-03-08 07:03:24,352 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a,us-east-1b,us-east-1c,us-east-1d,us-east-1f).
+2026-03-08 07:04:29,137 - INFO - [2m└── [0m[2mInstance is up.[0m
+2026-03-08 07:05:08,367 - INFO - [0m[32m✓ Cluster launched: roofline-tp2-pp4-L4.[0m[0m  [2mView logs: [1msky logs --provision roofline-tp2-pp4-L4[0m[0m
+2026-03-08 07:05:08,467 - INFO - [0m⚙︎ Syncing files.
+2026-03-08 07:05:08,567 - INFO -   [2mSyncing workdir (to 1 node): /home/orange/Desktop/tandemn/tandemn-profiling/roofline/vllm -> ~/sky_workdir[0m
+2026-03-08 07:07:05,710 - INFO - [0m[32m✓ Synced workdir.[0m[0m  [2mView logs: sky api logs -l sky-2026-03-08-07-03-22-917135/workdir_sync.log[0m
+2026-03-08 07:07:06,815 - INFO -   [2mSyncing (to 1 node): s3://tandemn-model-shards/hf-models/Qwen/Qwen3-32B -> /models/Qwen/Qwen3-32B[0m
+2026-03-08 07:10:03,798 - INFO - [0m[32m✓ Synced file_mounts.[0m[0m  [2mView logs: sky api logs -l sky-2026-03-08-07-03-22-917135/file_mounts.log[0m
+2026-03-08 07:10:08,830 - INFO - [0m[32m✓ Setup detached.[0m[0m
+2026-03-08 07:10:15,770 - INFO - [0m⚙︎ Job submitted, ID: 1
+2026-03-08 07:10:20,944 - INFO - [2m├── [0m[2mWaiting for task resources on 1 node.[0m
+2026-03-08 07:10:21,851 - INFO - [2m└── [0mJob started. Streaming logs... [2m(Ctrl-C to exit log streaming; job will not be killed)[0m
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m + GPU_TYPE=L4
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m + IS_A100=false
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m + echo 'GPU Type: L4, Is A100: false'
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m GPU Type: L4, Is A100: false
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m + echo '=== Initial System Diagnostics ==='
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m === Initial System Diagnostics ===
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m + echo 'Checking for NVIDIA driver...'
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m Checking for NVIDIA driver...
+2026-03-08 07:10:23,964 - INFO - [36m(setup pid=8471)[0m + nvidia-smi
+2026-03-08 07:10:24,767 - INFO - [36m(setup pid=8471)[0m Sun Mar  8 01:40:24 2026
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m +---------------------------------------------------------------------------------------+
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m | NVIDIA-SMI 535.216.01             Driver Version: 535.216.01   CUDA Version: 12.2     |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m | GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m | Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |                                         |                      |               MIG M. |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |=========================================+======================+======================|
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |   0  NVIDIA L4                      On  | 00000000:9F:00.0 Off |                    0 |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m | N/A   33C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |   1  NVIDIA L4                      On  | 00000000:A1:00.0 Off |                    0 |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m | N/A   29C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |   2  NVIDIA L4                      On  | 00000000:A3:00.0 Off |                    0 |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m | N/A   33C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |   3  NVIDIA L4                      On  | 00000000:A5:00.0 Off |                    0 |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m | N/A   31C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:10:24,768 - INFO - [36m(setup pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m |   4  NVIDIA L4                      On  | 00000000:AE:00.0 Off |                    0 |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m | N/A   32C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m |   5  NVIDIA L4                      On  | 00000000:B0:00.0 Off |                    0 |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m | N/A   31C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m |   6  NVIDIA L4                      On  | 00000000:B2:00.0 Off |                    0 |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m | N/A   29C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:10:25,472 - INFO - [36m(setup pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m |   7  NVIDIA L4                      On  | 00000000:B4:00.0 Off |                    0 |
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m | N/A   30C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m +---------------------------------------------------------------------------------------+
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m | Processes:                                                                            |
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m |  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m |        ID   ID                                                             Usage      |
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m |=======================================================================================|
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m |  No running processes found                                                           |
+2026-03-08 07:10:25,473 - INFO - [36m(setup pid=8471)[0m +---------------------------------------------------------------------------------------+
+2026-03-08 07:10:26,575 - INFO - [36m(setup pid=8471)[0m + echo 'Checking CUDA libraries...'
+2026-03-08 07:10:26,575 - INFO - [36m(setup pid=8471)[0m Checking CUDA libraries...
+2026-03-08 07:10:26,575 - INFO - [36m(setup pid=8471)[0m + ldconfig -p
+2026-03-08 07:10:26,575 - INFO - [36m(setup pid=8471)[0m + grep --color=auto cuda
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libpcsamplingutil.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libpcsamplingutil.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvrtc.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvrtc.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvrtc-builtins.so.12.4 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc-builtins.so.12.4
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvrtc-builtins.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc-builtins.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvperf_target.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvperf_target.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvperf_host.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvperf_host.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvjpeg.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvjpeg.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvjpeg.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvjpeg.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvfatbin.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvfatbin.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvfatbin.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvfatbin.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvblas.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvblas.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvblas.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvblas.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvToolsExt.so.1 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvToolsExt.so.1
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvToolsExt.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvToolsExt.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvJitLink.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvJitLink.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnvJitLink.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnvJitLink.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnpps.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnpps.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnpps.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnpps.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppitc.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppitc.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppitc.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppitc.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppisu.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppisu.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppisu.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppisu.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppist.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppist.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppist.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppist.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppim.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppim.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppim.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppim.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppig.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppig.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppig.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppig.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppif.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppif.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppif.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppif.so
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppidei.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppidei.so.12
+2026-03-08 07:10:26,576 - INFO - [36m(setup pid=8471)[0m 	libnppidei.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppidei.so
+2026-03-08 07:10:27,383 - INFO - [36m(setup pid=8471)[0m 	libnppicc.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppicc.so.12
+2026-03-08 07:10:27,383 - INFO - [36m(setup pid=8471)[0m 	libnppicc.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppicc.so
+2026-03-08 07:10:27,383 - INFO - [36m(setup pid=8471)[0m 	libnppial.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppial.so.12
+2026-03-08 07:10:27,383 - INFO - [36m(setup pid=8471)[0m 	libnppial.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppial.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libnppc.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppc.so.12
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libnppc.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libnppc.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libicudata.so.70 (libc6,x86-64) => /lib/x86_64-linux-gnu/libicudata.so.70
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcusparse.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcusparse.so.12
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcusparse.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcusparse.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcusolverMg.so.11 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcusolverMg.so.11
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcusolverMg.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcusolverMg.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcusolver.so.11 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcusolver.so.11
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcusolver.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcusolver.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcurand.so.10 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcurand.so.10
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcurand.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcurand.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcupti.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcupti.so.12
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcupti.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcupti.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcuinj64.so.12.4 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcuinj64.so.12.4
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcuinj64.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcuinj64.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcufile_rdma.so.1 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcufile_rdma.so.1
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcufile_rdma.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcufile_rdma.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcufile.so.0 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcufile.so.0
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcufile.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcufile.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcufftw.so.11 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcufftw.so.11
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcufftw.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcufftw.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcufft.so.11 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcufft.so.11
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcufft.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcufft.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcudart.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so.12
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcudart.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcudadebugger.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libcudadebugger.so.1
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcuda.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libcuda.so.1
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcuda.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libcuda.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcublasLt.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcublasLt.so.12
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcublasLt.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcublasLt.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcublas.so.12 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcublas.so.12
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcublas.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcublas.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libcheckpoint.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libcheckpoint.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libaccinj64.so.12.4 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libaccinj64.so.12.4
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libaccinj64.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libaccinj64.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libOpenCL.so.1 (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libOpenCL.so.1
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m 	libOpenCL.so (libc6,x86-64) => /usr/local/cuda/targets/x86_64-linux/lib/libOpenCL.so
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m + echo 'CUDA toolkit path:'
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m CUDA toolkit path:
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m + ls --color=auto -la /usr/local/cuda /usr/local/cuda-12 /usr/local/cuda-12.4
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m lrwxrwxrwx  1 root root   22 Nov  4  2024 /usr/local/cuda -> /etc/alternatives/cuda
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m lrwxrwxrwx  1 root root   25 Nov  4  2024 /usr/local/cuda-12 -> /etc/alternatives/cuda-12
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m /usr/local/cuda-12.4:
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m total 136
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x 15 root root  4096 Nov  4  2024 .
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x 11 root root  4096 Nov  4  2024 ..
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m -rw-r--r--  1 root root   160 Mar 15  2024 DOCS
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m -rw-r--r--  1 root root 63021 Mar 15  2024 EULA.txt
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m -rw-r--r--  1 root root   524 Mar 15  2024 README
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  3 root root  4096 Nov  4  2024 bin
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  5 root root  4096 Nov  4  2024 compute-sanitizer
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  3 root root  4096 Nov  4  2024 doc
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  4 root root  4096 Nov  4  2024 extras
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  3 root root  4096 Nov  4  2024 gds
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m lrwxrwxrwx  1 root root    28 Mar 15  2024 include -> targets/x86_64-linux/include
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m lrwxrwxrwx  1 root root    24 Mar 15  2024 lib64 -> targets/x86_64-linux/lib
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  7 root root  4096 Nov  4  2024 libnvvp
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  2 root root  4096 Nov  4  2024 nsightee_plugins
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  3 root root  4096 Nov  4  2024 nvml
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  6 root root  4096 Nov  4  2024 nvvm
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  3 root root  4096 Nov  4  2024 share
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  2 root root  4096 Nov  4  2024 src
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  3 root root  4096 Nov  4  2024 targets
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m drwxr-xr-x  2 root root  4096 Nov  4  2024 tools
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m -rw-r--r--  1 root root  3236 Mar 28  2024 version.json
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m + echo ===================================
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m ===================================
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m + command -v nvidia-smi
+2026-03-08 07:10:27,384 - INFO - [36m(setup pid=8471)[0m + '[' false = true ']'
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m + sudo apt-get install -y numactl
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m Reading package lists...
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m Building dependency tree...
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m Reading state information...
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m The following NEW packages will be installed:
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m   numactl
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m 0 upgraded, 1 newly installed, 0 to remove and 16 not upgraded.
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m Need to get 36.8 kB of archives.
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m After this operation, 140 kB of additional disk space will be used.
+2026-03-08 07:10:27,385 - INFO - [36m(setup pid=8471)[0m Get:1 http://us-east-1.ec2.archive.ubuntu.com/ubuntu jammy/main amd64 numactl amd64 2.0.14-3ubuntu2 [36.8 kB]
+2026-03-08 07:10:27,989 - INFO - [36m(setup pid=8471)[0m Fetched 36.8 kB in 0s (1585 kB/s)
+2026-03-08 07:10:27,989 - INFO - [36m(setup pid=8471)[0m Selecting previously unselected package numactl.
+2026-03-08 07:10:28,090 - INFO - [36m(setup pid=8471)[0m (Reading database ...
+2026-03-08 07:10:28,090 - INFO - (Reading database ... 5%
+2026-03-08 07:10:28,090 - INFO - (Reading database ... 10%
+2026-03-08 07:10:28,090 - INFO - (Reading database ... 15%
+2026-03-08 07:10:28,090 - INFO - (Reading database ... 20%
+2026-03-08 07:10:28,090 - INFO - (Reading database ... 25%
+2026-03-08 07:10:28,090 - INFO - (Reading database ... 30%
+2026-03-08 07:10:28,090 - INFO - (Reading database ... 35%
+2026-03-08 07:10:28,090 - INFO - (Reading database ... 40%
+2026-03-08 07:10:28,693 - INFO - (Reading database ... 45%
+2026-03-08 07:10:29,295 - INFO - [36m(setup pid=8471)[0m (Reading database ... 50%
+2026-03-08 07:10:29,295 - INFO - [36m(setup pid=8471)[0m (Reading database ... 55%
+2026-03-08 07:10:29,896 - INFO - [36m(setup pid=8471)[0m (Reading database ... 60%
+2026-03-08 07:10:30,699 - INFO - [36m(setup pid=8471)[0m (Reading database ... 65%
+2026-03-08 07:10:30,699 - INFO - [36m(setup pid=8471)[0m (Reading database ... 70%
+2026-03-08 07:10:31,504 - INFO - [36m(setup pid=8471)[0m (Reading database ... 75%
+2026-03-08 07:10:32,108 - INFO - [36m(setup pid=8471)[0m (Reading database ... 80%
+2026-03-08 07:10:32,912 - INFO - [36m(setup pid=8471)[0m (Reading database ... 85%
+2026-03-08 07:10:32,912 - INFO - [36m(setup pid=8471)[0m (Reading database ... 90%
+2026-03-08 07:10:32,912 - INFO - [36m(setup pid=8471)[0m (Reading database ... 95%
+2026-03-08 07:10:32,912 - INFO - (Reading database ... 100%
+2026-03-08 07:10:32,912 - INFO - (Reading database ... 95657 files and directories currently installed.)
+2026-03-08 07:10:32,912 - INFO - [36m(setup pid=8471)[0m Preparing to unpack .../numactl_2.0.14-3ubuntu2_amd64.deb ...
+2026-03-08 07:10:32,912 - INFO - [36m(setup pid=8471)[0m Unpacking numactl (2.0.14-3ubuntu2) ...
+2026-03-08 07:10:33,514 - INFO - [36m(setup pid=8471)[0m Setting up numactl (2.0.14-3ubuntu2) ...
+2026-03-08 07:10:34,217 - INFO - [36m(setup pid=8471)[0m Processing triggers for man-db (2.10.2-1) ...
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m Running kernel seems to be up-to-date.
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m No services need to be restarted.
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m No containers need to be restarted.
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m No user sessions are running outdated binaries.
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m
+2026-03-08 07:10:39,455 - INFO - [36m(setup pid=8471)[0m No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-03-08 07:10:40,863 - INFO - [36m(setup pid=8471)[0m + python3 -m pip install -U pip
+2026-03-08 07:10:44,179 - INFO - [36m(setup pid=8471)[0m Requirement already satisfied: pip in /home/ubuntu/miniconda3/lib/python3.10/site-packages (23.3.1)
+2026-03-08 07:10:44,780 - INFO - [36m(setup pid=8471)[0m Collecting pip
+2026-03-08 07:10:44,781 - INFO - [36m(setup pid=8471)[0m   Downloading pip-26.0.1-py3-none-any.whl.metadata (4.7 kB)
+2026-03-08 07:10:44,781 - INFO - [36m(setup pid=8471)[0m Downloading pip-26.0.1-py3-none-any.whl (1.8 MB)
+2026-03-08 07:10:44,781 - INFO - [36m(setup pid=8471)[0m    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 30.5 MB/s eta 0:00:00
+2026-03-08 07:10:44,781 - INFO - [36m(setup pid=8471)[0m Installing collected packages: pip
+2026-03-08 07:10:44,781 - INFO - [36m(setup pid=8471)[0m   Attempting uninstall: pip
+2026-03-08 07:10:44,781 - INFO - [36m(setup pid=8471)[0m     Found existing installation: pip 23.3.1
+2026-03-08 07:10:44,781 - INFO - [36m(setup pid=8471)[0m     Uninstalling pip-23.3.1:
+2026-03-08 07:10:48,001 - INFO - [36m(setup pid=8471)[0m       Successfully uninstalled pip-23.3.1
+2026-03-08 07:10:49,411 - INFO - [36m(setup pid=8471)[0m Successfully installed pip-26.0.1
+2026-03-08 07:10:50,318 - INFO - [36m(setup pid=8471)[0m + python3 -m pip install -U uv
+2026-03-08 07:10:50,818 - INFO - [36m(setup pid=8471)[0m Collecting uv
+2026-03-08 07:10:50,818 - INFO - [36m(setup pid=8471)[0m   Downloading uv-0.10.9-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+2026-03-08 07:10:51,522 - INFO - [36m(setup pid=8471)[0m Downloading uv-0.10.9-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (23.4 MB)
+2026-03-08 07:10:52,027 - INFO - [36m(setup pid=8471)[0m    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 23.4/23.4 MB 23.4 MB/s  0:00:01
+2026-03-08 07:10:52,027 - INFO - [36m(setup pid=8471)[0m Installing collected packages: uv
+2026-03-08 07:10:53,234 - INFO - [36m(setup pid=8471)[0m Successfully installed uv-0.10.9
+2026-03-08 07:10:53,234 - INFO - [36m(setup pid=8471)[0m + uv venv --python 3.12 --seed
+2026-03-08 07:10:54,140 - INFO - [36m(setup pid=8471)[0m Downloading cpython-3.12.13-linux-x86_64-gnu (download) (32.3MiB)
+2026-03-08 07:10:54,846 - INFO - [36m(setup pid=8471)[0m  Downloaded cpython-3.12.13-linux-x86_64-gnu (download)
+2026-03-08 07:10:54,846 - INFO - [36m(setup pid=8471)[0m Using CPython 3.12.13
+2026-03-08 07:10:54,846 - INFO - [36m(setup pid=8471)[0m Creating virtual environment with seed packages at: .venv
+2026-03-08 07:10:55,850 - INFO - [36m(setup pid=8471)[0m  + pip==26.0.1
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m Activate with: source .venv/bin/activate
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m + source .venv/bin/activate
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' -n x ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ SCRIPT_PATH=.venv/bin/activate
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' .venv/bin/activate = /tmp/sky_setup_sky-2026-03-08-07-03-22-917135 ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ deactivate nondestructive
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ unset -f pydoc
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ hash -r
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ unset VIRTUAL_ENV
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ unset VIRTUAL_ENV_PROMPT
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' '!' nondestructive = nondestructive ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ VIRTUAL_ENV=/home/ubuntu/sky_workdir/.venv
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' linux-gnu = cygwin ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' linux-gnu = msys ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ export VIRTUAL_ENV
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ unset SCRIPT_PATH
+2026-03-08 07:10:55,851 - INFO - [36m(setup pid=8471)[0m ++ _OLD_VIRTUAL_PATH=/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ PATH=/home/ubuntu/sky_workdir/.venv/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ export PATH
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ '[' xsky_workdir '!=' x ']'
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ VIRTUAL_ENV_PROMPT=sky_workdir
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ export VIRTUAL_ENV_PROMPT
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ _OLD_VIRTUAL_PS1='(base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ PS1='(sky_workdir) (base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ export PS1
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ alias pydoc
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ true
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m ++ hash -r
+2026-03-08 07:10:56,555 - INFO - [36m(setup pid=8471)[0m + uv pip install datasets requests pynvml aiohttp
+2026-03-08 07:10:57,560 - INFO - [36m(setup pid=8471)[0m Resolved 44 packages in 1.18s
+2026-03-08 07:10:57,560 - INFO - [36m(setup pid=8471)[0m Downloading numpy (15.8MiB)
+2026-03-08 07:10:58,165 - INFO - [36m(setup pid=8471)[0m Downloading pandas (10.4MiB)
+2026-03-08 07:10:58,165 - INFO - [36m(setup pid=8471)[0m Downloading pyarrow (45.4MiB)
+2026-03-08 07:10:58,165 - INFO - [36m(setup pid=8471)[0m Downloading hf-xet (4.0MiB)
+2026-03-08 07:10:58,166 - INFO - [36m(setup pid=8471)[0m Downloading aiohttp (1.7MiB)
+2026-03-08 07:10:58,166 - INFO - [36m(setup pid=8471)[0m Downloading pygments (1.2MiB)
+2026-03-08 07:10:58,166 - INFO - [36m(setup pid=8471)[0m  Downloaded hf-xet
+2026-03-08 07:10:59,071 - INFO - [36m(setup pid=8471)[0m  Downloaded aiohttp
+2026-03-08 07:10:59,072 - INFO - [36m(setup pid=8471)[0m  Downloaded pygments
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  Downloaded numpy
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  Downloaded pyarrow
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  Downloaded pandas
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m Prepared 37 packages in 1.65s
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m Installed 44 packages in 325ms
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + aiohappyeyeballs==2.6.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + aiohttp==3.13.3
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + aiosignal==1.4.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + annotated-doc==0.0.4
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + anyio==4.12.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + attrs==25.4.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + certifi==2026.2.25
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + charset-normalizer==3.4.5
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + click==8.3.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + datasets==4.6.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + dill==0.4.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + filelock==3.25.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + frozenlist==1.8.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + fsspec==2026.2.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + h11==0.16.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + hf-xet==1.3.2
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + httpcore==1.0.9
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + httpx==0.28.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + huggingface-hub==1.6.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + idna==3.11
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + markdown-it-py==4.0.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + mdurl==0.1.2
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + multidict==6.7.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + multiprocess==0.70.18
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + numpy==2.4.2
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + nvidia-ml-py==13.590.48
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + packaging==26.0
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + pandas==3.0.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + propcache==0.4.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + pyarrow==23.0.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + pygments==2.19.2
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + pynvml==13.0.1
+2026-03-08 07:10:59,578 - INFO - [36m(setup pid=8471)[0m  + python-dateutil==2.9.0.post0
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + pyyaml==6.0.3
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + requests==2.32.5
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + rich==14.3.3
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + shellingham==1.5.4
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + six==1.17.0
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + tqdm==4.67.3
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + typer==0.24.1
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + typing-extensions==4.15.0
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + urllib3==2.6.3
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + xxhash==3.6.0
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m  + yarl==1.23.0
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m + '[' false = true ']'
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m + echo '=== Installing vLLM 0.10.0 ==='
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m === Installing vLLM 0.10.0 ===
+2026-03-08 07:11:00,280 - INFO - [36m(setup pid=8471)[0m + uv pip install vllm==0.10.0
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Resolved 141 packages in 1.23s
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading opencv-python-headless (57.6MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading transformers (10.2MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading sympy (6.0MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading networkx (2.0MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading pillow (6.7MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading pycountry (7.7MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading tokenizers (3.1MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading scipy (33.6MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading mistral-common (6.2MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cuda-cupti-cu12 (8.5MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading pydantic-core (2.0MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-nvjitlink-cu12 (18.8MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cufft-cu12 (190.9MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cusparselt-cu12 (149.5MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading uvloop (4.2MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading llvmlite (40.4MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading tiktoken (1.1MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading torchaudio (3.3MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cuda-nvrtc-cu12 (22.6MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-nccl-cu12 (192.0MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading llguidance (14.3MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading outlines-core (2.2MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading torchvision (7.1MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cublas-cu12 (374.9MiB)
+2026-03-08 07:11:00,983 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cudnn-cu12 (544.5MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-curand-cu12 (53.7MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cusolver-cu12 (150.9MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading setuptools (1.2MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading cupy-cuda12x (128.4MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading xformers (111.6MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cufile-cu12 (1.1MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading nvidia-cusparse-cu12 (206.5MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading ray (69.6MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading torch (783.0MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading soundfile (1.3MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading vllm (368.7MiB)
+2026-03-08 07:11:00,984 - INFO - [36m(setup pid=8471)[0m Downloading triton (148.5MiB)
+2026-03-08 07:11:01,686 - INFO - [36m(setup pid=8471)[0m Downloading numba (3.7MiB)
+2026-03-08 07:11:01,686 - INFO - [36m(setup pid=8471)[0m Downloading xgrammar (11.3MiB)
+2026-03-08 07:11:01,686 - INFO - [36m(setup pid=8471)[0m Downloading numpy (15.8MiB)
+2026-03-08 07:11:01,686 - INFO - [36m(setup pid=8471)[0m Downloading sentencepiece (1.3MiB)
+2026-03-08 07:11:02,392 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cufile-cu12
+2026-03-08 07:11:02,392 - INFO - [36m(setup pid=8471)[0m  Downloaded tiktoken
+2026-03-08 07:11:02,392 - INFO - [36m(setup pid=8471)[0m  Downloaded soundfile
+2026-03-08 07:11:02,392 - INFO - [36m(setup pid=8471)[0m  Downloaded sentencepiece
+2026-03-08 07:11:02,392 - INFO - [36m(setup pid=8471)[0m  Downloaded pydantic-core
+2026-03-08 07:11:02,994 - INFO - [36m(setup pid=8471)[0m  Downloaded outlines-core
+2026-03-08 07:11:02,994 - INFO - [36m(setup pid=8471)[0m  Downloaded setuptools
+2026-03-08 07:11:03,698 - INFO - [36m(setup pid=8471)[0m  Downloaded tokenizers
+2026-03-08 07:11:03,698 - INFO - [36m(setup pid=8471)[0m  Downloaded torchaudio
+2026-03-08 07:11:03,698 - INFO - [36m(setup pid=8471)[0m  Downloaded networkx
+2026-03-08 07:11:03,698 - INFO - [36m(setup pid=8471)[0m  Downloaded uvloop
+2026-03-08 07:11:04,304 - INFO - [36m(setup pid=8471)[0m  Downloaded numba
+2026-03-08 07:11:04,304 - INFO - [36m(setup pid=8471)[0m  Downloaded mistral-common
+2026-03-08 07:11:04,807 - INFO - [36m(setup pid=8471)[0m  Downloaded torchvision
+2026-03-08 07:11:04,807 - INFO - [36m(setup pid=8471)[0m  Downloaded pillow
+2026-03-08 07:11:04,807 - INFO - [36m(setup pid=8471)[0m  Downloaded pycountry
+2026-03-08 07:11:04,807 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cuda-cupti-cu12
+2026-03-08 07:11:05,713 - INFO - [36m(setup pid=8471)[0m  Downloaded sympy
+2026-03-08 07:11:05,713 - INFO - [36m(setup pid=8471)[0m  Downloaded xgrammar
+2026-03-08 07:11:06,317 - INFO - [36m(setup pid=8471)[0m  Downloaded llguidance
+2026-03-08 07:11:06,821 - INFO - [36m(setup pid=8471)[0m  Downloaded numpy
+2026-03-08 07:11:06,821 - INFO - [36m(setup pid=8471)[0m  Downloaded transformers
+2026-03-08 07:11:06,821 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-nvjitlink-cu12
+2026-03-08 07:11:07,426 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cuda-nvrtc-cu12
+2026-03-08 07:11:08,863 - INFO - [36m(setup pid=8471)[0m  Downloaded scipy
+2026-03-08 07:11:09,869 - INFO - [36m(setup pid=8471)[0m  Downloaded llvmlite
+2026-03-08 07:11:10,875 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-curand-cu12
+2026-03-08 07:11:11,681 - INFO - [36m(setup pid=8471)[0m  Downloaded opencv-python-headless
+2026-03-08 07:11:16,502 - INFO - [36m(setup pid=8471)[0m  Downloaded xformers
+2026-03-08 07:11:18,311 - INFO - [36m(setup pid=8471)[0m  Downloaded ray
+2026-03-08 07:11:19,517 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cusparselt-cu12
+2026-03-08 07:11:20,520 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cusolver-cu12
+2026-03-08 07:11:20,520 - INFO - [36m(setup pid=8471)[0m  Downloaded triton
+2026-03-08 07:11:20,520 - INFO - [36m(setup pid=8471)[0m  Downloaded cupy-cuda12x
+2026-03-08 07:11:21,624 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cufft-cu12
+2026-03-08 07:11:21,625 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-nccl-cu12
+2026-03-08 07:11:22,532 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cusparse-cu12
+2026-03-08 07:11:25,648 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cublas-cu12
+2026-03-08 07:11:28,064 - INFO - [36m(setup pid=8471)[0m  Downloaded vllm
+2026-03-08 07:11:29,069 - INFO - [36m(setup pid=8471)[0m  Downloaded nvidia-cudnn-cu12
+2026-03-08 07:11:40,745 - INFO - [36m(setup pid=8471)[0m  Downloaded torch
+2026-03-08 07:11:40,745 - INFO - [36m(setup pid=8471)[0m Prepared 102 packages in 39.87s
+2026-03-08 07:11:40,745 - INFO - [36m(setup pid=8471)[0m Uninstalled 1 package in 13ms
+2026-03-08 07:11:42,153 - INFO - [36m(setup pid=8471)[0m Installed 106 packages in 1.56s
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + annotated-types==0.7.0
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + astor==0.8.1
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + blake3==1.0.8
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + cachetools==7.0.3
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + cbor2==5.8.0
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + cffi==2.0.0
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + cloudpickle==3.1.2
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + compressed-tensors==0.10.2
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + cuda-pathfinder==1.4.1
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + cupy-cuda12x==14.0.1
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + depyf==0.19.0
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + diskcache==5.6.3
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + distro==1.9.0
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + dnspython==2.8.0
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + einops==0.8.2
+2026-03-08 07:11:42,154 - INFO - [36m(setup pid=8471)[0m  + email-validator==2.3.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + fastapi==0.135.1
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + fastapi-cli==0.0.24
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + fastapi-cloud-cli==0.14.1
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + fastar==0.8.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + gguf==0.18.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + httptools==0.7.1
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + interegular==0.3.3
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + jinja2==3.1.6
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + jiter==0.13.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + jsonschema==4.26.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + jsonschema-specifications==2025.9.1
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + lark==1.2.2
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + llguidance==0.7.30
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + llvmlite==0.44.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + lm-format-enforcer==0.10.12
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + markupsafe==3.0.3
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + mistral-common==1.9.1
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + mpmath==1.3.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + msgpack==1.1.2
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + msgspec==0.20.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + networkx==3.6.1
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + ninja==1.13.0
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + numba==0.61.2
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  - numpy==2.4.2
+2026-03-08 07:11:42,758 - INFO - [36m(setup pid=8471)[0m  + numpy==2.2.6
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cublas-cu12==12.6.4.1
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cuda-cupti-cu12==12.6.80
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cuda-nvrtc-cu12==12.6.77
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cuda-runtime-cu12==12.6.77
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cudnn-cu12==9.5.1.17
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cufft-cu12==11.3.0.4
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cufile-cu12==1.11.1.6
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-curand-cu12==10.3.7.77
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cusolver-cu12==11.7.1.2
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cusparse-cu12==12.5.4.2
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-cusparselt-cu12==0.6.3
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-nccl-cu12==2.26.2
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-nvjitlink-cu12==12.6.85
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + nvidia-nvtx-cu12==12.6.77
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + openai==1.90.0
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + opencv-python-headless==4.13.0.92
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + outlines-core==0.2.10
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + partial-json-parser==0.2.1.1.post7
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + pillow==12.1.1
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + prometheus-client==0.24.1
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + prometheus-fastapi-instrumentator==7.1.0
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + protobuf==7.34.0
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + psutil==7.2.2
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + py-cpuinfo==9.0.0
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + pybase64==1.4.3
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + pycountry==26.2.16
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + pycparser==3.0
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + pydantic==2.12.5
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + pydantic-core==2.41.5
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + pydantic-extra-types==2.11.0
+2026-03-08 07:11:42,759 - INFO - [36m(setup pid=8471)[0m  + pydantic-settings==2.13.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + python-dotenv==1.2.2
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + python-json-logger==4.0.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + python-multipart==0.0.22
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + pyzmq==27.1.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + ray==2.54.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + referencing==0.37.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + regex==2026.2.28
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + rich-toolkit==0.19.7
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + rignore==0.7.6
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + rpds-py==0.30.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + safetensors==0.7.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + scipy==1.17.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + sentencepiece==0.2.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + sentry-sdk==2.54.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + setuptools==79.0.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + sniffio==1.3.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + soundfile==0.13.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + soxr==1.0.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + starlette==0.52.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + sympy==1.14.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + tiktoken==0.12.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + tokenizers==0.22.2
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + torch==2.7.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + torchaudio==2.7.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + torchvision==0.22.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + transformers==5.3.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + triton==3.3.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + typing-inspection==0.4.2
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + uvicorn==0.41.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + uvloop==0.22.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + vllm==0.10.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + watchfiles==1.1.1
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + websockets==16.0
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + xformers==0.0.31
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m  + xgrammar==0.1.21
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m + echo '=== Pinning transformers==4.57.3 (avoid 5.x breaking changes) ==='
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m === Pinning transformers==4.57.3 (avoid 5.x breaking changes) ===
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m + uv pip install transformers==4.57.3
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m Resolved 18 packages in 531ms
+2026-03-08 07:11:42,760 - INFO - [36m(setup pid=8471)[0m Downloading transformers (11.4MiB)
+2026-03-08 07:11:43,565 - INFO - [36m(setup pid=8471)[0m  Downloaded transformers
+2026-03-08 07:11:43,565 - INFO - [36m(setup pid=8471)[0m Prepared 2 packages in 775ms
+2026-03-08 07:11:43,565 - INFO - [36m(setup pid=8471)[0m Uninstalled 2 packages in 74ms
+2026-03-08 07:11:44,268 - INFO - [36m(setup pid=8471)[0m Installed 2 packages in 74ms
+2026-03-08 07:11:44,269 - INFO - [36m(setup pid=8471)[0m  - huggingface-hub==1.6.0
+2026-03-08 07:11:44,269 - INFO - [36m(setup pid=8471)[0m  + huggingface-hub==0.36.2
+2026-03-08 07:11:44,269 - INFO - [36m(setup pid=8471)[0m  - transformers==5.3.0
+2026-03-08 07:11:44,269 - INFO - [36m(setup pid=8471)[0m  + transformers==4.57.3
+2026-03-08 07:11:44,269 - INFO - [36m(setup pid=8471)[0m + echo '=== PyTorch CUDA Check ==='
+2026-03-08 07:11:44,269 - INFO - [36m(setup pid=8471)[0m === PyTorch CUDA Check ===
+2026-03-08 07:11:44,269 - INFO - [36m(setup pid=8471)[0m + python3 -c 'import torch; print('\''torch.cuda.is_available():'\'', torch.cuda.is_available()); print('\''torch.version.cuda:'\'', torch.version.cuda); print('\''torch.__version__:'\'', torch.__version__); print('\''torch.cuda.device_count():'\'', torch.cuda.device_count() if torch.cuda.is_available() else '\''N/A'\'')'
+2026-03-08 07:11:50,813 - INFO - [36m(setup pid=8471)[0m torch.cuda.is_available(): True
+2026-03-08 07:11:50,813 - INFO - [36m(setup pid=8471)[0m torch.version.cuda: 12.6
+2026-03-08 07:11:50,813 - INFO - [36m(setup pid=8471)[0m torch.__version__: 2.7.1+cu126
+2026-03-08 07:11:51,517 - INFO - [36m(setup pid=8471)[0m torch.cuda.device_count(): 8
+2026-03-08 07:11:52,122 - INFO - [36m(setup pid=8471)[0m + echo ===========================
+2026-03-08 07:11:52,122 - INFO - [36m(setup pid=8471)[0m ===========================
+2026-03-08 07:11:52,122 - INFO - [36m(setup pid=8471)[0m + echo '=== Setup complete ==='
+2026-03-08 07:11:52,122 - INFO - [36m(setup pid=8471)[0m === Setup complete ===
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export CUDA_HOME=/usr/local/cuda
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + CUDA_HOME=/usr/local/cuda
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '=== Pre-run Diagnostics ==='
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m === Pre-run Diagnostics ===
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + nvidia-smi
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Sun Mar  8 01:41:52 2026
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +---------------------------------------------------------------------------------------+
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | NVIDIA-SMI 535.216.01             Driver Version: 535.216.01   CUDA Version: 12.2     |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |               MIG M. |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |=========================================+======================+======================|
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |   0  NVIDIA L4                      On  | 00000000:9F:00.0 Off |                    0 |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | N/A   32C    P8              16W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |   1  NVIDIA L4                      On  | 00000000:A1:00.0 Off |                    0 |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | N/A   28C    P8              12W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |   2  NVIDIA L4                      On  | 00000000:A3:00.0 Off |                    0 |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | N/A   31C    P8              12W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |   3  NVIDIA L4                      On  | 00000000:A5:00.0 Off |                    0 |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | N/A   31C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |   4  NVIDIA L4                      On  | 00000000:AE:00.0 Off |                    0 |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | N/A   30C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:11:52,626 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:53,229 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |   5  NVIDIA L4                      On  | 00000000:B0:00.0 Off |                    0 |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | N/A   30C    P8              11W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |   6  NVIDIA L4                      On  | 00000000:B2:00.0 Off |                    0 |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | N/A   28C    P8              16W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |   7  NVIDIA L4                      On  | 00000000:B4:00.0 Off |                    0 |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | N/A   29C    P8              12W /  72W |      0MiB / 23034MiB |      0%      Default |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |                                         |                      |                  N/A |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +-----------------------------------------+----------------------+----------------------+
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +---------------------------------------------------------------------------------------+
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m | Processes:                                                                            |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |        ID   ID                                                             Usage      |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |=======================================================================================|
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m |  No running processes found                                                           |
+2026-03-08 07:11:53,230 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m +---------------------------------------------------------------------------------------+
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- A100 SXM4 Diagnostics ---'
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- A100 SXM4 Diagnostics ---
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'Checking NVIDIA Fabric Manager (required for NVSwitch on A100-SXM4)...'
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Checking NVIDIA Fabric Manager (required for NVSwitch on A100-SXM4)...
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + systemctl status nvidia-fabricmanager
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Unit nvidia-fabricmanager.service could not be found.
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'Fabric Manager status check failed or not present'
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Fabric Manager status check failed or not present
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'Checking for NVLink topology...'
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Checking for NVLink topology...
+2026-03-08 07:11:54,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + nvidia-smi topo -m
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 	[4mGPU0	GPU1	GPU2	GPU3	GPU4	GPU5	GPU6	GPU7	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU0	 X 	NODE	NODE	NODE	SYS	SYS	SYS	SYS	0-47,96-143	0		N/A
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU1	NODE	 X 	NODE	NODE	SYS	SYS	SYS	SYS	0-47,96-143	0		N/A
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU2	NODE	NODE	 X 	NODE	SYS	SYS	SYS	SYS	0-47,96-143	0		N/A
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU3	NODE	NODE	NODE	 X 	SYS	SYS	SYS	SYS	0-47,96-143	0		N/A
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU4	SYS	SYS	SYS	SYS	 X 	NODE	NODE	NODE	48-95,144-191	1		N/A
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU5	SYS	SYS	SYS	SYS	NODE	 X 	NODE	NODE	48-95,144-191	1		N/A
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU6	SYS	SYS	SYS	SYS	NODE	NODE	 X 	NODE	48-95,144-191	1		N/A
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU7	SYS	SYS	SYS	SYS	NODE	NODE	NODE	 X 	48-95,144-191	1		N/A
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Legend:
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   X    = Self
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   PIX  = Connection traversing at most a single PCIe bridge
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   NV#  = Connection traversing a bonded set of # NVLinks
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- NUMA Topology and GPU-NUMA Mapping ---'
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- NUMA Topology and GPU-NUMA Mapping ---
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'NUMA hardware layout:'
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m NUMA hardware layout:
+2026-03-08 07:11:55,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numactl --hardware
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m available: 2 nodes (0-1)
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m node 0 cpus: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m node 0 size: 372826 MB
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m node 0 free: 295746 MB
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m node 1 cpus: 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m node 1 size: 372846 MB
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m node 1 free: 361443 MB
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m node distances:
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m node   0   1
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   0:  10  32
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m   1:  32  10
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo ''
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU PCIe Bus IDs and NUMA node assignments:'
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU PCIe Bus IDs and NUMA node assignments:
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=count --format=csv,noheader
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ head -1
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + gpu_count=8
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' 8 -gt 0 ']'
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ seq 0 7
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + for gpu in $(seq 0 $((gpu_count - 1)))
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i 0
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus=00000000:9F:00.0
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' -n 00000000:9F:00.0 ']'
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo 00000000:9F:00.0
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ tr '[:upper:]' '[:lower:]'
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus_lower=00000000:9f:00.0
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:9f:00.0/numa_node
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numa_node=N/A
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:9f:00.0/local_cpulist
+2026-03-08 07:11:55,242 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU0: PCIe=00000000:9F:00.0, NUMA_node=N/A, local_cpus=N/A'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU0: PCIe=00000000:9F:00.0, NUMA_node=N/A, local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + for gpu in $(seq 0 $((gpu_count - 1)))
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i 1
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus=00000000:A1:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' -n 00000000:A1:00.0 ']'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo 00000000:A1:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ tr '[:upper:]' '[:lower:]'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus_lower=00000000:a1:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:a1:00.0/numa_node
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numa_node=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:a1:00.0/local_cpulist
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU1: PCIe=00000000:A1:00.0, NUMA_node=N/A, local_cpus=N/A'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU1: PCIe=00000000:A1:00.0, NUMA_node=N/A, local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + for gpu in $(seq 0 $((gpu_count - 1)))
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i 2
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus=00000000:A3:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' -n 00000000:A3:00.0 ']'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo 00000000:A3:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ tr '[:upper:]' '[:lower:]'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus_lower=00000000:a3:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:a3:00.0/numa_node
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numa_node=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:a3:00.0/local_cpulist
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU2: PCIe=00000000:A3:00.0, NUMA_node=N/A, local_cpus=N/A'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU2: PCIe=00000000:A3:00.0, NUMA_node=N/A, local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + for gpu in $(seq 0 $((gpu_count - 1)))
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i 3
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus=00000000:A5:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' -n 00000000:A5:00.0 ']'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo 00000000:A5:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ tr '[:upper:]' '[:lower:]'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus_lower=00000000:a5:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:a5:00.0/numa_node
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numa_node=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:a5:00.0/local_cpulist
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU3: PCIe=00000000:A5:00.0, NUMA_node=N/A, local_cpus=N/A'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU3: PCIe=00000000:A5:00.0, NUMA_node=N/A, local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + for gpu in $(seq 0 $((gpu_count - 1)))
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i 4
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus=00000000:AE:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' -n 00000000:AE:00.0 ']'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo 00000000:AE:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ tr '[:upper:]' '[:lower:]'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus_lower=00000000:ae:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:ae:00.0/numa_node
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numa_node=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:ae:00.0/local_cpulist
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU4: PCIe=00000000:AE:00.0, NUMA_node=N/A, local_cpus=N/A'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU4: PCIe=00000000:AE:00.0, NUMA_node=N/A, local_cpus=N/A
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + for gpu in $(seq 0 $((gpu_count - 1)))
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i 5
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus=00000000:B0:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' -n 00000000:B0:00.0 ']'
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo 00000000:B0:00.0
+2026-03-08 07:11:55,243 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ tr '[:upper:]' '[:lower:]'
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus_lower=00000000:b0:00.0
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:b0:00.0/numa_node
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numa_node=N/A
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:b0:00.0/local_cpulist
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + local_cpus=N/A
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU5: PCIe=00000000:B0:00.0, NUMA_node=N/A, local_cpus=N/A'
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU5: PCIe=00000000:B0:00.0, NUMA_node=N/A, local_cpus=N/A
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + for gpu in $(seq 0 $((gpu_count - 1)))
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i 6
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus=00000000:B2:00.0
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' -n 00000000:B2:00.0 ']'
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo 00000000:B2:00.0
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ tr '[:upper:]' '[:lower:]'
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus_lower=00000000:b2:00.0
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:b2:00.0/numa_node
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,244 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numa_node=N/A
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:b2:00.0/local_cpulist
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + local_cpus=N/A
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU6: PCIe=00000000:B2:00.0, NUMA_node=N/A, local_cpus=N/A'
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU6: PCIe=00000000:B2:00.0, NUMA_node=N/A, local_cpus=N/A
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + for gpu in $(seq 0 $((gpu_count - 1)))
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ nvidia-smi --query-gpu=pci.bus_id --format=csv,noheader -i 7
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus=00000000:B4:00.0
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + '[' -n 00000000:B4:00.0 ']'
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ tr '[:upper:]' '[:lower:]'
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo 00000000:B4:00.0
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + bus_lower=00000000:b4:00.0
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:b4:00.0/numa_node
+2026-03-08 07:11:55,745 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + numa_node=N/A
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ cat /sys/bus/pci/devices/00000000:b4:00.0/local_cpulist
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ echo N/A
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + local_cpus=N/A
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'GPU7: PCIe=00000000:B4:00.0, NUMA_node=N/A, local_cpus=N/A'
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m GPU7: PCIe=00000000:B4:00.0, NUMA_node=N/A, local_cpus=N/A
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo -------------------------------------------
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m -------------------------------------------
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'Checking for GPU processes and errors...'
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Checking for GPU processes and errors...
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + awk 'NR<=50'
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + nvidia-smi -q -d ERRORS
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Failed to parse --display/-d flags
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'Error check failed'
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Error check failed
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- CUDA Device Query ---'
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- CUDA Device Query ---
+2026-03-08 07:11:55,746 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + python3 -c 'import ctypes; cudart = ctypes.CDLL('\''libcudart.so.12'\''); count = ctypes.c_int(); result = cudart.cudaGetDeviceCount(ctypes.byref(count)); print(f'\''cudaGetDeviceCount result: {result} (0=success), device count: {count.value}'\'')'
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m cudaGetDeviceCount result: 0 (0=success), device count: 8
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo ===========================
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ===========================
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + source .venv/bin/activate
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' -n x ']'
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ SCRIPT_PATH=.venv/bin/activate
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' .venv/bin/activate = /tmp/sky_app_00d0vdtu ']'
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ deactivate nondestructive
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ unset -f pydoc
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:11:56,348 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ hash -r
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ unset VIRTUAL_ENV
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ unset VIRTUAL_ENV_PROMPT
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' '!' nondestructive = nondestructive ']'
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ VIRTUAL_ENV=/home/ubuntu/sky_workdir/.venv
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' linux-gnu = cygwin ']'
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' linux-gnu = msys ']'
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ export VIRTUAL_ENV
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:11:56,349 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ unset SCRIPT_PATH
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ _OLD_VIRTUAL_PATH=/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ PATH=/home/ubuntu/sky_workdir/.venv/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ export PATH
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' xsky_workdir '!=' x ']'
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ VIRTUAL_ENV_PROMPT=sky_workdir
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ export VIRTUAL_ENV_PROMPT
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ '[' -z '' ']'
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ _OLD_VIRTUAL_PS1='(base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ PS1='(sky_workdir) (base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ export PS1
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ alias pydoc
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ true
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ++ hash -r
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '=== DETAILED PyTorch CUDA Diagnostics (in run phase) ==='
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m === DETAILED PyTorch CUDA Diagnostics (in run phase) ===
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- Environment ---'
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- Environment ---
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'LD_LIBRARY_PATH: /usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:'
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m LD_LIBRARY_PATH: /usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'CUDA_HOME: /usr/local/cuda'
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m CUDA_HOME: /usr/local/cuda
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + which python3
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m /home/ubuntu/sky_workdir/.venv/bin/python3
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- Torch info ---'
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- Torch info ---
+2026-03-08 07:11:56,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + python3 -c 'import torch; print('\''torch.__version__:'\'', torch.__version__); print('\''torch.__file__:'\'', torch.__file__); print('\''torch.version.cuda:'\'', torch.version.cuda); print('\''torch.backends.cuda.is_built():'\'', torch.backends.cuda.is_built())'
+2026-03-08 07:11:57,556 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torch.__version__: 2.7.1+cu126
+2026-03-08 07:11:57,556 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torch.__file__: /home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/__init__.py
+2026-03-08 07:11:57,556 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torch.version.cuda: 12.6
+2026-03-08 07:11:57,556 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torch.backends.cuda.is_built(): True
+2026-03-08 07:11:58,260 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- CUDA check ---'
+2026-03-08 07:11:58,260 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- CUDA check ---
+2026-03-08 07:11:58,260 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + python3 -c 'import torch; print('\''torch.cuda.is_available():'\'', torch.cuda.is_available()); print('\''torch.cuda.device_count():'\'', torch.cuda.device_count() if torch.cuda.is_available() else '\''N/A - checking why...'\'')'
+2026-03-08 07:11:59,972 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torch.cuda.is_available(): True
+2026-03-08 07:11:59,972 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torch.cuda.device_count(): 8
+2026-03-08 07:12:00,775 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- Loading CUDA libs directly ---'
+2026-03-08 07:12:00,775 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- Loading CUDA libs directly ---
+2026-03-08 07:12:00,775 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + python3 -c 'import ctypes; libs=['\''libcuda.so.1'\'','\''libcudart.so.12'\'','\''libnvidia-ml.so.1'\'']; [print(l+'\'': OK'\'') if ctypes.CDLL(l) else None for l in libs]'
+2026-03-08 07:12:00,775 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m libcuda.so.1: OK
+2026-03-08 07:12:00,775 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m libcudart.so.12: OK
+2026-03-08 07:12:00,775 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m libnvidia-ml.so.1: OK
+2026-03-08 07:12:00,775 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- Manual CUDA init attempt ---'
+2026-03-08 07:12:00,776 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- Manual CUDA init attempt ---
+2026-03-08 07:12:00,776 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + python3 -c 'import torch; torch.cuda.init(); print('\''torch.cuda.init() OK, device_count:'\'', torch.cuda.device_count())'
+2026-03-08 07:12:02,793 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torch.cuda.init() OK, device_count: 8
+2026-03-08 07:12:03,398 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo '--- Installed torch packages ---'
+2026-03-08 07:12:03,398 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m --- Installed torch packages ---
+2026-03-08 07:12:03,398 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + pip list
+2026-03-08 07:12:03,398 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + grep --color=auto -i -E 'torch|nvidia|cuda|triton'
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m cuda-pathfinder                   1.4.1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m cupy-cuda12x                      14.0.1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cublas-cu12                12.6.4.1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cuda-cupti-cu12            12.6.80
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cuda-nvrtc-cu12            12.6.77
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cuda-runtime-cu12          12.6.77
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cudnn-cu12                 9.5.1.17
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cufft-cu12                 11.3.0.4
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cufile-cu12                1.11.1.6
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-curand-cu12                10.3.7.77
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cusolver-cu12              11.7.1.2
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cusparse-cu12              12.5.4.2
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-cusparselt-cu12            0.6.3
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-ml-py                      13.590.48
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-nccl-cu12                  2.26.2
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-nvjitlink-cu12             12.6.85
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m nvidia-nvtx-cu12                  12.6.77
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torch                             2.7.1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torchaudio                        2.7.1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m torchvision                       0.22.1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m triton                            3.3.1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo =========================================
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m =========================================
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export NCCL_P2P_DISABLE=0
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + NCCL_P2P_DISABLE=0
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export NCCL_TIMEOUT=3600
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + NCCL_TIMEOUT=3600
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export TORCH_NCCL_BLOCKING_WAIT=1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + TORCH_NCCL_BLOCKING_WAIT=1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export TORCH_DISTRIBUTED_DEBUG=DETAIL
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + TORCH_DISTRIBUTED_DEBUG=DETAIL
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export NCCL_DEBUG=INFO
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + NCCL_DEBUG=INFO
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export RAY_DASHBOARD_HOST=0.0.0.0
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + RAY_DASHBOARD_HOST=0.0.0.0
+2026-03-08 07:12:04,001 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export RAY_HEAD_PORT=6379
+2026-03-08 07:12:04,002 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + RAY_HEAD_PORT=6379
+2026-03-08 07:12:04,002 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + export RAY_DASHBOARD_PORT=8265
+2026-03-08 07:12:04,002 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + RAY_DASHBOARD_PORT=8265
+2026-03-08 07:12:04,002 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + echo 'Starting Ray for single-node pipeline parallelism...'
+2026-03-08 07:12:04,002 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Starting Ray for single-node pipeline parallelism...
+2026-03-08 07:12:04,002 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + uv run ray start --head --port=6379 --dashboard-host=0.0.0.0 --dashboard-port=8265 --num-cpus=0
+2026-03-08 07:12:06,017 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:05,866	INFO usage_lib.py:447 -- Usage stats collection is disabled.
+2026-03-08 07:12:06,017 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:05,866	INFO scripts.py:936 -- Local node IP: 172.31.35.143
+2026-03-08 07:12:11,045 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	SUCC scripts.py:975 -- --------------------
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	SUCC scripts.py:976 -- Ray runtime started.
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	SUCC scripts.py:977 -- --------------------
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:979 -- Next steps
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:982 -- To add another node to this Ray cluster, run
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:985 --   ray start --address='172.31.35.143:6379'
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:996 -- To connect to this Ray cluster:
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:998 -- import ray
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:999 -- ray.init()
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:1032 -- To terminate the Ray runtime, run
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:1033 --   ray stop
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:1036 -- To view the status of the cluster, use
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:42:10,635	INFO scripts.py:1037 --   ray status
+2026-03-08 07:12:11,046 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + sleep 5
+2026-03-08 07:12:16,273 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + uv run ray status --address=127.0.0.1:6379
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======== Autoscaler status: 2026-03-08 01:42:12.899244 ========
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Node status
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ---------------------------------------------------------------
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Active:
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m  1 node_75491c5c809bf86db18360548348c4ae15d3c16cefc7e4ad30a56b9a
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Pending:
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m  (no pending nodes)
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Recent failures:
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m  (no failures)
+2026-03-08 07:12:16,878 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Resources
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ---------------------------------------------------------------
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Total Usage:
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m  0.0/8.0 GPU
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m  0B/523.89GiB memory
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m  0B/186.26GiB object_store_memory
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m From request_resources:
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m  (none)
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Pending Demands:
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m  (no resource demands)
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + PYTHONHASHSEED=0
+2026-03-08 07:12:16,879 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m + python roofline_benchmarks/benchmark_roofline-tp2-pp4-L4.py
+2026-03-08 07:12:18,187 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🚀 Starting vLLM server: /home/ubuntu/sky_workdir/.venv/bin/python -m vllm.entrypoints.openai.api_server --model /models/Qwen/Qwen3-32B --tensor-parallel-size 2 --pipeline-parallel-size 4 --max-model-len 18432 --gpu-memory-utilization 0.85 --enforce-eager --disable-log-requests --port 8000 --distributed-executor-backend ray
+2026-03-08 07:12:18,890 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ⏳ Waiting for server health (timeout=600s)...
+2026-03-08 07:13:57,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Server healthy after 99.0s
+2026-03-08 07:13:57,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Parsed from server log: KV cache=337888 tokens, num_gpu_blocks=21118, block_size=16
+2026-03-08 07:13:57,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 target_concurrency = 18 (21118 blocks × 16 / 18432)
+2026-03-08 07:13:57,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:13:57,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 07:13:57,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=128, output=128
+2026-03-08 07:13:57,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 07:13:57,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 07:13:58,151 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:43:57,770	INFO worker.py:1810 -- Connecting to existing Ray cluster at address: 172.31.35.143:6379...
+2026-03-08 07:13:58,852 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 2026-03-08 01:43:57,929	INFO worker.py:2013 -- Connected to Ray cluster.
+2026-03-08 07:13:58,852 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 07:13:58,852 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 07:14:02,273 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 07:14:02,979 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 07:14:02,979 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 07:14:02,979 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 07:14:02,979 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 07:14:04,788 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:14:04,788 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Generating test split:   0%|          | 0/100 [00:00<?, ? examples/s]
+2026-03-08 07:14:04,788 - INFO - Generating test split: 100%|██████████| 100/100 [00:00<00:00, 499.30 examples/s]
+2026-03-08 07:14:04,788 - INFO - Generating test split: 100%|██████████| 100/100 [00:00<00:00, 489.12 examples/s]
+2026-03-08 07:14:05,595 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 07:14:59,000 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:14:59,000 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 07:14:59,000 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 07:14:59,000 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 53.9s
+2026-03-08 07:14:59,000 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 07:14:59,000 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 454.7 / 1213.4 / 1222.2 ms
+2026-03-08 07:14:59,000 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 18155.1 / 18743.9 / 18750.0 ms
+2026-03-08 07:14:59,606 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 07:15:01,616 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 07:15:04,841 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 07:15:05,747 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 07:15:05,747 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 07:15:05,747 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 07:15:05,747 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 07:15:07,759 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 07:15:22,250 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 07:16:52,705 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:16:52,706 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 07:16:52,706 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 72/72 successful
+2026-03-08 07:16:52,706 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 90.3s
+2026-03-08 07:16:52,706 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/client_results_tp2_pp4_in128_out128.json
+2026-03-08 07:16:52,706 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 1866.9 / 1881.8 / 1882.3 ms
+2026-03-08 07:16:52,706 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 22651.5 / 22686.4 / 22686.5 ms
+2026-03-08 07:16:53,312 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 GPU monitoring: local (single node)
+2026-03-08 07:16:53,312 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📈 Time-series saved to /tmp/timeseries_tp2_pp4_in128_out128.json
+2026-03-08 07:16:54,015 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Result: success
+2026-03-08 07:16:54,015 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:16:54,015 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 07:16:54,015 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=128, output=2048
+2026-03-08 07:16:54,015 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 07:16:54,016 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 07:16:54,016 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 07:16:54,016 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 07:16:56,733 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 07:16:57,637 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 07:16:57,638 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 07:16:57,638 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 07:16:57,638 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 07:16:58,138 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 07:31:03,663 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:31:03,663 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 07:31:03,663 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 07:31:03,663 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 845.5s
+2026-03-08 07:31:03,663 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 07:31:03,663 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 172.4 / 225.1 / 225.2 ms
+2026-03-08 07:31:03,663 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 286336.3 / 286740.7 / 286740.9 ms
+2026-03-08 07:31:04,467 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 07:31:06,479 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 07:31:09,498 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 07:31:10,305 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 07:31:10,305 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 07:31:10,305 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 07:31:10,305 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 07:31:12,817 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 07:31:27,097 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 07:55:06,823 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:55:06,823 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 07:55:06,823 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 72/72 successful
+2026-03-08 07:55:06,823 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 1419.7s
+2026-03-08 07:55:06,823 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/client_results_tp2_pp4_in128_out2048.json
+2026-03-08 07:55:06,823 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 455.9 / 485.9 / 486.5 ms
+2026-03-08 07:55:06,823 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 354869.0 / 355066.1 / 355066.3 ms
+2026-03-08 07:55:07,628 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 GPU monitoring: local (single node)
+2026-03-08 07:55:07,628 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📈 Time-series saved to /tmp/timeseries_tp2_pp4_in128_out2048.json
+2026-03-08 07:55:08,331 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Result: success
+2026-03-08 07:55:08,332 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:55:08,332 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 07:55:08,332 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=512, output=256
+2026-03-08 07:55:08,332 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 07:55:08,332 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 07:55:08,332 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 07:55:08,332 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 07:55:11,040 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 07:55:11,948 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 07:55:11,948 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 07:55:11,948 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 07:55:11,948 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 07:55:12,450 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 07:56:59,192 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 07:56:59,192 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 07:56:59,192 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 07:56:59,192 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 106.6s
+2026-03-08 07:56:59,192 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 07:56:59,192 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 640.1 / 645.3 / 645.5 ms
+2026-03-08 07:56:59,192 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 36180.8 / 36214.4 / 36214.4 ms
+2026-03-08 07:56:59,797 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 07:57:01,812 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 07:57:05,034 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 07:57:05,737 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 07:57:05,737 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 07:57:05,737 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 07:57:05,737 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 07:57:08,157 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 07:57:22,851 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 08:00:05,442 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:00:05,443 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 08:00:05,443 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 72/72 successful
+2026-03-08 08:00:05,443 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 162.7s
+2026-03-08 08:00:05,443 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/client_results_tp2_pp4_in512_out256.json
+2026-03-08 08:00:05,443 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 2088.3 / 2426.2 / 2427.4 ms
+2026-03-08 08:00:05,443 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 40573.7 / 41266.1 / 41266.3 ms
+2026-03-08 08:00:06,251 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 GPU monitoring: local (single node)
+2026-03-08 08:00:06,251 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📈 Time-series saved to /tmp/timeseries_tp2_pp4_in512_out256.json
+2026-03-08 08:00:06,956 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Result: success
+2026-03-08 08:00:06,956 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:00:06,957 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 08:00:06,957 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=512, output=1024
+2026-03-08 08:00:06,957 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 08:00:06,957 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 08:00:06,957 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 08:00:06,957 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 08:00:09,673 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 08:00:10,376 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 08:00:10,376 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 08:00:10,376 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 08:00:10,376 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 08:00:10,978 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 08:07:13,359 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:07:13,359 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 08:07:13,359 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 08:07:13,359 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 422.3s
+2026-03-08 08:07:13,359 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 08:07:13,359 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 176.8 / 182.6 / 182.9 ms
+2026-03-08 08:07:13,359 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 143076.0 / 143153.3 / 143153.4 ms
+2026-03-08 08:07:13,962 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 08:07:16,177 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 08:07:19,401 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 08:07:20,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 08:07:20,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 08:07:20,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 08:07:20,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 08:07:22,622 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 08:07:37,206 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 08:19:23,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:19:23,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 08:19:23,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 72/72 successful
+2026-03-08 08:19:23,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 705.9s
+2026-03-08 08:19:23,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/client_results_tp2_pp4_in512_out1024.json
+2026-03-08 08:19:23,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 462.0 / 499.6 / 500.3 ms
+2026-03-08 08:19:23,104 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 176427.1 / 176627.1 / 176627.9 ms
+2026-03-08 08:19:23,908 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 GPU monitoring: local (single node)
+2026-03-08 08:19:23,908 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📈 Time-series saved to /tmp/timeseries_tp2_pp4_in512_out1024.json
+2026-03-08 08:19:24,613 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Result: success
+2026-03-08 08:19:24,613 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:19:24,613 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 08:19:24,613 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=1024, output=512
+2026-03-08 08:19:24,613 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 08:19:24,613 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 08:19:24,613 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 08:19:24,613 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 08:19:27,533 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 08:19:28,239 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 08:19:28,239 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 08:19:28,239 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 08:19:28,239 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 08:19:28,954 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 08:23:02,435 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:23:02,435 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 08:23:02,435 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 08:23:02,435 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 213.5s
+2026-03-08 08:23:02,436 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 08:23:02,436 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 820.6 / 827.5 / 827.7 ms
+2026-03-08 08:23:02,436 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 72357.0 / 72537.7 / 72538.0 ms
+2026-03-08 08:23:03,241 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 08:23:05,247 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 08:23:08,667 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 08:23:09,571 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 08:23:09,571 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 08:23:09,571 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 08:23:09,571 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 08:23:12,086 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 08:23:26,482 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 08:29:11,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:29:11,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 08:29:11,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 72/72 successful
+2026-03-08 08:29:11,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 345.0s
+2026-03-08 08:29:11,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/client_results_tp2_pp4_in1024_out512.json
+2026-03-08 08:29:11,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 1973.3 / 3059.9 / 3188.8 ms
+2026-03-08 08:29:11,536 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 86307.9 / 87117.9 / 87160.4 ms
+2026-03-08 08:29:12,342 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 GPU monitoring: local (single node)
+2026-03-08 08:29:12,342 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📈 Time-series saved to /tmp/timeseries_tp2_pp4_in1024_out512.json
+2026-03-08 08:29:12,342 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Result: success
+2026-03-08 08:29:12,342 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:29:12,342 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 08:29:12,342 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=1024, output=4096
+2026-03-08 08:29:12,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 08:29:12,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 08:29:12,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 08:29:12,343 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 08:29:15,969 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 08:29:16,573 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 08:29:16,574 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 08:29:16,574 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 08:29:16,574 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 08:29:17,280 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 08:57:27,276 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 08:57:27,276 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 08:57:27,276 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 08:57:27,276 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 1690.1s
+2026-03-08 08:57:27,276 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 08:57:27,276 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 209.5 / 310.6 / 314.6 ms
+2026-03-08 08:57:27,276 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 555264.5 / 582888.9 / 582905.2 ms
+2026-03-08 08:57:28,082 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 08:57:30,090 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 08:57:33,512 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 08:57:34,217 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 08:57:34,218 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 08:57:34,218 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 08:57:34,218 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 08:57:36,531 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 08:57:50,911 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 09:37:54,283 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 09:37:54,283 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 09:37:54,283 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 0/72 successful
+2026-03-08 09:37:54,283 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 2403.3s
+2026-03-08 09:37:54,283 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/client_results_tp2_pp4_in1024_out4096.json
+2026-03-08 09:37:55,088 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 GPU monitoring: local (single node)
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📈 Time-series saved to /tmp/timeseries_tp2_pp4_in1024_out4096.json
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Result: success
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=2048, output=512
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 09:37:55,692 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 09:37:58,602 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 09:37:59,508 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 09:37:59,508 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 09:37:59,508 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 09:37:59,509 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 09:38:00,010 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 09:41:35,160 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 09:41:35,161 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 09:41:35,161 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 09:41:35,161 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 214.9s
+2026-03-08 09:41:35,161 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 09:41:35,161 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 1784.6 / 2452.8 / 2562.2 ms
+2026-03-08 09:41:35,161 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 70904.4 / 74640.4 / 74646.3 ms
+2026-03-08 09:41:35,765 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 09:41:37,777 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 09:41:40,894 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 09:41:41,799 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 09:41:41,799 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 09:41:41,799 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 09:41:41,799 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 09:41:44,105 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 09:41:58,780 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 09:47:59,813 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 09:47:59,813 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 09:47:59,813 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 72/72 successful
+2026-03-08 09:47:59,813 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 361.2s
+2026-03-08 09:47:59,813 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/client_results_tp2_pp4_in2048_out512.json
+2026-03-08 09:47:59,813 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 2474.9 / 5393.5 / 5740.2 ms
+2026-03-08 09:47:59,813 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 90110.8 / 93056.6 / 93523.0 ms
+2026-03-08 09:48:00,816 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 GPU monitoring: local (single node)
+2026-03-08 09:48:00,816 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📈 Time-series saved to /tmp/timeseries_tp2_pp4_in2048_out512.json
+2026-03-08 09:48:01,520 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Result: success
+2026-03-08 09:48:01,520 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 09:48:01,520 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 09:48:01,520 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=4096, output=256
+2026-03-08 09:48:01,520 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 09:48:01,520 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 09:48:01,520 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 09:48:01,520 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 09:48:04,231 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 09:48:04,935 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 09:48:04,935 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 09:48:04,935 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 09:48:04,935 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 09:48:05,638 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 09:49:57,450 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 09:49:57,451 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 09:49:57,451 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 09:49:57,451 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 111.7s
+2026-03-08 09:49:57,451 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 09:49:57,451 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 1900.1 / 3370.7 / 3582.5 ms
+2026-03-08 09:49:57,451 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 37087.5 / 39705.9 / 39984.7 ms
+2026-03-08 09:49:58,053 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 09:50:00,061 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 09:50:03,174 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 09:50:04,082 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 09:50:04,082 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 09:50:04,082 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 09:50:04,082 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 09:50:06,596 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 09:50:21,273 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 09:53:52,714 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 09:53:52,714 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 09:53:52,714 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 72/72 successful
+2026-03-08 09:53:52,714 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 211.5s
+2026-03-08 09:53:52,714 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/client_results_tp2_pp4_in4096_out256.json
+2026-03-08 09:53:52,714 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 3329.9 / 7110.4 / 7652.8 ms
+2026-03-08 09:53:52,714 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 52718.1 / 55211.8 / 56186.3 ms
+2026-03-08 09:53:53,719 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 GPU monitoring: local (single node)
+2026-03-08 09:53:53,719 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📈 Time-series saved to /tmp/timeseries_tp2_pp4_in4096_out256.json
+2026-03-08 09:53:54,422 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Result: success
+2026-03-08 09:53:54,422 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 09:53:54,422 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 09:53:54,422 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running: TP=2, PP=4, input=4096, output=1024
+2026-03-08 09:53:54,422 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Target concurrency: 18
+2026-03-08 09:53:54,422 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ======================================================================
+2026-03-08 09:53:54,422 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-08 09:53:54,422 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 🔥 Running warmup (5 requests)...
+2026-03-08 09:53:57,136 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 09:53:57,842 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 09:53:57,842 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 09:53:57,842 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 09:53:57,842 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 09:53:58,346 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-08 10:01:08,097 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m
+2026-03-08 10:01:08,097 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ============================================================
+2026-03-08 10:01:08,097 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Benchmark complete: 5/5 successful
+2026-03-08 10:01:08,097 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Wall clock: 429.7s
+2026-03-08 10:01:08,097 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Results saved to: /tmp/warmup_results.json
+2026-03-08 10:01:08,097 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m TTFT p50/p95/p99: 2262.9 / 2343.6 / 2350.9 ms
+2026-03-08 10:01:08,097 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m E2E  p50/p95/p99: 141704.3 / 147314.3 / 147330.1 ms
+2026-03-08 10:01:08,903 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m ✅ Warmup complete
+2026-03-08 10:01:10,912 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m 📊 Running benchmark: 72 requests, concurrency=18
+2026-03-08 10:01:14,129 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading tokenizer for /models/Qwen/Qwen3-32B...
+2026-03-08 10:01:14,834 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Loading dataset emozilla/pg19-test...
+2026-03-08 10:01:14,835 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m `trust_remote_code` is not supported anymore.
+2026-03-08 10:01:14,835 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-08 10:01:14,835 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-08 10:01:17,347 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-08 10:01:32,111 - INFO - [36m(roofline-tp2-pp4-L4, pid=8471)[0m Running 72 benchmark requests (concurrency=18)...
+2026-03-08 10:03:23,994 - INFO - 'sky.logs' request 81793c23-94c0-444d-ac91-698bf879c34f cancelled
+2026-03-08 10:03:24,857 - INFO - sky.exceptions.RequestCancelled: [33mCurrent 'sky.logs' request (81793c23-94c0-444d-ac91-698bf879c34f) is cancelled by another process.[0m
+2026-03-08 10:03:25,043 - ERROR - ❌ Cluster error: Command 'sky launch' returned non-zero exit status 1.
+2026-03-08 10:03:25,044 - INFO - 📥 Attempting to fetch results (benchmark may have completed)...
+2026-03-08 10:03:25,044 - INFO - 📥 Fetching results.json from cluster...
+2026-03-08 10:03:30,756 - INFO - 📈 Attempting to fetch timeseries data from cluster (best-effort)...
