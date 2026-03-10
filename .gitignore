@@ -1,1 +1,7 @@
 docs/
+__pycache__/
+roofline/vllm/roofline_benchmarks/benchmark_rf-*
+roofline/vllm/roofline_benchmarks/rf-*
+roofline/vllm/roofline_benchmarks/roofline-*
+roofline/vllm/sweep_L*.csv
+roofline/vllm/sweep_results_*.csv
