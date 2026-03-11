@@ -1,0 +1,8 @@
+tp,pp,max_input_length,max_output_length,model,status,error
+8,1,128,128,Qwen/Qwen2.5-72B-Instruct,cluster_error,Command 'sky launch' returned non-zero exit status 100.
+8,1,128,2048,Qwen/Qwen2.5-72B-Instruct,cluster_error,Command 'sky launch' returned non-zero exit status 100.
+8,1,512,1024,Qwen/Qwen2.5-72B-Instruct,cluster_error,Command 'sky launch' returned non-zero exit status 100.
+8,1,1024,512,Qwen/Qwen2.5-72B-Instruct,cluster_error,Command 'sky launch' returned non-zero exit status 100.
+8,1,4096,1024,Qwen/Qwen2.5-72B-Instruct,cluster_error,Command 'sky launch' returned non-zero exit status 100.
+8,1,8192,256,Qwen/Qwen2.5-72B-Instruct,cluster_error,Command 'sky launch' returned non-zero exit status 100.
+8,1,16384,2048,Qwen/Qwen2.5-72B-Instruct,cluster_error,Command 'sky launch' returned non-zero exit status 100.

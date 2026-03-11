@@ -773,8 +773,11 @@ run: |
 DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1453154642706960485/iFXIAaDTLxNO7_GHKHhXnXwFFnXziniP4TUwLUDUnXHtT9kNo08eQBjGQ4CiBr6AazY6"
 
 def send_discord_message(message):
-    payload = {"content": message}
-    requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
+    try:
+        payload = {"content": message}
+        requests.post(DISCORD_WEBHOOK, json=payload, timeout=10)
+    except Exception:
+        pass
 
 def generate_benchmark_script(experiments, gpus_per_node, num_nodes, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
     """Generate Python benchmark script for a set of experiments.
@@ -1367,8 +1370,11 @@ except Exception:
 
 
 def send_discord_message(message):
-    payload = {{"content": message}}
-    req_lib.post(DISCORD_WEBHOOK, json=payload, timeout=10)
+    try:
+        payload = {{"content": message}}
+        req_lib.post(DISCORD_WEBHOOK, json=payload, timeout=10)
+    except Exception:
+        pass
 
 
 def get_model_config_info(model_name_or_path):

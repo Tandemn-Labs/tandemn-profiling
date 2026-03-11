@@ -1,0 +1,65 @@
+[
+  {
+    "tp": 8,
+    "pp": 3,
+    "max_input_length": 128,
+    "max_output_length": 128,
+    "model": "Qwen/Qwen3-235B-A22B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 100."
+  },
+  {
+    "tp": 8,
+    "pp": 3,
+    "max_input_length": 128,
+    "max_output_length": 2048,
+    "model": "Qwen/Qwen3-235B-A22B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 100."
+  },
+  {
+    "tp": 8,
+    "pp": 3,
+    "max_input_length": 512,
+    "max_output_length": 1024,
+    "model": "Qwen/Qwen3-235B-A22B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 100."
+  },
+  {
+    "tp": 8,
+    "pp": 3,
+    "max_input_length": 1024,
+    "max_output_length": 512,
+    "model": "Qwen/Qwen3-235B-A22B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 100."
+  },
+  {
+    "tp": 8,
+    "pp": 3,
+    "max_input_length": 4096,
+    "max_output_length": 1024,
+    "model": "Qwen/Qwen3-235B-A22B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 100."
+  },
+  {
+    "tp": 8,
+    "pp": 3,
+    "max_input_length": 8192,
+    "max_output_length": 256,
+    "model": "Qwen/Qwen3-235B-A22B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 100."
+  },
+  {
+    "tp": 8,
+    "pp": 3,
+    "max_input_length": 16384,
+    "max_output_length": 2048,
+    "model": "Qwen/Qwen3-235B-A22B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 100."
+  }
+]

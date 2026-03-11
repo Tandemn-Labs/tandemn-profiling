@@ -1,0 +1,449 @@
+2026-03-11 09:38:37,755 - INFO - Results will be saved to: results/aws_g6_L4/tp8-pp3-3x_g6_48xlarge-20260311_093837
+2026-03-11 09:38:37,756 - INFO - 📋 Copied benchmark_client.py to roofline_benchmarks/
+2026-03-11 09:38:37,756 - INFO - 📋 Copied prometheus_parser.py to roofline_benchmarks/
+2026-03-11 09:38:37,756 - INFO - 🚀 Launching rf-qwen3-32b-tp8pp3-L4...
+2026-03-11 09:38:37,756 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-32b-tp8pp3-L4.yaml
+2026-03-11 09:38:37,756 - INFO - Running on cluster: rf-qwen3-32b-tp8pp3-L4
+2026-03-11 09:38:39,296 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-32b-tp8pp3-L4.yaml
+2026-03-11 09:38:39,455 - INFO - Running on cluster: rf-qwen3-32b-tp8pp3-L4
+2026-03-11 09:38:40,879 - INFO - Considered resources (3 nodes):
+2026-03-11 09:38:40,980 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:38:40,980 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:38:40,980 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:38:40,980 - INFO -  AWS (us-east-1)   g6.48xlarge   192     768       L4:8   40.05      [32m   ✔[0m
+2026-03-11 09:38:40,980 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:38:40,980 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-03-11 09:38:59,804 - INFO - [2mW 03-11 09:38:59.726 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 1000 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:39:04,145 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:39:04,346 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1b).
+2026-03-11 09:39:23,166 - INFO - [2mW 03-11 09:39:23.128 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6.48xlarge capacity in the Availability Zone you requested (us-east-1b). Our system will be working on provisioning additional capacity. You can currently get g6.48xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1c, us-east-1d, us-east-1f.[0m
+2026-03-11 09:39:26,893 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:39:27,094 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1c).
+2026-03-11 09:39:45,695 - INFO - [2mW 03-11 09:39:45.596 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6.48xlarge capacity in the Availability Zone you requested (us-east-1c). Our system will be working on provisioning additional capacity. You can currently get g6.48xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1b, us-east-1d, us-east-1f.[0m
+2026-03-11 09:39:49,625 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:39:49,828 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1d).
+2026-03-11 09:40:08,162 - INFO - [2mW 03-11 09:40:08.087 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 1000 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:40:11,184 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:40:11,387 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1f).
+2026-03-11 09:40:30,007 - INFO - [2mW 03-11 09:40:29.975 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6.48xlarge capacity in the Availability Zone you requested (us-east-1f). Our system will be working on provisioning additional capacity. You can currently get g6.48xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1b, us-east-1c, us-east-1d.[0m
+2026-03-11 09:40:34,036 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:40:34,137 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-east-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:40:34,137 - INFO - 
+2026-03-11 09:40:34,640 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:40:34,640 - INFO - Considered resources (3 nodes):
+2026-03-11 09:40:34,841 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:40:34,841 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:40:34,841 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:40:34,841 - INFO -  AWS (us-east-2)   g6.48xlarge   192     768       L4:8   40.05      [32m   ✔[0m
+2026-03-11 09:40:34,841 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:40:34,842 - INFO - [0m⚙︎ Launching on AWS us-east-2[0m (us-east-2a).
+2026-03-11 09:40:49,010 - INFO - [2mW 03-11 09:40:48.915 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:40:52,631 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:40:52,934 - INFO - [0m⚙︎ Launching on AWS us-east-2[0m (us-east-2b).
+2026-03-11 09:41:06,025 - INFO - [2mW 03-11 09:41:05.974 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:41:09,443 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:41:09,747 - INFO - [0m⚙︎ Launching on AWS us-east-2[0m (us-east-2c).
+2026-03-11 09:41:23,013 - INFO - [2mW 03-11 09:41:22.932 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:41:26,546 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:41:26,648 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-east-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:41:26,749 - INFO - 
+2026-03-11 09:41:27,356 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:41:27,356 - INFO - Considered resources (3 nodes):
+2026-03-11 09:41:27,457 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:41:27,558 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:41:27,558 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:41:27,558 - INFO -  AWS (us-west-2)   g6.48xlarge   192     768       L4:8   40.05      [32m   ✔[0m
+2026-03-11 09:41:27,558 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:41:27,558 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
+2026-03-11 09:41:48,392 - INFO - [2mW 03-11 09:41:48.309 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:41:52,524 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:41:52,826 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2b).
+2026-03-11 09:42:12,930 - INFO - [2mW 03-11 09:42:12.909 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:42:16,655 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:42:16,958 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2c).
+2026-03-11 09:42:37,181 - INFO - [2mW 03-11 09:42:37.136 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:42:41,315 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:42:41,620 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2d).
+2026-03-11 09:43:01,630 - INFO - [2mW 03-11 09:43:01.609 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:43:05,354 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:43:05,456 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-west-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:43:06,364 - INFO - 
+2026-03-11 09:43:06,364 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:43:06,364 - INFO - Considered resources (3 nodes):
+2026-03-11 09:43:06,667 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:43:06,668 - INFO -  INFRA              INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:43:06,668 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:43:06,668 - INFO -  AWS (eu-north-1)   g6.48xlarge   192     768       L4:8   42.48      [32m   ✔[0m
+2026-03-11 09:43:06,668 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:43:06,668 - INFO - [0m⚙︎ Launching on AWS eu-north-1[0m (eu-north-1a).
+2026-03-11 09:43:18,755 - INFO - [2mW 03-11 09:43:18.701 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:43:21,777 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:43:22,078 - INFO - [0m⚙︎ Launching on AWS eu-north-1[0m (eu-north-1b).
+2026-03-11 09:43:33,135 - INFO - [2mW 03-11 09:43:33.038 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:43:36,959 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:43:37,061 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in eu-north-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:43:37,163 - INFO - 
+2026-03-11 09:43:38,167 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:43:38,168 - INFO - Considered resources (3 nodes):
+2026-03-11 09:43:38,370 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:43:38,370 - INFO -  INFRA                INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:43:38,370 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:43:38,370 - INFO -  AWS (ca-central-1)   g6.48xlarge   192     768       L4:8   44.47      [32m   ✔[0m
+2026-03-11 09:43:38,370 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:43:38,370 - INFO - [0m⚙︎ Launching on AWS ca-central-1[0m (ca-central-1a).
+2026-03-11 09:43:51,351 - INFO - [2mW 03-11 09:43:51.295 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:43:54,167 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:43:54,571 - INFO - [0m⚙︎ Launching on AWS ca-central-1[0m (ca-central-1b).
+2026-03-11 09:44:07,362 - INFO - [2mW 03-11 09:44:07.296 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:44:10,069 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:44:10,472 - INFO - [0m⚙︎ Launching on AWS ca-central-1[0m (ca-central-1d).
+2026-03-11 09:44:23,264 - INFO - [2mW 03-11 09:44:23.185 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:44:26,185 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:44:26,387 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ca-central-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:44:26,490 - INFO - 
+2026-03-11 09:44:27,600 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:44:27,600 - INFO - Considered resources (3 nodes):
+2026-03-11 09:44:27,802 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:44:27,802 - INFO -  INFRA              INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:44:27,802 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:44:27,802 - INFO -  AWS (ap-south-1)   g6.48xlarge   192     768       L4:8   48.09      [32m   ✔[0m
+2026-03-11 09:44:27,802 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:44:27,802 - INFO - [0m⚙︎ Launching on AWS ap-south-1[0m (ap-south-1a).
+2026-03-11 09:44:34,344 - INFO - [2mW 03-11 09:44:34.244 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:44:35,051 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:44:35,353 - INFO - [0m⚙︎ Launching on AWS ap-south-1[0m (ap-south-1b).
+2026-03-11 09:44:41,094 - INFO - [2mW 03-11 09:44:41.039 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:44:41,901 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:44:42,103 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ap-south-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:44:42,205 - INFO - 
+2026-03-11 09:44:43,410 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:44:43,410 - INFO - Considered resources (3 nodes):
+2026-03-11 09:44:43,714 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:44:43,714 - INFO -  INFRA                  INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:44:43,714 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:44:43,714 - INFO -  AWS (ap-northeast-2)   g6.48xlarge   192     768       L4:8   49.25      [32m   ✔[0m
+2026-03-11 09:44:43,714 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:44:43,714 - INFO - [0m⚙︎ Launching on AWS ap-northeast-2[0m (ap-northeast-2a).
+2026-03-11 09:44:54,983 - INFO - [2mW 03-11 09:44:54.923 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:44:56,992 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:44:57,396 - INFO - [0m⚙︎ Launching on AWS ap-northeast-2[0m (ap-northeast-2c).
+2026-03-11 09:45:07,574 - INFO - [2mW 03-11 09:45:07.523 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:45:09,585 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:45:10,090 - INFO - [0m⚙︎ Launching on AWS ap-northeast-2[0m (ap-northeast-2d).
+2026-03-11 09:45:20,370 - INFO - [2mW 03-11 09:45:20.302 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:45:22,382 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:45:22,585 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ap-northeast-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:45:22,687 - INFO - 
+2026-03-11 09:45:23,998 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:45:23,998 - INFO - Considered resources (3 nodes):
+2026-03-11 09:45:24,300 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:45:24,300 - INFO -  INFRA                INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:45:24,300 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:45:24,300 - INFO -  AWS (eu-central-1)   g6.48xlarge   192     768       L4:8   50.08      [32m   ✔[0m
+2026-03-11 09:45:24,300 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:45:24,301 - INFO - [0m⚙︎ Launching on AWS eu-central-1[0m (eu-central-1a).
+2026-03-11 09:45:35,766 - INFO - [2mW 03-11 09:45:35.676 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:45:37,886 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:45:38,391 - INFO - [0m⚙︎ Launching on AWS eu-central-1[0m (eu-central-1b).
+2026-03-11 09:45:49,265 - INFO - [2mW 03-11 09:45:49.207 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:45:51,380 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:45:51,784 - INFO - [0m⚙︎ Launching on AWS eu-central-1[0m (eu-central-1c).
+2026-03-11 09:46:02,158 - INFO - [2mW 03-11 09:46:02.082 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:46:04,273 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:46:04,574 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in eu-central-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:46:04,675 - INFO - 
+2026-03-11 09:46:05,985 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:46:05,985 - INFO - Considered resources (3 nodes):
+2026-03-11 09:46:06,289 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:46:06,289 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:46:06,289 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:46:06,289 - INFO -  AWS (eu-west-2)   g6.48xlarge   192     768       L4:8   50.84      [32m   ✔[0m
+2026-03-11 09:46:06,289 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:46:06,289 - INFO - [0m⚙︎ Launching on AWS eu-west-2[0m (eu-west-2a).
+2026-03-11 09:46:17,880 - INFO - [2mW 03-11 09:46:17.795 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:46:20,499 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:46:21,004 - INFO - [0m⚙︎ Launching on AWS eu-west-2[0m (eu-west-2b).
+2026-03-11 09:46:31,264 - INFO - [2mW 03-11 09:46:31.219 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:46:33,481 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:46:33,988 - INFO - [0m⚙︎ Launching on AWS eu-west-2[0m (eu-west-2c).
+2026-03-11 09:46:44,141 - INFO - [2mW 03-11 09:46:44.096 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:46:46,357 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:46:46,559 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in eu-west-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:46:46,762 - INFO - 
+2026-03-11 09:46:48,072 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:46:48,072 - INFO - Considered resources (3 nodes):
+2026-03-11 09:46:48,373 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:46:48,373 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:46:48,373 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:46:48,373 - INFO -  AWS (eu-west-3)   g6.48xlarge   192     768       L4:8   50.84      [32m   ✔[0m
+2026-03-11 09:46:48,373 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:46:48,373 - INFO - [0m⚙︎ Launching on AWS eu-west-3[0m (eu-west-3b).
+2026-03-11 09:46:59,645 - INFO - [2mW 03-11 09:46:59.583 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:47:01,760 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:47:02,263 - INFO - [0m⚙︎ Launching on AWS eu-west-3[0m (eu-west-3c).
+2026-03-11 09:47:12,532 - INFO - [2mW 03-11 09:47:12.446 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:47:14,648 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:47:14,849 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in eu-west-3 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:47:15,051 - INFO - 
+2026-03-11 09:47:16,360 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:47:16,361 - INFO - Considered resources (3 nodes):
+2026-03-11 09:47:16,663 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:47:16,663 - INFO -  INFRA                  INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:47:16,663 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:47:16,663 - INFO -  AWS (ap-southeast-2)   g6.48xlarge   192     768       L4:8   52.07      [32m   ✔[0m
+2026-03-11 09:47:16,663 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:47:16,664 - INFO - [0m⚙︎ Launching on AWS ap-southeast-2[0m (ap-southeast-2a).
+2026-03-11 09:47:27,943 - INFO - [2mW 03-11 09:47:27.926 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:47:30,162 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:47:30,768 - INFO - [0m⚙︎ Launching on AWS ap-southeast-2[0m (ap-southeast-2b).
+2026-03-11 09:47:40,833 - INFO - [2mW 03-11 09:47:40.811 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:47:42,949 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:47:43,554 - INFO - [0m⚙︎ Launching on AWS ap-southeast-2[0m (ap-southeast-2c).
+2026-03-11 09:47:53,537 - INFO - [2mW 03-11 09:47:53.500 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:47:56,160 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:47:56,363 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ap-southeast-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:47:56,566 - INFO - 
+2026-03-11 09:47:57,876 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:47:57,876 - INFO - Considered resources (3 nodes):
+2026-03-11 09:47:57,977 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:47:58,278 - INFO -  INFRA                  INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:47:58,278 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:47:58,278 - INFO -  AWS (ap-northeast-1)   g6.48xlarge   192     768       L4:8   58.09      [32m   ✔[0m
+2026-03-11 09:47:58,278 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:47:58,279 - INFO - [0m⚙︎ Launching on AWS ap-northeast-1[0m (ap-northeast-1a).
+2026-03-11 09:48:09,536 - INFO - [2mW 03-11 09:48:09.446 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:48:11,649 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:48:12,356 - INFO - [0m⚙︎ Launching on AWS ap-northeast-1[0m (ap-northeast-1c).
+2026-03-11 09:48:22,711 - INFO - [2mW 03-11 09:48:22.615 PID=19919 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:48:24,722 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:48:25,024 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ap-northeast-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:48:25,226 - INFO - 
+2026-03-11 09:48:27,537 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:48:27,537 - INFO - 
+2026-03-11 09:48:59,217 - INFO - [?25h[31mFailed to provision all possible launchable resources.[0m Relax the task's resource requirements: 3x AWS(mem=64.0+, {'L4': 8}, disk_size=500)
+2026-03-11 09:48:59,218 - INFO - 
+2026-03-11 09:48:59,218 - INFO - [0m[33m↺[0m Retry after 30s  [2mView logs: [1msky logs --provision rf-qwen3-32b-tp8pp3-L4[0m[0m[0m
+2026-03-11 09:48:59,218 - INFO - The cluster 'rf-qwen3-32b-tp8pp3-L4' (status: INIT) was not found on the cloud: it may be autodowned, manually terminated, or its launch never succeeded. Provisioning a new cluster by using the same resources as its original launch.
+2026-03-11 09:48:59,420 - INFO - [0m⚙︎ Launching on AWS ap-northeast-1[0m (ap-northeast-1c).
+2026-03-11 09:49:10,291 - INFO - [2mW 03-11 09:49:10.208 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:49:12,302 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:49:12,605 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in ap-northeast-1c for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:49:12,605 - INFO - 
+2026-03-11 09:49:12,605 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:49:12,605 - INFO - Considered resources (3 nodes):
+2026-03-11 09:49:12,808 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:49:12,808 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:49:12,808 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:49:12,808 - INFO -  AWS (us-east-1)   g6.48xlarge   192     768       L4:8   40.05      [32m   ✔[0m
+2026-03-11 09:49:12,808 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:49:12,808 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-03-11 09:49:32,743 - INFO - [2mW 03-11 09:49:32.655 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6.48xlarge capacity in the Availability Zone you requested (us-east-1a). Our system will be working on provisioning additional capacity. You can currently get g6.48xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1b, us-east-1c, us-east-1d, us-east-1f.[0m
+2026-03-11 09:49:36,669 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:49:36,871 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1b).
+2026-03-11 09:49:55,906 - INFO - [2mW 03-11 09:49:55.852 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6.48xlarge capacity in the Availability Zone you requested (us-east-1b). Our system will be working on provisioning additional capacity. You can currently get g6.48xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1c, us-east-1d, us-east-1f.[0m
+2026-03-11 09:49:59,734 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:49:59,938 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1c).
+2026-03-11 09:50:18,529 - INFO - [2mW 03-11 09:50:18.515 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 1000 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:50:22,051 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:50:22,355 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1d).
+2026-03-11 09:50:40,781 - INFO - [2mW 03-11 09:50:40.709 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6.48xlarge capacity in the Availability Zone you requested (us-east-1d). Our system will be working on provisioning additional capacity. You can currently get g6.48xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1b, us-east-1c, us-east-1f.[0m
+2026-03-11 09:50:43,708 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:50:43,912 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1f).
+2026-03-11 09:51:02,440 - INFO - [2mW 03-11 09:51:02.346 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient g6.48xlarge capacity in the Availability Zone you requested (us-east-1f). Our system will be working on provisioning additional capacity. You can currently get g6.48xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a, us-east-1b, us-east-1c, us-east-1d.[0m
+2026-03-11 09:51:05,965 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:51:06,668 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-east-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:51:06,668 - INFO - 
+2026-03-11 09:51:06,668 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:51:06,668 - INFO - Considered resources (3 nodes):
+2026-03-11 09:51:06,872 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:51:06,872 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:51:06,872 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:51:06,872 - INFO -  AWS (us-east-2)   g6.48xlarge   192     768       L4:8   40.05      [32m   ✔[0m
+2026-03-11 09:51:06,873 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:51:06,873 - INFO - [0m⚙︎ Launching on AWS us-east-2[0m (us-east-2a).
+2026-03-11 09:51:21,045 - INFO - [2mW 03-11 09:51:21.022 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:51:24,969 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:51:25,170 - INFO - [0m⚙︎ Launching on AWS us-east-2[0m (us-east-2b).
+2026-03-11 09:51:38,560 - INFO - [2mW 03-11 09:51:38.487 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:51:42,494 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:51:42,696 - INFO - [0m⚙︎ Launching on AWS us-east-2[0m (us-east-2c).
+2026-03-11 09:51:56,486 - INFO - [2mW 03-11 09:51:56.483 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:52:00,205 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:52:00,606 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-east-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:52:00,606 - INFO - 
+2026-03-11 09:52:00,606 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:52:00,606 - INFO - Considered resources (3 nodes):
+2026-03-11 09:52:00,706 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:52:00,706 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:52:00,706 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:52:00,706 - INFO -  AWS (us-west-2)   g6.48xlarge   192     768       L4:8   40.05      [32m   ✔[0m
+2026-03-11 09:52:00,706 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:52:00,706 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
+2026-03-11 09:52:22,899 - INFO - [2mW 03-11 09:52:22.843 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:52:26,612 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:52:26,713 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2b).
+2026-03-11 09:52:46,490 - INFO - [2mW 03-11 09:52:46.421 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:52:50,101 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:52:50,303 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2c).
+2026-03-11 09:53:10,292 - INFO - [2mW 03-11 09:53:10.261 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:53:13,707 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:53:13,809 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2d).
+2026-03-11 09:53:33,387 - INFO - [2mW 03-11 09:53:33.305 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 128 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:53:37,006 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:53:37,508 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-west-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:53:37,508 - INFO - 
+2026-03-11 09:53:37,508 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:53:37,508 - INFO - Considered resources (3 nodes):
+2026-03-11 09:53:37,709 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:53:37,709 - INFO -  INFRA              INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:53:37,709 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:53:37,709 - INFO -  AWS (eu-north-1)   g6.48xlarge   192     768       L4:8   42.48      [32m   ✔[0m
+2026-03-11 09:53:37,709 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:53:37,709 - INFO - [0m⚙︎ Launching on AWS eu-north-1[0m (eu-north-1a).
+2026-03-11 09:53:49,360 - INFO - [2mW 03-11 09:53:49.265 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:53:51,675 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:53:51,876 - INFO - [0m⚙︎ Launching on AWS eu-north-1[0m (eu-north-1b).
+2026-03-11 09:54:03,233 - INFO - [2mW 03-11 09:54:03.151 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:54:05,542 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:54:05,642 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in eu-north-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:54:06,244 - INFO - 
+2026-03-11 09:54:06,244 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:54:06,244 - INFO - Considered resources (3 nodes):
+2026-03-11 09:54:06,345 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:54:06,345 - INFO -  INFRA                INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:54:06,345 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:54:06,345 - INFO -  AWS (ca-central-1)   g6.48xlarge   192     768       L4:8   44.47      [32m   ✔[0m
+2026-03-11 09:54:06,345 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:54:06,345 - INFO - [0m⚙︎ Launching on AWS ca-central-1[0m (ca-central-1a).
+2026-03-11 09:54:19,798 - INFO - [2mW 03-11 09:54:19.726 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:54:22,610 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:54:22,810 - INFO - [0m⚙︎ Launching on AWS ca-central-1[0m (ca-central-1b).
+2026-03-11 09:54:34,554 - INFO - [2mW 03-11 09:54:34.494 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:54:37,668 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:54:37,869 - INFO - [0m⚙︎ Launching on AWS ca-central-1[0m (ca-central-1d).
+2026-03-11 09:54:50,330 - INFO - [2mW 03-11 09:54:50.274 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:54:53,040 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:54:53,141 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ca-central-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:54:53,844 - INFO - 
+2026-03-11 09:54:53,844 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:54:53,845 - INFO - Considered resources (3 nodes):
+2026-03-11 09:54:54,046 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:54:54,046 - INFO -  INFRA              INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:54:54,046 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:54:54,046 - INFO -  AWS (ap-south-1)   g6.48xlarge   192     768       L4:8   48.09      [32m   ✔[0m
+2026-03-11 09:54:54,046 - INFO - -------------------------------------------------------------------------------
+2026-03-11 09:54:54,046 - INFO - [0m⚙︎ Launching on AWS ap-south-1[0m (ap-south-1a).
+2026-03-11 09:54:59,665 - INFO - [2mW 03-11 09:54:59.637 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:55:00,469 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:55:00,671 - INFO - [0m⚙︎ Launching on AWS ap-south-1[0m (ap-south-1b).
+2026-03-11 09:55:06,192 - INFO - [2mW 03-11 09:55:06.113 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:55:06,794 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:55:06,895 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ap-south-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:55:07,599 - INFO - 
+2026-03-11 09:55:07,599 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:55:07,599 - INFO - Considered resources (3 nodes):
+2026-03-11 09:55:07,801 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:55:07,801 - INFO -  INFRA                  INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:55:07,801 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:55:07,801 - INFO -  AWS (ap-northeast-2)   g6.48xlarge   192     768       L4:8   49.25      [32m   ✔[0m
+2026-03-11 09:55:07,801 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:55:07,801 - INFO - [0m⚙︎ Launching on AWS ap-northeast-2[0m (ap-northeast-2a).
+2026-03-11 09:55:17,942 - INFO - [2mW 03-11 09:55:17.886 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:55:20,047 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:55:20,248 - INFO - [0m⚙︎ Launching on AWS ap-northeast-2[0m (ap-northeast-2c).
+2026-03-11 09:55:29,987 - INFO - [2mW 03-11 09:55:29.894 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:55:31,895 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:55:32,197 - INFO - [0m⚙︎ Launching on AWS ap-northeast-2[0m (ap-northeast-2d).
+2026-03-11 09:55:41,441 - INFO - [2mW 03-11 09:55:41.400 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:55:43,346 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:55:43,446 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ap-northeast-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:55:43,547 - INFO - 
+2026-03-11 09:55:44,251 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:55:44,251 - INFO - Considered resources (3 nodes):
+2026-03-11 09:55:44,452 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:55:44,452 - INFO -  INFRA                INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:55:44,452 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:55:44,452 - INFO -  AWS (eu-central-1)   g6.48xlarge   192     768       L4:8   50.08      [32m   ✔[0m
+2026-03-11 09:55:44,452 - INFO - ---------------------------------------------------------------------------------
+2026-03-11 09:55:44,452 - INFO - [0m⚙︎ Launching on AWS eu-central-1[0m (eu-central-1a).
+2026-03-11 09:55:55,790 - INFO - [2mW 03-11 09:55:55.779 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:55:58,196 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:55:58,398 - INFO - [0m⚙︎ Launching on AWS eu-central-1[0m (eu-central-1b).
+2026-03-11 09:56:08,643 - INFO - [2mW 03-11 09:56:08.595 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:56:11,055 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:56:11,355 - INFO - [0m⚙︎ Launching on AWS eu-central-1[0m (eu-central-1c).
+2026-03-11 09:56:21,609 - INFO - [2mW 03-11 09:56:21.599 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:56:23,922 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:56:24,023 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in eu-central-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:56:24,124 - INFO - 
+2026-03-11 09:56:24,927 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:56:24,927 - INFO - Considered resources (3 nodes):
+2026-03-11 09:56:25,129 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:56:25,129 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:56:25,129 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:56:25,129 - INFO -  AWS (eu-west-2)   g6.48xlarge   192     768       L4:8   50.84      [32m   ✔[0m
+2026-03-11 09:56:25,129 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:56:25,129 - INFO - [0m⚙︎ Launching on AWS eu-west-2[0m (eu-west-2a).
+2026-03-11 09:56:35,581 - INFO - [2mW 03-11 09:56:35.495 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:56:37,691 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:56:37,993 - INFO - [0m⚙︎ Launching on AWS eu-west-2[0m (eu-west-2b).
+2026-03-11 09:56:47,838 - INFO - [2mW 03-11 09:56:47.809 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:56:50,048 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:56:50,350 - INFO - [0m⚙︎ Launching on AWS eu-west-2[0m (eu-west-2c).
+2026-03-11 09:57:00,295 - INFO - [2mW 03-11 09:57:00.229 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:57:02,401 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:57:02,502 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in eu-west-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:57:02,603 - INFO - 
+2026-03-11 09:57:03,405 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:57:03,405 - INFO - Considered resources (3 nodes):
+2026-03-11 09:57:03,606 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:57:03,606 - INFO -  INFRA             INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:57:03,606 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:57:03,606 - INFO -  AWS (eu-west-3)   g6.48xlarge   192     768       L4:8   50.84      [32m   ✔[0m
+2026-03-11 09:57:03,606 - INFO - ------------------------------------------------------------------------------
+2026-03-11 09:57:03,606 - INFO - [0m⚙︎ Launching on AWS eu-west-3[0m (eu-west-3b).
+2026-03-11 09:57:14,344 - INFO - [2mW 03-11 09:57:14.303 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:57:16,455 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:57:16,857 - INFO - [0m⚙︎ Launching on AWS eu-west-3[0m (eu-west-3c).
+2026-03-11 09:57:26,607 - INFO - [2mW 03-11 09:57:26.547 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:57:28,716 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:57:28,817 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in eu-west-3 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:57:28,917 - INFO - 
+2026-03-11 09:57:29,723 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:57:29,723 - INFO - Considered resources (3 nodes):
+2026-03-11 09:57:29,923 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:57:29,923 - INFO -  INFRA                  INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:57:29,923 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:57:29,923 - INFO -  AWS (ap-southeast-2)   g6.48xlarge   192     768       L4:8   52.07      [32m   ✔[0m
+2026-03-11 09:57:29,923 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:57:29,923 - INFO - [0m⚙︎ Launching on AWS ap-southeast-2[0m (ap-southeast-2a).
+2026-03-11 09:57:40,469 - INFO - [2mW 03-11 09:57:40.419 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:57:42,581 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:57:42,883 - INFO - [0m⚙︎ Launching on AWS ap-southeast-2[0m (ap-southeast-2b).
+2026-03-11 09:57:52,626 - INFO - [2mW 03-11 09:57:52.568 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:57:54,637 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:57:55,039 - INFO - [0m⚙︎ Launching on AWS ap-southeast-2[0m (ap-southeast-2c).
+2026-03-11 09:58:04,887 - INFO - [2mW 03-11 09:58:04.863 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 0 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:58:06,896 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:58:07,096 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ap-southeast-2 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:58:07,197 - INFO - 
+2026-03-11 09:58:08,001 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:58:08,001 - INFO - Considered resources (3 nodes):
+2026-03-11 09:58:08,101 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:58:08,101 - INFO -  INFRA                  INSTANCE      vCPUs   Mem(GB)   GPUS   COST ($)   CHOSEN
+2026-03-11 09:58:08,101 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:58:08,101 - INFO -  AWS (ap-northeast-1)   g6.48xlarge   192     768       L4:8   58.09      [32m   ✔[0m
+2026-03-11 09:58:08,101 - INFO - -----------------------------------------------------------------------------------
+2026-03-11 09:58:08,101 - INFO - [0m⚙︎ Launching on AWS ap-northeast-1[0m (ap-northeast-1a).
+2026-03-11 09:58:18,451 - INFO - [2mW 03-11 09:58:18.355 PID=353687 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 8 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-11 09:58:20,361 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-11 09:58:20,561 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in ap-northeast-1 for {AWS(mem=64.0+, {'L4': 8}, disk_size=500)}.
+2026-03-11 09:58:20,663 - INFO - 
+2026-03-11 09:58:22,374 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-11 09:58:22,374 - INFO - 
+2026-03-11 09:58:53,103 - INFO - [?25h[31mFailed to provision all possible launchable resources.[0m Relax the task's resource requirements: 3x AWS(mem=64.0+, {'L4': 8}, disk_size=500)
+2026-03-11 09:58:53,103 - INFO - 
+2026-03-11 09:58:53,103 - INFO - [0m[33m↺[0m Retry after 30s  [2mView logs: [1msky logs --provision rf-qwen3-32b-tp8pp3-L4[0m[0m[0m
+2026-03-11 09:58:53,103 - INFO - The cluster 'rf-qwen3-32b-tp8pp3-L4' (status: INIT) was not found on the cloud: it may be autodowned, manually terminated, or its launch never succeeded. Provisioning a new cluster by using the same resources as its original launch.
+2026-03-11 09:58:53,203 - INFO - [0m⚙︎ Launching on AWS ap-northeast-1[0m (ap-northeast-1a).
+2026-03-11 09:59:02,622 - INFO - 🗑️  Tearing down rf-qwen3-32b-tp8pp3-L4...
