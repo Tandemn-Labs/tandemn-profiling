@@ -3,7 +3,7 @@
 
 Benchmarking framework for profiling distributed LLM inference with [vLLM](https://github.com/vllm-project/vllm), systematically evaluating how different combinations of **Tensor Parallelism (TP)** and **Pipeline Parallelism (PP)** affect throughput, latency, GPU utilization, and cost-efficiency across GPU types.
 
-**Primary model:** `deepseek-ai/DeepSeek-R1-Distill-Llama-70B` (70B parameters, requires multi-GPU inference)
+**Models:** `Qwen/Qwen3-32B`, `Qwen/Qwen2.5-72B-Instruct`, `Qwen/Qwen3-235B-A22B`
 **Dataset:** `emozilla/pg19-test` (Project Gutenberg books, used as summarization prompts)
 
 ---
@@ -11,20 +11,20 @@ Benchmarking framework for profiling distributed LLM inference with [vLLM](https
 ## Architecture
 
 ```
-┌─────────────────────┐
-│  config_generation   │  Generate experiment matrix (TP × PP × input/output lengths)
-│       .py            │  → experiment_L40_llama.csv
-└────────┬────────────┘
-         ▼
-┌─────────────────────┐
-│  automatic_launch    │  For each row in the CSV:
-│       _1.py          │    1. Select GPU instance type & node count
-│                      │    2. Provision cluster via SkyPilot
-│                      │    3. Launch benchmark script
-│                      │    4. Collect results & tear down
-└────────┬────────────┘
-         │  provisions
-         ▼
+┌──────────────────────┐
+│  automatic_benchmark  │  Main entrypoint: define sweep (models × TP/PP × IO lengths × GPU)
+│        _1.py          │  → generates experiment CSV, then calls automatic_launch_1.py
+└─────────┬────────────┘
+          ▼
+┌──────────────────────┐
+│  automatic_launch     │  For each row in the CSV:
+│       _1.py           │    1. Select GPU instance type & node count
+│                       │    2. Provision cluster via SkyPilot
+│                       │    3. Launch benchmark script
+│                       │    4. Collect results & tear down
+└─────────┬────────────┘
+          │  provisions
+          ▼
 ┌─────────────────────────────────────────────────┐
 │  SkyPilot Cluster (AWS)                         │
 │  ┌────────────────────────────────────────────┐ │
@@ -55,13 +55,11 @@ Benchmarking framework for profiling distributed LLM inference with [vLLM](https
 
 | File | Purpose |
 |---|---|
-| `config_generation.py` | Generates the experiment matrix CSV with all TP/PP/input/output combinations to test |
+| `automatic_benchmark_1.py` | **Main entrypoint.** Defines the full sweep (models × TP/PP × IO lengths × GPU types), generates the experiment CSV, and kicks off `automatic_launch_1.py` |
 | `automatic_launch_1.py` | Orchestrates the full pipeline: selects instance types, provisions SkyPilot clusters, runs benchmarks, collects results, tears down |
-| `roofline_benchmarks/*.yaml` | SkyPilot cluster specs (GPU type, node count, setup commands, vLLM/Ray install) |
-| `roofline_benchmarks/*.py` | Per-experiment benchmark scripts with GPU monitoring, scheduler tracking, and vLLM config extraction |
+| `benchmark_client.py` | Async HTTP client that sends inference requests to a running vLLM server and measures throughput/latency |
 | `plot_benchmark_results.py` | Bar charts comparing throughput, GPU utilization, and cost-efficiency across TP/PP configs |
 | `plot_timeseries.py` | Time-series plots of per-GPU SM%, memory%, memory bandwidth% during a benchmark run |
-| `ray-vllm.yaml` | Base SkyPilot cluster template for multi-node Ray + vLLM |
 
 ### GPU monitoring
 
@@ -77,52 +75,65 @@ Benchmarking framework for profiling distributed LLM inference with [vLLM](https
 
 ### Tested hardware
 
-| GPU | AWS Instance | GPUs/node | vLLM version |
-|---|---|---|---|
-| L40S | g6e.48xlarge | 8 | 0.10.0 |
-| A10G | g5.48xlarge | 8 | 0.10.0 |
-| A100-80GB | p4de.24xlarge | 8 | 0.10.0 (AMI: driver 580, CUDA 12.8) |
-| A100-40GB | p4d.24xlarge | 8 | 0.10.0 (AMI: driver 580, CUDA 12.8) |
-| H100 | p5.48xlarge | 8 | 0.10.0 |
+| GPU | AWS Instance | GPUs/node | VRAM | vLLM version |
+|---|---|---|---|---|
+| L4 | g6.12xlarge / g6.48xlarge | 4 / 8 | 24GB | 0.10.0 |
+| L40S | g6e.12xlarge / g6e.48xlarge | 4 / 8 | 48GB | 0.10.0 |
+| A10G | g5.12xlarge / g5.48xlarge | 4 / 8 | 24GB | 0.10.0 |
+| A100-40GB | p4d.24xlarge | 8 | 40GB | 0.10.0 (AMI: driver 580, CUDA 12.8) |
+| H100 | p5.48xlarge | 8 | 80GB | 0.10.0 |
 
 ---
 
 ## How to run
 
-### 1. Generate the experiment matrix
+### Prerequisites
+
+- Python 3.12+
+- [SkyPilot](https://skypilot.readthedocs.io/) configured with AWS credentials (`sky check`)
+- Install dependencies:
 
 ```bash
-python config_generation.py
+pip install skypilot-nightly aiohttp requests numpy pandas boto3
 ```
 
-This creates a CSV (e.g. `experiment_L40_llama.csv`) with rows like:
+### 1. Dry-run (preview the plan)
 
-```
-tensor_degree,pipeline_degree,max_input_length,max_output_length,model
-4,2,2048,512,deepseek-ai/DeepSeek-R1-Distill-Llama-70B
-8,1,2048,512,deepseek-ai/DeepSeek-R1-Distill-Llama-70B
-...
-```
+Always do this first to verify what will be launched and the estimated cost:
 
-TP=1 PP=1 is automatically excluded (the 70B model does not fit on a single GPU).
+```bash
+cd roofline/vllm
+
+python3 automatic_benchmark_1.py                        # all GPU types
+python3 automatic_benchmark_1.py --gpu L40S             # L40S only
+python3 automatic_benchmark_1.py --gpu L4 --gpu L40S    # multiple GPU types
+```
 
 ### 2. Launch the benchmarks
 
 ```bash
-python automatic_launch_1.py
+# Full sweep on one GPU type
+python3 automatic_benchmark_1.py --gpu L40S --run
+
+# Specific model only
+python3 automatic_benchmark_1.py --gpu L4 --run --models Qwen/Qwen3-32B
+
+# Specific TP/PP + IO shapes
+python3 automatic_benchmark_1.py --gpu L4 --run --tp-pp 8,3 --io 512,1024 1024,512
+
+# Use S3 model weights instead of HuggingFace
+python3 automatic_benchmark_1.py --gpu L40S --run --s3-models
+
+# GCP instead of AWS
+python3 automatic_benchmark_1.py --gpu L4 --run --cloud gcp
 ```
 
-This iterates over every row in the experiment CSV and for each:
-1. Computes the total GPU count (`TP × PP`) and selects the cheapest matching AWS instance configuration.
-2. Generates a SkyPilot YAML and a benchmark Python script in `roofline_benchmarks/`.
-3. Provisions the cluster with `sky launch`, starts a Ray cluster, and runs the benchmark.
-4. Downloads `results.json`, `timeseries_*.json`, and `benchmark.log` into `results/`.
-5. Tears down the cluster.
-6. Sends progress notifications to Discord (if a webhook is configured).
-
-**Prerequisites:**
-- [SkyPilot](https://skypilot.readthedocs.io/) configured with AWS credentials
-- Python 3.12+ with `pandas`, `requests`
+`automatic_benchmark_1.py` generates the experiment CSV and calls `automatic_launch_1.py`, which for each experiment:
+1. Selects the cheapest matching instance configuration for the required GPU count (`TP × PP`).
+2. Provisions the cluster with `sky launch`, starts Ray, and runs the benchmark.
+3. Downloads `results.json`, `timeseries_*.json`, `benchmark_results-*.csv`, and `benchmark.log` into `results/`.
+4. Tears down the cluster.
+5. Sends progress notifications to Discord (webhook configured in `automatic_launch_1.py`).
 
 ### 3. Plot the results
 
@@ -238,21 +249,19 @@ Aggregated CSV combining all successful runs in a result directory (150+ columns
 
 ```
 roofline/vllm/
-├── automatic_launch_1.py           # Main orchestrator
-├── config_generation.py            # Experiment matrix generator
+├── automatic_benchmark_1.py        # Main entrypoint (sweep definition + launcher)
+├── automatic_launch_1.py           # Cluster orchestrator (called by automatic_benchmark_1.py)
+├── benchmark_client.py             # Async HTTP benchmark client
 ├── plot_benchmark_results.py       # Bar-chart visualizations
 ├── plot_timeseries.py              # Time-series visualizations
-├── experiment_L40_llama.csv        # Example experiment matrix
-├── ray-vllm.yaml                   # Base SkyPilot template
-├── roofline_benchmarks/            # Generated per-experiment configs
-│   ├── benchmark_roofline-*.py     # Benchmark scripts
-│   └── roofline-*.yaml             # SkyPilot cluster specs
-├── results/                        # Successful benchmark outputs
-│   ├── result-2048in_512out/
-│   │   ├── aws-g5-A10G/
-│   │   ├── aws-g6e-L40S/
-│   │   └── benchmark_results_merged.csv
-│   ├── result-8192in-2048out/
-│   └── result-16384in_2048out/
+├── results/                        # Benchmark outputs per run
+│   ├── aws_g6_L4/                  # L4 results
+│   │   └── tp{X}-pp{Y}-...-success/
+│   │       ├── benchmark_results-TIMESTAMP.csv
+│   │       ├── results.json
+│   │       ├── timeseries_*.json
+│   │       └── benchmark.log
+│   └── aws_g6e_L40S/               # L40S results (same structure)
+├── perfdb_all.csv                  # Consolidated perf database (all runs)
 └── failed/                         # Failed runs (logs + partial results)
 ```
