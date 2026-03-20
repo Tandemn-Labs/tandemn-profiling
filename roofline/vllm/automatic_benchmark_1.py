@@ -235,6 +235,10 @@ Examples:
         default="aws",
         help="Cloud provider to launch on (default: aws). Ensures all instances stay on one cloud.",
     )
+    parser.add_argument(
+        "--spot", action="store_true",
+        help="Use spot/preemptible instances (cheaper but may be interrupted)",
+    )
 
     args = parser.parse_args()
 
@@ -297,6 +301,7 @@ Examples:
                     gpu_type=gpu_type,
                     s3_models=args.s3_models,
                     cloud=args.cloud,
+                    use_spot=args.spot,
                 )
                 if results:
                     all_results.extend(results)

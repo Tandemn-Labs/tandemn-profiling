@@ -384,7 +384,7 @@ def cleanup_old_benchmark_files(work_dir=None):
     
     return removed_count
 
-def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
+def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws", use_spot=False):
     # Determine if this GPU type uses EFA-capable instances (A100/H100 on AWS)
     is_efa_capable = gpu_type.upper().startswith("A100") or gpu_type.upper() == "H100"
 
@@ -509,7 +509,7 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
     return f"""
 name: {cluster_name}
 resources:
-{cloud_line}{accelerator_spec}{network_tier_line}  use_spot: false
+{cloud_line}{accelerator_spec}{network_tier_line}  use_spot: {"true" if use_spot else "false"}
   disk_size: {disk_size_gb}GB
   memory: "64GB+"
 num_nodes: {num_nodes}
@@ -1965,7 +1965,7 @@ finally:
     print("✅ Server stopped")
 '''
 
-def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
+def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run=True, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws", use_spot=False):
     gpus_per_node, num_nodes = cluster_config
     # Use TP/PP from the first experiment for naming (all experiments in a group have compatible TP/PP)
     tp = experiments[0]['tp']
@@ -2055,7 +2055,7 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
     yaml_path = work_dir / f"{cluster_name}.yaml"
     script_path = work_dir / f"benchmark_{cluster_name}.py"
     
-    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type, s3_models=s3_models, cloud=cloud)
+    yaml_content = generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type, s3_models=s3_models, cloud=cloud, use_spot=use_spot)
     yaml_path.write_text(yaml_content)
 
     # 2. Write benchmark script
@@ -2360,6 +2360,8 @@ Examples:
                        choices=['aws', 'gcp', 'azure'],
                        default='aws',
                        help='Cloud provider to launch on (default: aws)')
+    parser.add_argument('--spot', action='store_true',
+                       help='Use spot/preemptible instances (cheaper but may be interrupted)')
     parser.add_argument('--cleanup', action='store_true',
                        help='Clean up old benchmark files without GPU type in their names')
     
@@ -2410,6 +2412,7 @@ Examples:
                 cluster_config, exps, parent_dir=parent_dir,
                 dry_run=dry_run, gpu_type=gpu_type,
                 s3_models=args.s3_models, cloud=args.cloud,
+                use_spot=args.spot,
             )
             if results:
                 all_results.extend(results)
