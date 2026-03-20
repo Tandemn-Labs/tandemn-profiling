@@ -385,6 +385,9 @@ def cleanup_old_benchmark_files(work_dir=None):
     return removed_count
 
 def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=DEFAULT_GPU_TYPE, s3_models=False, cloud="aws"):
+    # Determine if this GPU type uses EFA-capable instances (A100/H100 on AWS)
+    is_efa_capable = gpu_type.upper().startswith("A100") or gpu_type.upper() == "H100"
+
     env_exports = """
   # Ensure CUDA libraries are in LD_LIBRARY_PATH for PyTorch
   export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:${LD_LIBRARY_PATH:-}"
@@ -397,6 +400,15 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
   export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
   export TORCH_DISTRIBUTED_DEBUG=DETAIL
   export NCCL_DEBUG=INFO
+"""
+    if is_efa_capable and cloud == "aws":
+        env_exports += """
+  # EFA + NCCL OFI (auto-configured when using network_tier=best + DLAMI)
+  export LD_LIBRARY_PATH="/opt/amazon/ofi-nccl/lib:/opt/amazon/efa/lib:${LD_LIBRARY_PATH}"
+  export NCCL_NET_PLUGIN=ofi
+  export FI_EFA_USE_DEVICE_RDMA=1
+  export FI_PROVIDER=efa
+  export NCCL_DEBUG_SUBSYS=NET
 """
 
     # Check if any experiment needs Ray (PP > 1)
@@ -450,42 +462,31 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
   sleep 2  # Give vLLM workers a moment to finish cleanup
   uv run ray stop || echo "⚠️  Ray stop completed with warnings (this is OK - benchmark succeeded)"
         """
-    # Handle A100 variants: Only specify accelerators, let SkyPilot choose instance
-    # SkyPilot will automatically select the right instance type and install drivers
-    # DON'T specify instance_type as it can cause issues with driver installation
-    accelerator_spec = ""
-    instance_type_constraint = ""
-    if gpu_type in ["A100_40gb", "A100-40gb"]:
-        # Use "A100" without memory suffix - SkyPilot will select p4d.24xlarge (40GB)
-        accelerator_name = "A100"
-        accelerator_spec = f"  accelerators: {accelerator_name}:{gpus_per_node}\n"
-    elif gpu_type in ["A100_80gb", "A100-80gb"]:
-        # Use "A100-80GB" with memory suffix - SkyPilot will select p4de.24xlarge (80GB)
-        accelerator_name = "A100-80GB"
-        accelerator_spec = f"  accelerators: {accelerator_name}:{gpus_per_node}\n"
-    else:
-        # For other GPU types, specify accelerators normally
-        accelerator_spec = f"  accelerators: {gpu_type}:{gpus_per_node}\n"
-    
-    # Determine if this is an A100 GPU type
     is_a100 = gpu_type.upper().startswith("A100")
 
-    # A100 on AWS: use pre-built AMI with driver 580.105.08 + CUDA 12.8 + vLLM 0.10.0
-    # This avoids the old driver 535.x / CUDA 12.1 limitation entirely.
-    # See AMI/AWS.md and AMI/build-p4d-ami.sh for details.
-    image_id_line = ""
-    # A100 on AWS needs cloud+region (not infra) because image_id requires explicit region
-    # Pre-built AMIs: driver 580.105.08, CUDA 12.8, vLLM 0.10.0
-    A100_AMIS = {
-        "us-east-1": "ami-04f8546cd7cc1dcd9",
+    # EFA-capable GPU types (A100, H100) on AWS: use instance_type + network_tier=best.
+    # This makes SkyPilot auto-select the DLAMI (with EFA/NCCL pre-installed) and
+    # attach EFA network interfaces. No custom image_id needed.
+    # Non-EFA types (L4, L40S, A10G): use accelerators spec as before.
+    EFA_INSTANCE_TYPES = {
+        "A100_40gb": "p4d.24xlarge",
+        "A100-40gb": "p4d.24xlarge",
+        "A100_80gb": "p4de.24xlarge",
+        "A100-80gb": "p4de.24xlarge",
+        "H100": "p5.48xlarge",
     }
-    A100_DEFAULT_REGION = "us-east-1"
+
+    accelerator_spec = ""
+    network_tier_line = ""
     cloud_line = f"  infra: {cloud}\n"
-    if is_a100 and cloud == "aws":
-        ami_region = A100_DEFAULT_REGION
-        ami_id = A100_AMIS[ami_region]
-        image_id_line = f"  image_id: {ami_id}  # Pre-built: driver 580.105.08, CUDA 12.8, vLLM 0.10.0\n"
-        cloud_line = f"  cloud: aws\n  region: {ami_region}\n"
+
+    if gpu_type in EFA_INSTANCE_TYPES and cloud == "aws":
+        instance_type = EFA_INSTANCE_TYPES[gpu_type]
+        accelerator_spec = f"  instance_type: {instance_type}\n"
+        network_tier_line = "  network_tier: best\n"
+        # No image_id — SkyPilot auto-selects DLAMI + attaches EFA interfaces
+    else:
+        accelerator_spec = f"  accelerators: {gpu_type}:{gpus_per_node}\n"
 
     # Build file_mounts block for S3 model loading
     file_mounts_block = ""
@@ -508,10 +509,9 @@ def generate_yaml(gpus_per_node, num_nodes, cluster_name, experiments, gpu_type=
     return f"""
 name: {cluster_name}
 resources:
-{cloud_line}{accelerator_spec}{instance_type_constraint}{image_id_line}  use_spot: false
+{cloud_line}{accelerator_spec}{network_tier_line}  use_spot: false
   disk_size: {disk_size_gb}GB
   memory: "64GB+"
-  # No region constraint - SkyPilot will try all available regions for the chosen cloud
 num_nodes: {num_nodes}
 workdir: .{file_mounts_block}
 setup: |
@@ -544,143 +544,47 @@ setup: |
   fi
 
   # ========================================================================
-  # NVIDIA Fabric Manager - ONLY for A100-SXM4 (NVSwitch) systems
+  # NVIDIA Fabric Manager - ONLY for NVSwitch systems (A100-SXM4, H100)
+  # On DLAMI (auto-selected by network_tier=best), driver is pre-installed
+  # but Fabric Manager may need to be installed/started.
   # ========================================================================
   if [ "$IS_A100" = "true" ]; then
-  # On p4d/p4de instances with A100-SXM4 GPUs connected via NVSwitch:
-  #   - CUDA Error 802 ("system not yet initialized") occurs without Fabric Manager
-  #   - nvidia-smi shows GPUs but CUDA runtime cannot access them
-  #   - NVLink topology shows only PCIe (PHB/NODE/SYS) instead of NV#
-  #
-  # The Fabric Manager service is REQUIRED to:
-  #   - Initialize the NVSwitch fabric topology
-  #   - Enable peer-to-peer GPU communication via NVLink
-  #   - Allow CUDA runtime to properly enumerate and access GPUs
-  # ========================================================================
-  echo "=== Installing NVIDIA Fabric Manager for A100-SXM4 NVSwitch support ==="
-
-  # Get the FULL driver version (e.g., 535.216.01) to install EXACT matching Fabric Manager
-  # The Fabric Manager MUST match the driver version EXACTLY or it will fail to start
-  # Note: Use --id=0 to query single GPU instead of piping to head (avoids SIGPIPE with set -e)
-  DRIVER_VERSION_FULL=$(nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader)
-  DRIVER_VERSION_MAJOR=$(echo "$DRIVER_VERSION_FULL" | cut -d. -f1)
-  echo "Detected NVIDIA driver version: $DRIVER_VERSION_FULL (major: $DRIVER_VERSION_MAJOR)"
-
-  # Check if Fabric Manager is already installed and running
+  echo "=== Fabric Manager for NVSwitch ==="
   if systemctl is-active --quiet nvidia-fabricmanager 2>/dev/null; then
-    echo "✅ NVIDIA Fabric Manager is already running"
+    echo "Fabric Manager already running"
   else
-    echo "Installing NVIDIA Fabric Manager..."
-    sudo apt-get update
-
-    # Check available Fabric Manager versions
-    echo "Available Fabric Manager versions:"
-    apt-cache madison nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}} 2>/dev/null | awk 'NR<=5' || true
-
-    # Try to install the EXACT version matching the driver
-    # Format: nvidia-fabricmanager-535=535.216.01-1
-    FM_INSTALLED=false
-    echo "Attempting to install exact version: nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}}=${{DRIVER_VERSION_FULL}}-1"
-    if sudo apt-get install -y "nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}}=${{DRIVER_VERSION_FULL}}-1" 2>/dev/null; then
-      echo "✅ Installed exact Fabric Manager version ${{DRIVER_VERSION_FULL}}"
-      FM_INSTALLED=true
-    fi
-
-    # If exact version failed, we need to UPDATE the driver to match available Fabric Manager
-    if [ "$FM_INSTALLED" = "false" ]; then
-      echo "⚠️  Exact Fabric Manager version ${{DRIVER_VERSION_FULL}} not available in apt repository"
-      echo "The AWS AMI has driver ${{DRIVER_VERSION_FULL}} but NVIDIA repo has newer Fabric Manager"
-      echo ""
-      echo "Solution: Update NVIDIA driver to match the available Fabric Manager version"
-
-      # Get the latest available Fabric Manager version for this major
-      # Note: Use awk 'NR==1' instead of head -1 to avoid SIGPIPE with set -e
-      FM_LATEST=$(apt-cache madison nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}} 2>/dev/null | awk 'NR==1 {{print $3}}' | sed 's/-1$//')
-      echo "Latest available Fabric Manager: $FM_LATEST"
-
-      if [ -n "$FM_LATEST" ]; then
-        echo "Updating NVIDIA driver to version $FM_LATEST to match Fabric Manager..."
-
-        # Install matching driver version
-        # The driver package is nvidia-driver-535 or similar
-        sudo apt-get install -y --allow-downgrades \
-          nvidia-driver-${{DRIVER_VERSION_MAJOR}}=${{FM_LATEST}}-1 \
-          nvidia-dkms-${{DRIVER_VERSION_MAJOR}}=${{FM_LATEST}}-1 \
-          nvidia-kernel-source-${{DRIVER_VERSION_MAJOR}}=${{FM_LATEST}}-1 \
-          2>/dev/null || {{
-            echo "Could not update driver, trying alternative approach..."
-            # Try installing just the Fabric Manager - sometimes the versions are close enough
-            sudo apt-get install -y nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}} || true
-          }}
-
-        # Now install Fabric Manager
-        sudo apt-get install -y nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}} || true
-        FM_INSTALLED=true
-      fi
-    fi
-
-    # Start and enable the Fabric Manager service
-    echo "Starting NVIDIA Fabric Manager service..."
-    sudo systemctl start nvidia-fabricmanager || echo "Warning: Failed to start Fabric Manager"
-    sudo systemctl enable nvidia-fabricmanager || echo "Warning: Failed to enable Fabric Manager"
-
-    # Give Fabric Manager time to initialize the NVSwitch fabric
-    echo "Waiting for Fabric Manager to initialize NVSwitch fabric..."
-    sleep 5
-
-    # Verify Fabric Manager is running
-    if systemctl is-active --quiet nvidia-fabricmanager; then
-      echo "✅ NVIDIA Fabric Manager started successfully"
-      # Verify new driver version (use --id=0 to avoid SIGPIPE)
-      nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader
-    else
-      echo "⚠️  NVIDIA Fabric Manager failed to start"
-      echo "This usually means version mismatch between driver and Fabric Manager"
-      echo "Driver version: $(nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader)"
-      echo "Installed Fabric Manager:"
-      dpkg -l | grep nvidia-fabricmanager || true
-      systemctl status nvidia-fabricmanager 2>&1 || true
-      echo ""
-      echo "⚠️  CUDA will NOT work on this A100-SXM4 instance without Fabric Manager!"
-      echo "⚠️  Consider using a different AMI with matching driver/Fabric Manager versions"
-    fi
+    DRIVER_VERSION_FULL=$(nvidia-smi --id=0 --query-gpu=driver_version --format=csv,noheader)
+    DRIVER_VERSION_MAJOR=$(echo "$DRIVER_VERSION_FULL" | cut -d. -f1)
+    echo "Driver: $DRIVER_VERSION_FULL, installing Fabric Manager..."
+    sudo apt-get update -qq
+    sudo apt-get install -y "nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}}=${{DRIVER_VERSION_FULL}}-1" 2>/dev/null \
+      || sudo apt-get install -y "nvidia-fabricmanager-${{DRIVER_VERSION_MAJOR}}" 2>/dev/null
+    sudo systemctl enable --now nvidia-fabricmanager
+    sleep 3
+    systemctl is-active --quiet nvidia-fabricmanager \
+      && echo "Fabric Manager: OK" \
+      || echo "WARNING: Fabric Manager failed to start"
   fi
-
-  # Verify NVLink topology after Fabric Manager
-  echo "=== Verifying NVLink topology ==="
-  nvidia-smi topo -m 2>&1 | awk 'NR<=20' || echo "NVLink topology check failed"
-  echo "================================="
-  fi  # End of A100-specific Fabric Manager section
+  nvidia-smi topo -m 2>&1 | awk 'NR<=15' || true
+  fi  # End of A100/NVSwitch Fabric Manager section
 
   # Install numactl for NUMA diagnostics
   sudo apt-get install -y numactl 2>/dev/null || echo "numactl installation skipped"
 
-  python3 -m pip install -U pip
-  python3 -m pip install -U uv
+  if ! command -v uv &>/dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+  fi
+  export PATH="$HOME/.local/bin:$PATH"
 
-  uv venv --python 3.12 --seed
+  uv venv --python 3.12 --seed --allow-existing
   source .venv/bin/activate
 
   # Install dependencies
   uv pip install "datasets" "requests" "pynvml" "aiohttp"
 
-  # ========================================================================
-  # vLLM + PyTorch Installation
-  # ========================================================================
-  # All GPUs use vLLM 0.10.0 + CUDA 12.8. A100 uses a pre-built AMI with
-  # driver 580.105.08 (see AMI/AWS.md), so no version downgrade is needed.
-  # ========================================================================
-
-  if [ "$IS_A100" = "true" ]; then
-    # A100 with pre-built AMI: vLLM is already installed at /opt/vllm-env
-    # Just install into our venv to ensure benchmark dependencies are available
-    echo "=== Installing vLLM 0.10.0 (A100 with pre-built AMI, driver 580.x, CUDA 12.8) ==="
-    uv pip install "vllm==0.10.0"
-  else
-    # L40S/L4/others: install vLLM 0.10.0 with default PyTorch
-    echo "=== Installing vLLM 0.10.0 ==="
-    uv pip install "vllm==0.10.0"
-  fi
+  # vLLM 0.10.0 for all GPU types
+  echo "=== Installing vLLM 0.10.0 ==="
+  uv pip install "vllm==0.10.0" "ray[cgraph]"
 
   # Pin transformers to avoid breaking changes in 5.x
   # (vllm 0.10.0 allows transformers>=5 but it breaks tokenizer backend)
