@@ -189,7 +189,16 @@ async def run_benchmark(args, prompts):
             for i in range(args.num_requests)
         ]
 
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        # Track progress so long-running benchmarks don't trigger watchdog
+        completed = 0
+        results = []
+        for coro in asyncio.as_completed(tasks):
+            result = await coro
+            results.append(result)
+            completed += 1
+            if completed % max(1, args.num_requests // 10) == 0 or completed == args.num_requests:
+                elapsed = time.perf_counter() - t_start
+                print(f"  Progress: {completed}/{args.num_requests} ({elapsed:.0f}s elapsed)")
         wall_clock = time.perf_counter() - t_start
 
     # Process results

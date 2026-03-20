@@ -2095,7 +2095,7 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
         )
 
         # Stream output with watchdog: kill if no output for 30 minutes
-        SKY_OUTPUT_TIMEOUT = 1800  # 30 minutes with no output = hung
+        SKY_OUTPUT_TIMEOUT = 7200  # 2 hours with no output = hung (long-context experiments can take 30+ min)
         last_output_time = time.time()
         while True:
             ready, _, _ = select.select([process.stdout], [], [], 60)  # check every 60s
