@@ -91,20 +91,10 @@ def generate_experiment_csv(output_path, models, tp_pp_configs, io_lengths):
 
 
 def get_cluster_info(tp, pp, gpu_type):
-    """Get cluster sizing for a TP/PP config (mirrors automatic_launch_1 logic)."""
+    """Get cluster sizing for a TP/PP config (uses same logic as automatic_launch_1)."""
+    from automatic_launch_1 import get_cluster_config
     gpu_config = GPU_CONFIGS[gpu_type]
-    available = sorted(gpu_config["available_gpus"])
-
-    # fit_tp_then_scale strategy: find smallest instance that fits TP, then scale PP across nodes
-    gpus_per_node = None
-    for g in available:
-        if g >= tp:
-            gpus_per_node = g
-            break
-    if gpus_per_node is None:
-        gpus_per_node = available[-1]
-
-    num_nodes = max(1, pp)  # PP stages across nodes
+    gpus_per_node, num_nodes = get_cluster_config(tp, pp, gpu_type)
     total_gpus = gpus_per_node * num_nodes
 
     pricing = gpu_config["pricing"].get(gpus_per_node, {})
