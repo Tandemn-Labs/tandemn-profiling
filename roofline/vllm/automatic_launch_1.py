@@ -1997,11 +1997,30 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
 
     subdir_name = f"tp{tp}-pp{pp}-{instance_name_safe}-{timestamp}"
 
-    # Directory structure: results/result-{input_len}in_{output_len}out/aws-{family}-{gpu}/tp{tp}-pp{pp}-{instance}-{timestamp}
+    # Directory structure: results/{instance_dir}/tp{tp}-pp{pp}-{instance}-{timestamp}-{status}
     if parent_dir:
         instance_path = Path(parent_dir) / instance_dir
     else:
         instance_path = Path(instance_dir)
+
+    # Skip if a successful run already exists for this config + model
+    existing = list(instance_path.glob(f"tp{tp}-pp{pp}-{instance_name_safe}-*-success"))
+    if existing and not dry_run:
+        # Verify the existing result has all experiments
+        latest = sorted(existing)[-1]
+        results_file = latest / "results.json"
+        if results_file.exists():
+            try:
+                with open(results_file) as f:
+                    prior = json.load(f)
+                prior_success = {r['exp_id'] for r in prior if r.get('status') == 'success'}
+                needed = {f"tp{e['tp']}_pp{e['pp']}_in{e['max_input_length']}_out{e['max_output_length']}" for e in experiments}
+                if needed.issubset(prior_success):
+                    print(f"\n⏭️  Skipping {cluster_name} — already completed in {latest.name}")
+                    return prior
+            except Exception:
+                pass  # corrupted results, re-run
+
     instance_path.mkdir(parents=True, exist_ok=True)
     result_dir = instance_path / subdir_name
 
