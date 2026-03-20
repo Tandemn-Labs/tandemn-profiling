@@ -2006,18 +2006,20 @@ def run_cluster_benchmarks(cluster_config, experiments, parent_dir=None, dry_run
     # Skip if a successful run already exists for this config + model
     existing = list(instance_path.glob(f"tp{tp}-pp{pp}-{instance_name_safe}-*-success"))
     if existing and not dry_run:
-        # Verify the existing result has all experiments
         latest = sorted(existing)[-1]
         results_file = latest / "results.json"
         if results_file.exists():
             try:
                 with open(results_file) as f:
                     prior = json.load(f)
-                prior_success = {r['exp_id'] for r in prior if r.get('status') == 'success'}
-                needed = {f"tp{e['tp']}_pp{e['pp']}_in{e['max_input_length']}_out{e['max_output_length']}" for e in experiments}
-                if needed.issubset(prior_success):
-                    print(f"\n⏭️  Skipping {cluster_name} — already completed in {latest.name}")
-                    return prior
+                # Check model matches AND all experiment IDs are present
+                prior_models = {r.get('model') for r in prior if r.get('status') == 'success'}
+                if model in prior_models:
+                    prior_success = {r['exp_id'] for r in prior if r.get('status') == 'success' and r.get('model') == model}
+                    needed = {f"tp{e['tp']}_pp{e['pp']}_in{e['max_input_length']}_out{e['max_output_length']}" for e in experiments}
+                    if needed.issubset(prior_success):
+                        print(f"\n⏭️  Skipping {cluster_name} — already completed in {latest.name}")
+                        return [r for r in prior if r.get('model') == model]
             except Exception:
                 pass  # corrupted results, re-run
 
