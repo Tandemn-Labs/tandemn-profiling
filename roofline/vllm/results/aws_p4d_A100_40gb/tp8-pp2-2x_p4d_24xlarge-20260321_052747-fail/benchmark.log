@@ -1,0 +1,1000 @@
+2026-03-21 05:27:47,758 - INFO - Results will be saved to: results/aws_p4d_A100_40gb/tp8-pp2-2x_p4d_24xlarge-20260321_052747
+2026-03-21 05:27:47,758 - INFO - 📋 Copied benchmark_client.py to roofline_benchmarks/
+2026-03-21 05:27:47,759 - INFO - 📋 Copied prometheus_parser.py to roofline_benchmarks/
+2026-03-21 05:27:47,759 - INFO - 🚀 Launching rf-qwen3-235b-a22b-tp8pp2-A100-40gb...
+2026-03-21 05:27:47,759 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-235b-a22b-tp8pp2-A100-40gb.yaml
+2026-03-21 05:27:47,759 - INFO - Running on cluster: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+2026-03-21 05:30:49,644 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-235b-a22b-tp8pp2-A100-40gb.yaml
+Running on cluster: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+Considered resources (2 nodes):
+---------------------------------------------------------------------------------
+ INFRA             INSTANCE       vCPUs   Mem(GB)   GPUS     COST ($)   CHOSEN   
+---------------------------------------------------------------------------------
+ AWS (us-east-2)   p4d.24xlarge   96      1152      A100:8   43.92      [32m   ✔[0m     
+---------------------------------------------------------------------------------
+[0m⚙︎ Launching on AWS us-east-2[0m (us-east-2a).
+[2mW 03-21 05:27:57.163 PID=142017 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 64 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+AWS handler error: Failed to launch instances. Max attempts exceeded.
+[0m⚙︎ Launching on AWS us-east-2[0m (us-east-2b).
+[2mW 03-21 05:28:01.940 PID=142017 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 64 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+AWS handler error: Failed to launch instances. Max attempts exceeded.
+[0m⚙︎ Launching on AWS us-east-2[0m (us-east-2c).
+[2mW 03-21 05:28:06.596 PID=142017 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 64 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+AWS handler error: Failed to launch instances. Max attempts exceeded.
+sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-east-2 for {AWS(p4d.24xlarge, mem=64.0+, {'A100': 8}, network_tier=best, disk_size=1000)}. 
+
+[0m[33m↺[0m Trying other potential resources.
+Considered resources (2 nodes):
+---------------------------------------------------------------------------------
+ INFRA             INSTANCE       vCPUs   Mem(GB)   GPUS     COST ($)   CHOSEN   
+---------------------------------------------------------------------------------
+ AWS (us-west-2)   p4d.24xlarge   96      1152      A100:8   43.92      [32m   ✔[0m     
+---------------------------------------------------------------------------------
+[0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
+[2mW 03-21 05:28:15.201 PID=142017 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4d.24xlarge capacity in the Availability Zone you requested (us-west-2a). Our system will be working on provisioning additional capacity. You can currently get p4d.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2b, us-west-2c, us-west-2d.[0m
+AWS handler error: Failed to launch instances. Max attempts exceeded.
+[0m⚙︎ Launching on AWS us-west-2[0m (us-west-2b).
+[2m└── [0m[2mInstances are up.[0m
+[0m[32m✓ Cluster launched: rf-qwen3-235b-a22b-tp8pp2-A100-40gb.[0m[0m  [2mView logs: [1msky logs --provision rf-qwen3-235b-a22b-tp8pp2-A100-40gb[0m[0m
+[0m⚙︎ Syncing files.
+  [33mThe size of workdir '/home/gcpuser/workspace/development/tandemn-profiling/roofline/vllm' is 386 MB. Try to keep workdir small or use .skyignore to exclude large files, as large sizes will slow down rsync.[0m
+  [2mSyncing workdir (to 2 nodes): /home/gcpuser/workspace/development/tandemn-profiling/roofline/vllm -> ~/sky_workdir[0m
+[0m[32m✓ Synced workdir.[0m[0m  [2mView logs: sky api logs -l sky-2026-03-21-05-27-50-757658/workdir_sync.log[0m
+[0m[32m✓ Setup detached.[0m[0m
+[0m⚙︎ Job submitted, ID: 1
+
+📋 Useful Commands
+Job ID: 1
+├── To cancel the job:		sky cancel rf-qwen3-235b-a22b-tp8pp2-A100-40gb 1
+├── To stream job logs:		sky logs rf-qwen3-235b-a22b-tp8pp2-A100-40gb 1
+└── To view job queue:		sky queue rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+Cluster name: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+├── To log into the head VM:	ssh rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+├── To submit a job:		sky exec rf-qwen3-235b-a22b-tp8pp2-A100-40gb yaml_file
+├── To stop the cluster:	sky stop rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+└── To teardown the cluster:	sky down rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+2026-03-21 05:30:49,645 - INFO - ⏳ Job submitted. Polling sky queue for completion (max 4h)...
+2026-03-21 05:31:53,350 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 min ago  13 secs ago  13s       2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:32:59,549 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED   STARTED    DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 mins ago  1 min ago  1m 19s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:34:03,313 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED   STARTED     DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  3 mins ago  2 mins ago  2m 23s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:35:07,149 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED   STARTED     DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  4 mins ago  3 mins ago  3m 27s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:36:10,842 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED   STARTED     DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  5 mins ago  4 mins ago  4m 30s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:37:14,713 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED   STARTED     DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  6 mins ago  5 mins ago  5m 34s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:38:18,414 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED   STARTED     DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  7 mins ago  6 mins ago  6m 38s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:39:22,125 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED   STARTED     DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  8 mins ago  7 mins ago  7m 42s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:40:25,889 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED   STARTED     DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  9 mins ago  8 mins ago  8m 45s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:41:29,676 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED     DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  10 mins ago  9 mins ago  9m 49s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:42:33,378 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  11 mins ago  10 mins ago  10m 53s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:43:37,104 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  12 mins ago  11 mins ago  11m 57s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:44:41,080 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  13 mins ago  13 mins ago  13m       2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:45:44,874 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  14 mins ago  14 mins ago  14m 4s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:46:48,601 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  16 mins ago  15 mins ago  15m 8s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:47:52,561 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  17 mins ago  16 mins ago  16m 12s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:48:56,429 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  18 mins ago  17 mins ago  17m 16s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:49:59,997 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  19 mins ago  18 mins ago  18m 19s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:51:03,712 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  20 mins ago  19 mins ago  19m 23s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:52:10,724 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  21 mins ago  20 mins ago  20m 30s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:53:14,789 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  22 mins ago  21 mins ago  21m 34s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:54:18,412 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  23 mins ago  22 mins ago  22m 38s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:55:22,161 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  24 mins ago  23 mins ago  23m 42s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:56:26,077 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  25 mins ago  24 mins ago  24m 45s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:57:29,656 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  26 mins ago  25 mins ago  25m 49s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:58:33,368 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  27 mins ago  26 mins ago  26m 53s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 05:59:36,986 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  28 mins ago  27 mins ago  27m 56s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:00:40,990 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  29 mins ago  29 mins ago  29m       2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:01:44,865 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  30 mins ago  30 mins ago  30m 4s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:02:48,669 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  32 mins ago  31 mins ago  31m 8s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:03:52,434 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  33 mins ago  32 mins ago  32m 12s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:04:56,248 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  34 mins ago  33 mins ago  33m 16s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:06:00,058 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  35 mins ago  34 mins ago  34m 19s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:07:03,761 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  36 mins ago  35 mins ago  35m 23s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:08:07,498 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  37 mins ago  36 mins ago  36m 27s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:09:11,268 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  38 mins ago  37 mins ago  37m 31s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:10:15,081 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  39 mins ago  38 mins ago  38m 34s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:11:18,849 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  40 mins ago  39 mins ago  39m 38s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:12:22,683 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  41 mins ago  40 mins ago  40m 42s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:13:26,488 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  42 mins ago  41 mins ago  41m 46s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:14:30,139 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  43 mins ago  42 mins ago  42m 50s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:15:33,824 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  44 mins ago  43 mins ago  43m 53s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:16:37,547 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  45 mins ago  44 mins ago  44m 57s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:17:41,277 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  46 mins ago  46 mins ago  46m 1s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:18:44,952 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  47 mins ago  47 mins ago  47m 4s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:19:48,677 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  49 mins ago  48 mins ago  48m 8s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:20:52,609 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  50 mins ago  49 mins ago  49m 12s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:21:56,444 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  51 mins ago  50 mins ago  50m 16s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:23:00,152 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  52 mins ago  51 mins ago  51m 20s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:24:03,876 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  53 mins ago  52 mins ago  52m 23s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:25:07,668 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  54 mins ago  53 mins ago  53m 27s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:26:11,429 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  55 mins ago  54 mins ago  54m 31s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:27:15,027 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  56 mins ago  55 mins ago  55m 34s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:28:18,782 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  57 mins ago  56 mins ago  56m 38s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:29:22,383 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  58 mins ago  57 mins ago  57m 42s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:30:26,081 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED    STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  59 mins ago  58 mins ago  58m 46s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:31:29,771 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED      DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   59 mins ago  59m 49s   2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:32:33,540 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 53s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:33:37,215 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 1m 57s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:34:40,904 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 3m     2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:35:44,745 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 4m 4s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:36:48,637 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 5m 8s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:37:52,616 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 6m 12s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:38:56,240 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 7m 16s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:39:59,923 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 8m 19s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:41:03,654 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 9m 23s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:42:07,347 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 10m 27s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:43:11,095 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 11m 30s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:44:15,433 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 12m 35s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:45:19,091 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 13m 39s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:46:22,832 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 14m 42s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:47:26,619 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 15m 46s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:48:30,456 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 16m 50s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:49:34,491 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 17m 54s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:50:38,570 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 18m 58s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:51:42,262 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 20m 2s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:52:45,916 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 21m 5s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:53:49,508 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 22m 9s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:54:53,219 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 23m 13s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:55:57,011 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 24m 16s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:57:00,799 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 25m 20s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:58:04,569 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 26m 24s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 06:59:08,601 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 27m 28s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:00:12,967 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 28m 32s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:01:17,092 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 29m 37s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:02:20,998 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 30m 40s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:03:25,060 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 31m 44s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:04:28,734 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 32m 48s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:05:33,809 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 33m 53s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:06:42,410 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 35m 2s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:07:46,094 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 36m 6s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:08:49,747 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 37m 9s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:09:53,504 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 38m 13s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:10:57,210 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 39m 17s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:12:00,875 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 40m 20s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:13:05,035 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 41m 24s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:14:08,716 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 42m 28s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:15:12,434 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 43m 32s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:16:16,071 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 44m 36s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:17:19,866 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 45m 39s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:18:23,843 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 46m 43s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:19:27,400 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 47m 47s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:20:31,215 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 48m 51s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:21:34,772 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 49m 54s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:22:38,441 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 50m 58s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:23:42,114 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 52m 2s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:24:45,898 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 53m 5s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:25:49,616 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 54m 9s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:26:53,434 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 55m 13s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:27:56,948 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 56m 16s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:29:00,658 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 57m 20s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:30:04,349 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  1 hr ago   1 hr ago  1h 58m 24s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:31:08,006 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED   DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  1 hr ago  1h 59m 27s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:32:11,741 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 31s    2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:33:15,667 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 1m 35s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:34:19,423 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 2m 39s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:35:23,243 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 3m 43s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:36:26,894 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 4m 46s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:37:30,428 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 5m 50s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:38:34,159 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 6m 54s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:39:37,783 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 7m 57s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:40:41,667 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION  RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 9m 1s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:41:45,337 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 10m 5s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:42:48,927 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 11m 8s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:43:52,579 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 12m 12s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:44:56,280 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 13m 16s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:46:00,002 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 14m 19s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:47:03,623 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 15m 23s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:48:07,245 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 16m 27s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:49:10,896 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 17m 30s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:50:14,594 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 18m 34s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:51:18,178 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 19m 38s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:52:21,765 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 20m 41s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:53:25,517 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 21m 45s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:54:29,097 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 22m 49s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:55:32,718 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 23m 52s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:56:36,286 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 24m 56s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:57:39,845 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 25m 59s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:58:43,538 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 27m 3s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 07:59:47,222 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 28m 7s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:00:50,883 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 29m 10s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:01:54,630 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 30m 14s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:02:58,311 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 31m 18s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:04:01,928 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 32m 21s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:05:05,619 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 33m 25s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:06:09,174 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 34m 29s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:07:12,683 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 35m 32s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:08:16,262 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 36m 36s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:09:20,010 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 37m 39s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:10:23,744 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 38m 43s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:11:27,380 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 39m 47s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:12:31,281 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 40m 51s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:13:34,990 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 41m 54s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:14:38,580 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION    RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 42m 58s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:15:42,275 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS   LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 44m 2s  2x[A100:8]  RUNNING  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:16:45,827 - INFO - [queue] Fetching and parsing job queue...
+Fetching job queue for: rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+
+Job queue of current user on cluster rf-qwen3-235b-a22b-tp8pp2-A100-40gb
+ID  NAME                                 USER     SUBMITTED  STARTED    DURATION   RESOURCES   STATUS     LOG                                        GIT COMMIT                                
+1   rf-qwen3-235b-a22b-tp8pp2-A100-40gb  gcpuser  2 hrs ago  2 hrs ago  2h 44m 4s  2x[A100:8]  SUCCEEDED  ~/sky_logs/sky-2026-03-21-05-27-50-757658  a7b17024fd0d845b30650395a141eb1391d5e55f
+2026-03-21 08:16:45,827 - INFO - 📥 Fetching results...
+2026-03-21 08:16:47,045 - INFO - 📈 Fetching timeseries data...
+2026-03-21 08:16:48,548 - INFO - 📁 Renaming directory: tp8-pp2-2x_p4d_24xlarge-20260321_052747 -> tp8-pp2-2x_p4d_24xlarge-20260321_052747-fail
+2026-03-21 08:16:48,554 - INFO - 📈 Plotting timeseries for 6 successful experiment(s)...
+2026-03-21 08:16:48,556 - WARNING - ⚠️  Failed to generate timeseries plots: [Errno 2] No such file or directory: 'python'
+2026-03-21 08:16:48,556 - INFO - ✅ Results saved to results/aws_p4d_A100_40gb/tp8-pp2-2x_p4d_24xlarge-20260321_052747-fail/
+2026-03-21 08:16:48,770 - INFO - 🗑️  Tearing down rf-qwen3-235b-a22b-tp8pp2-A100-40gb...
