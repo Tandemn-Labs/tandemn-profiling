@@ -63,7 +63,7 @@ IO_LENGTHS = [
     (16384, 2048),   # ratio 8.0  — maximum context stress test
 ]
 
-GPU_TYPES = ["A10G", "L40S", "L4", "A100_40gb", "H100"]
+GPU_TYPES = ["A10G", "L40S", "L4", "A100_40gb", "A100_80gb", "H100"]
 
 # ── Helper functions ──────────────────────────────────────────────────────────
 
