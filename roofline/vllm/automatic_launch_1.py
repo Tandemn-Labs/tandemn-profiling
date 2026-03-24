@@ -1861,7 +1861,7 @@ server_proc, server_log_file = start_vllm_server(MODEL_PATH, TP, PP, MAX_MODEL_L
 
 try:
     # Wait for server health
-    if not wait_for_health(server_proc, timeout=600):
+    if not wait_for_health(server_proc, timeout=1800):  # 30 min for large models like 235B
         if server_proc.poll() is not None:
             with open(SERVER_LOG) as f:
                 log_tail = f.read()[-3000:]
