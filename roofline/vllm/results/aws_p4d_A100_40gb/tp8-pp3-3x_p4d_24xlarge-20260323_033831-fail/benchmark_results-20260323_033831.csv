@@ -1,0 +1,2 @@
+tp,pp,max_input_length,max_output_length,model,status,error
+8,3,512,1024,Qwen/Qwen3-32B,cluster_error,Command 'sky launch' returned non-zero exit status 100.

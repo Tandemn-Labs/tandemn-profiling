@@ -1,0 +1,11 @@
+[
+  {
+    "tp": 8,
+    "pp": 3,
+    "max_input_length": 512,
+    "max_output_length": 1024,
+    "model": "Qwen/Qwen3-32B",
+    "status": "cluster_error",
+    "error": "Command 'sky launch' returned non-zero exit status 100."
+  }
+]

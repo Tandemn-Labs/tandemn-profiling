@@ -1,0 +1,1350 @@
+2026-03-24 09:12:46,368 - INFO - Results will be saved to: results/aws_p4d_A100_40gb/tp4-pp2-p4d_24xlarge-20260324_091246
+2026-03-24 09:12:46,369 - INFO - 📋 Copied benchmark_client.py to roofline_benchmarks/
+2026-03-24 09:12:46,370 - INFO - 📋 Copied prometheus_parser.py to roofline_benchmarks/
+2026-03-24 09:12:46,370 - INFO - 🚀 Launching rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb...
+2026-03-24 09:12:46,370 - INFO - YAML to run: roofline_benchmarks/rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb.yaml
+2026-03-24 09:12:46,370 - INFO - Running on cluster: rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb
+2026-03-24 09:12:47,744 - INFO - YAML to run: roofline_benchmarks/rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb.yaml
+2026-03-24 09:12:47,884 - INFO - Running on cluster: rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb
+2026-03-24 09:12:48,904 - INFO - Considered resources (1 node):
+2026-03-24 09:12:50,418 - INFO - ---------------------------------------------------------------------------------
+2026-03-24 09:12:50,418 - INFO -  INFRA             INSTANCE       vCPUs   Mem(GB)   GPUS     COST ($)   CHOSEN
+2026-03-24 09:12:50,418 - INFO - ---------------------------------------------------------------------------------
+2026-03-24 09:12:50,418 - INFO -  AWS (us-east-2)   p4d.24xlarge   96      1152      A100:8   21.96      [32m   ✔[0m
+2026-03-24 09:12:50,418 - INFO - ---------------------------------------------------------------------------------
+2026-03-24 09:12:50,418 - INFO - [33mInstance type p4d.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-24 09:12:51,829 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-24 09:12:51,829 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-24 09:12:51,829 - INFO - Option 1 (with SSM):
+2026-03-24 09:12:51,829 - INFO -   aws:
+2026-03-24 09:12:51,829 - INFO -     use_internal_ips: true
+2026-03-24 09:12:51,829 - INFO -     use_ssm: true
+2026-03-24 09:12:51,829 - INFO - Option 2 (with SSH proxy):
+2026-03-24 09:12:51,829 - INFO -   aws:
+2026-03-24 09:12:51,829 - INFO -     use_internal_ips: true
+2026-03-24 09:12:51,829 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-24 09:12:51,829 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-24 09:12:51,829 - INFO - [0m⚙︎ Launching on AWS us-east-2[0m (us-east-2a,us-east-2b,us-east-2c).
+2026-03-24 09:13:00,191 - INFO - [2mW 03-24 09:13:00.144 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 64 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-24 09:13:02,008 - INFO - [2mW 03-24 09:13:01.945 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 64 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-24 09:13:03,720 - INFO - [2mW 03-24 09:13:03.641 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (VcpuLimitExceeded) when calling the RunInstances operation: You have requested more vCPU capacity than your current vCPU limit of 64 allows for the instance bucket that the specified instance type belongs to. Please visit http://aws.amazon.com/contact-us/ec2-request to request an adjustment to this limit.[0m
+2026-03-24 09:13:07,354 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-24 09:13:07,757 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in all zones in us-east-2 for {AWS(p4d.24xlarge, mem=64.0+, {'A100': 8}, network_tier=best, disk_size=500)}.
+2026-03-24 09:13:07,757 - INFO - 
+2026-03-24 09:13:07,757 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-24 09:13:07,758 - INFO - Considered resources (1 node):
+2026-03-24 09:13:09,069 - INFO - ---------------------------------------------------------------------------------
+2026-03-24 09:13:09,069 - INFO -  INFRA             INSTANCE       vCPUs   Mem(GB)   GPUS     COST ($)   CHOSEN
+2026-03-24 09:13:09,069 - INFO - ---------------------------------------------------------------------------------
+2026-03-24 09:13:09,069 - INFO -  AWS (us-west-2)   p4d.24xlarge   96      1152      A100:8   21.96      [32m   ✔[0m
+2026-03-24 09:13:09,069 - INFO - ---------------------------------------------------------------------------------
+2026-03-24 09:13:09,069 - INFO - [33mInstance type p4d.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-24 09:13:10,987 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-24 09:13:10,987 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-24 09:13:10,987 - INFO - Option 1 (with SSM):
+2026-03-24 09:13:10,987 - INFO -   aws:
+2026-03-24 09:13:10,987 - INFO -     use_internal_ips: true
+2026-03-24 09:13:10,987 - INFO -     use_ssm: true
+2026-03-24 09:13:10,987 - INFO - Option 2 (with SSH proxy):
+2026-03-24 09:13:10,987 - INFO -   aws:
+2026-03-24 09:13:10,987 - INFO -     use_internal_ips: true
+2026-03-24 09:13:10,987 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-24 09:13:10,988 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-24 09:13:10,988 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a,us-west-2b,us-west-2c,us-west-2d).
+2026-03-24 09:13:27,519 - INFO - [2mW 03-24 09:13:27.422 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4d.24xlarge capacity in the Availability Zone you requested (us-west-2a). Our system will be working on provisioning additional capacity. You can currently get p4d.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2b, us-west-2c, us-west-2d.[0m
+2026-03-24 09:13:29,740 - INFO - [2mW 03-24 09:13:29.708 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4d.24xlarge capacity in the Availability Zone you requested (us-west-2b). Our system will be working on provisioning additional capacity. You can currently get p4d.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2c, us-west-2d.[0m
+2026-03-24 09:13:50,592 - INFO - [33mInstance type p4d.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-24 09:15:23,068 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-24 09:15:23,068 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-24 09:15:23,068 - INFO - Option 1 (with SSM):
+2026-03-24 09:15:23,068 - INFO -   aws:
+2026-03-24 09:15:23,068 - INFO -     use_internal_ips: true
+2026-03-24 09:15:23,068 - INFO -     use_ssm: true
+2026-03-24 09:15:23,068 - INFO - Option 2 (with SSH proxy):
+2026-03-24 09:15:23,068 - INFO -   aws:
+2026-03-24 09:15:23,068 - INFO -     use_internal_ips: true
+2026-03-24 09:15:23,068 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-24 09:15:23,068 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-24 09:15:23,068 - INFO - [2m└── [0m[2mInstance is up.[0m
+2026-03-24 09:16:13,083 - INFO - [0m[32m✓ Cluster launched: rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb.[0m[0m  [2mView logs: [1msky logs --provision rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb[0m[0m
+2026-03-24 09:16:13,185 - INFO - [0m⚙︎ Syncing files.
+2026-03-24 09:16:13,185 - INFO -   [33mThe size of workdir '/home/orange/Desktop/tandemn/tandemn-profiling/roofline/vllm' is 414 MB. Try to keep workdir small or use .skyignore to exclude large files, as large sizes will slow down rsync.[0m
+2026-03-24 09:16:38,774 - INFO -   [2mSyncing workdir (to 1 node): /home/orange/Desktop/tandemn/tandemn-profiling/roofline/vllm -> ~/sky_workdir[0m
+2026-03-24 09:16:38,774 - INFO - [0m[32m✓ Synced workdir.[0m[0m  [2mView logs: sky api logs -l sky-2026-03-24-09-12-48-023830/workdir_sync.log[0m
+2026-03-24 09:16:44,924 - INFO - [0m[32m✓ Setup detached.[0m[0m
+2026-03-24 09:16:49,658 - INFO - [0m⚙︎ Job submitted, ID: 1
+2026-03-24 09:16:56,060 - INFO - [2m├── [0m[2mWaiting for task resources on 1 node.[0m
+2026-03-24 09:16:56,870 - INFO - [2m└── [0mJob started. Streaming logs... [2m(Ctrl-C to exit log streaming; job will not be killed)[0m
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m + GPU_TYPE=A100_40gb
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m + IS_A100=true
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m + echo 'GPU Type: A100_40gb, Is A100: true'
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m GPU Type: A100_40gb, Is A100: true
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m + echo '=== Initial System Diagnostics ==='
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m === Initial System Diagnostics ===
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m + echo 'Checking for NVIDIA driver...'
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m Checking for NVIDIA driver...
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m + nvidia-smi
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m Tue Mar 24 03:46:54 2026
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------------------------------------------------------+
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m | NVIDIA-SMI 570.172.08             Driver Version: 570.172.08     CUDA Version: 12.8     |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m | GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m | Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |                                         |                        |               MIG M. |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |=========================================+========================+======================|
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |   0  NVIDIA A100-SXM4-40GB          On  |   00000000:10:1C.0 Off |                    0 |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m | N/A   31C    P0             53W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |   1  NVIDIA A100-SXM4-40GB          On  |   00000000:10:1D.0 Off |                    0 |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m | N/A   30C    P0             52W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |   2  NVIDIA A100-SXM4-40GB          On  |   00000000:20:1C.0 Off |                    0 |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m | N/A   31C    P0             52W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |   3  NVIDIA A100-SXM4-40GB          On  |   00000000:20:1D.0 Off |                    0 |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m | N/A   30C    P0             56W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |   4  NVIDIA A100-SXM4-40GB          On  |   00000000:90:1C.0 Off |                    0 |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m | N/A   32C    P0             53W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:56,871 - INFO - [36m(setup pid=6476)[0m |   5  NVIDIA A100-SXM4-40GB          On  |   00000000:90:1D.0 Off |                    0 |
+2026-03-24 09:16:56,872 - INFO - [36m(setup pid=6476)[0m | N/A   30C    P0             56W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:16:57,982 - INFO - [36m(setup pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:16:57,982 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:57,982 - INFO - [36m(setup pid=6476)[0m |   6  NVIDIA A100-SXM4-40GB          On  |   00000000:A0:1C.0 Off |                    0 |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m | N/A   32C    P0             56W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m |   7  NVIDIA A100-SXM4-40GB          On  |   00000000:A0:1D.0 Off |                    0 |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m | N/A   30C    P0             52W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------------------------------------------------------+
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m | Processes:                                                                              |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m |  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m |        ID   ID                                                               Usage      |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m |=========================================================================================|
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m |  No running processes found                                                             |
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m +-----------------------------------------------------------------------------------------+
+2026-03-24 09:16:57,983 - INFO - [36m(setup pid=6476)[0m + echo 'Checking CUDA libraries...'
+2026-03-24 09:16:58,285 - INFO - [36m(setup pid=6476)[0m Checking CUDA libraries...
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m + ldconfig -p
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m + grep --color=auto cuda
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvrtc.so.12
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvrtc.so.12
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvrtc.so.12
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvrtc.so.12
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvrtc.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvrtc.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvrtc.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvrtc.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.alt.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvrtc.alt.so.12
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc.alt.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvrtc.alt.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.so.12.8 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvrtc-builtins.so.12.8
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.so.12.6 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvrtc-builtins.so.12.6
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.so.12.5 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvrtc-builtins.so.12.5
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.so.12.4 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvrtc-builtins.so.12.4
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvrtc-builtins.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvrtc-builtins.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvrtc-builtins.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvrtc-builtins.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.alt.so.12.8 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvrtc-builtins.alt.so.12.8
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvrtc-builtins.alt.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvrtc-builtins.alt.so
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvjpeg.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvjpeg.so.12
+2026-03-24 09:16:58,286 - INFO - [36m(setup pid=6476)[0m 	libnvjpeg.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvjpeg.so.12
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvjpeg.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvjpeg.so.12
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvjpeg.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvjpeg.so.12
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvjpeg.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvjpeg.so
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvjpeg.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvjpeg.so
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvjpeg.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvjpeg.so
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvjpeg.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvjpeg.so
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvfatbin.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvfatbin.so.12
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvfatbin.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvfatbin.so.12
+2026-03-24 09:16:58,287 - INFO - [36m(setup pid=6476)[0m 	libnvfatbin.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvfatbin.so.12
+2026-03-24 09:16:58,590 - INFO - [36m(setup pid=6476)[0m 	libnvfatbin.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvfatbin.so.12
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvfatbin.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvfatbin.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvfatbin.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvfatbin.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvfatbin.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvfatbin.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvfatbin.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvfatbin.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvblas.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvblas.so.12
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvblas.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvblas.so.12
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvblas.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvblas.so.12
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvblas.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvblas.so.12
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvblas.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvblas.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvblas.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvblas.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvblas.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvblas.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvblas.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvblas.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvToolsExt.so.1 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvToolsExt.so.1
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvToolsExt.so.1 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvToolsExt.so.1
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvToolsExt.so.1 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvToolsExt.so.1
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvToolsExt.so.1 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvToolsExt.so.1
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvToolsExt.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvToolsExt.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvToolsExt.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvToolsExt.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvToolsExt.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvToolsExt.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvToolsExt.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvToolsExt.so
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvJitLink.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvJitLink.so.12
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvJitLink.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvJitLink.so.12
+2026-03-24 09:16:58,591 - INFO - [36m(setup pid=6476)[0m 	libnvJitLink.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvJitLink.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnvJitLink.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvJitLink.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnvJitLink.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvJitLink.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnvJitLink.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnvJitLink.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnvJitLink.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnvJitLink.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnvJitLink.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnvJitLink.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnpps.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnpps.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnpps.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnpps.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnpps.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnpps.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnpps.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnpps.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnpps.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnpps.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnpps.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnpps.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnpps.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnpps.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnpps.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnpps.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppitc.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppitc.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppitc.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppitc.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppitc.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppitc.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppitc.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppitc.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppitc.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppitc.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppitc.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppitc.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppitc.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppitc.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppitc.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppitc.so
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppisu.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppisu.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppisu.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppisu.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppisu.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppisu.so.12
+2026-03-24 09:16:58,592 - INFO - [36m(setup pid=6476)[0m 	libnppisu.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppisu.so.12
+2026-03-24 09:16:58,895 - INFO - [36m(setup pid=6476)[0m 	libnppisu.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppisu.so
+2026-03-24 09:16:58,895 - INFO - [36m(setup pid=6476)[0m 	libnppisu.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppisu.so
+2026-03-24 09:16:58,895 - INFO - [36m(setup pid=6476)[0m 	libnppisu.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppisu.so
+2026-03-24 09:16:58,895 - INFO - [36m(setup pid=6476)[0m 	libnppisu.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppisu.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppist.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppist.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppist.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppist.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppist.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppist.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppist.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppist.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppist.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppist.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppist.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppist.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppist.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppist.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppist.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppist.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppim.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppim.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppim.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppim.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppim.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppim.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppim.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppim.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppim.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppim.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppim.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppim.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppim.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppim.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppim.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppim.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppig.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppig.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppig.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppig.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppig.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppig.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppig.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppig.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppig.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppig.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppig.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppig.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppig.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppig.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppig.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppig.so
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppif.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppif.so.12
+2026-03-24 09:16:58,896 - INFO - [36m(setup pid=6476)[0m 	libnppif.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppif.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppif.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppif.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppif.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppif.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppif.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppif.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppif.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppif.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppif.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppif.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppif.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppif.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppidei.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppidei.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppidei.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppidei.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppidei.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppidei.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppidei.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppidei.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppidei.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppidei.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppidei.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppidei.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppidei.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppidei.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppidei.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppidei.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppicc.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppicc.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppicc.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppicc.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppicc.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppicc.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppicc.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppicc.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppicc.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppicc.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppicc.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppicc.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppicc.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppicc.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppicc.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppicc.so
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppial.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppial.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppial.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppial.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppial.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppial.so.12
+2026-03-24 09:16:58,897 - INFO - [36m(setup pid=6476)[0m 	libnppial.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppial.so.12
+2026-03-24 09:16:58,898 - INFO - [36m(setup pid=6476)[0m 	libnppial.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppial.so
+2026-03-24 09:16:58,898 - INFO - [36m(setup pid=6476)[0m 	libnppial.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppial.so
+2026-03-24 09:16:58,898 - INFO - [36m(setup pid=6476)[0m 	libnppial.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppial.so
+2026-03-24 09:16:58,898 - INFO - [36m(setup pid=6476)[0m 	libnppial.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppial.so
+2026-03-24 09:16:58,898 - INFO - [36m(setup pid=6476)[0m 	libnppc.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppc.so.12
+2026-03-24 09:16:59,198 - INFO - [36m(setup pid=6476)[0m 	libnppc.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppc.so.12
+2026-03-24 09:16:59,198 - INFO - [36m(setup pid=6476)[0m 	libnppc.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppc.so.12
+2026-03-24 09:16:59,198 - INFO - [36m(setup pid=6476)[0m 	libnppc.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppc.so.12
+2026-03-24 09:16:59,198 - INFO - [36m(setup pid=6476)[0m 	libnppc.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnppc.so
+2026-03-24 09:16:59,198 - INFO - [36m(setup pid=6476)[0m 	libnppc.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libnppc.so
+2026-03-24 09:16:59,198 - INFO - [36m(setup pid=6476)[0m 	libnppc.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libnppc.so
+2026-03-24 09:16:59,198 - INFO - [36m(setup pid=6476)[0m 	libnppc.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libnppc.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libicudata.so.70 (libc6,x86-64) => /lib/x86_64-linux-gnu/libicudata.so.70
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusparse.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcusparse.so.12
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusparse.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcusparse.so.12
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusparse.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcusparse.so.12
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusparse.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusparse.so.12
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusparse.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcusparse.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusparse.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcusparse.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusparse.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcusparse.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusparse.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusparse.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolverMg.so.11 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcusolverMg.so.11
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolverMg.so.11 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcusolverMg.so.11
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolverMg.so.11 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcusolverMg.so.11
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolverMg.so.11 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusolverMg.so.11
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolverMg.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcusolverMg.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolverMg.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcusolverMg.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolverMg.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcusolverMg.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolverMg.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusolverMg.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolver.so.11 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcusolver.so.11
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolver.so.11 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcusolver.so.11
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolver.so.11 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcusolver.so.11
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolver.so.11 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusolver.so.11
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolver.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcusolver.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolver.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcusolver.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolver.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcusolver.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcusolver.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcusolver.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcurand.so.10 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcurand.so.10
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcurand.so.10 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcurand.so.10
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcurand.so.10 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcurand.so.10
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcurand.so.10 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcurand.so.10
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcurand.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcurand.so
+2026-03-24 09:16:59,199 - INFO - [36m(setup pid=6476)[0m 	libcurand.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcurand.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcurand.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcurand.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcurand.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcurand.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcuinj64.so.12.8 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcuinj64.so.12.8
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcuinj64.so.12.6 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcuinj64.so.12.6
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcuinj64.so.12.5 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcuinj64.so.12.5
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcuinj64.so.12.4 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcuinj64.so.12.4
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcuinj64.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcuinj64.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcuinj64.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcuinj64.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcuinj64.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcuinj64.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcuinj64.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcuinj64.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile_rdma.so.1 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcufile_rdma.so.1
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile_rdma.so.1 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcufile_rdma.so.1
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile_rdma.so.1 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcufile_rdma.so.1
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile_rdma.so.1 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufile_rdma.so.1
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile_rdma.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcufile_rdma.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile_rdma.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcufile_rdma.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile_rdma.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcufile_rdma.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile_rdma.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufile_rdma.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile.so.0 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcufile.so.0
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile.so.0 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcufile.so.0
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile.so.0 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcufile.so.0
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile.so.0 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufile.so.0
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcufile.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcufile.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcufile.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufile.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufile.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufftw.so.11 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcufftw.so.11
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufftw.so.11 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcufftw.so.11
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufftw.so.11 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcufftw.so.11
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufftw.so.11 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufftw.so.11
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufftw.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcufftw.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufftw.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcufftw.so
+2026-03-24 09:16:59,200 - INFO - [36m(setup pid=6476)[0m 	libcufftw.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcufftw.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufftw.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufftw.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufft.so.11 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcufft.so.11
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufft.so.11 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcufft.so.11
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufft.so.11 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcufft.so.11
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufft.so.11 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufft.so.11
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufft.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcufft.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufft.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcufft.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufft.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcufft.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcufft.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcufft.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudart.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcudart.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudart.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcudart.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudart.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudart.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcudart.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudart.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcudart.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudart.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcudart.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudart.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudart.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcudart.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcudadebugger.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libcudadebugger.so.1
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcuda.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libcuda.so.1
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcuda.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libcuda.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublasLt.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcublasLt.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublasLt.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcublasLt.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublasLt.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcublasLt.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublasLt.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublasLt.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublasLt.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcublasLt.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublasLt.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcublasLt.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublasLt.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcublasLt.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublasLt.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublasLt.so
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublas.so.12 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcublas.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublas.so.12 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcublas.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublas.so.12 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcublas.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublas.so.12 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublas.so.12
+2026-03-24 09:16:59,201 - INFO - [36m(setup pid=6476)[0m 	libcublas.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libcublas.so
+2026-03-24 09:16:59,202 - INFO - [36m(setup pid=6476)[0m 	libcublas.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libcublas.so
+2026-03-24 09:16:59,202 - INFO - [36m(setup pid=6476)[0m 	libcublas.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcublas.so
+2026-03-24 09:16:59,202 - INFO - [36m(setup pid=6476)[0m 	libcublas.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libcublas.so
+2026-03-24 09:16:59,202 - INFO - [36m(setup pid=6476)[0m 	libaccinj64.so.12.8 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libaccinj64.so.12.8
+2026-03-24 09:16:59,202 - INFO - [36m(setup pid=6476)[0m 	libaccinj64.so.12.6 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libaccinj64.so.12.6
+2026-03-24 09:16:59,202 - INFO - [36m(setup pid=6476)[0m 	libaccinj64.so.12.5 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libaccinj64.so.12.5
+2026-03-24 09:16:59,202 - INFO - [36m(setup pid=6476)[0m 	libaccinj64.so.12.4 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libaccinj64.so.12.4
+2026-03-24 09:16:59,202 - INFO - [36m(setup pid=6476)[0m 	libaccinj64.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libaccinj64.so
+2026-03-24 09:16:59,502 - INFO - [36m(setup pid=6476)[0m 	libaccinj64.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libaccinj64.so
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libaccinj64.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libaccinj64.so
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libaccinj64.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libaccinj64.so
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libOpenCL.so.1 (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libOpenCL.so.1
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libOpenCL.so.1 (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libOpenCL.so.1
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libOpenCL.so.1 (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libOpenCL.so.1
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libOpenCL.so.1 (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libOpenCL.so.1
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libOpenCL.so (libc6,x86-64) => /usr/local/cuda-12.4/targets/x86_64-linux/lib/libOpenCL.so
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libOpenCL.so (libc6,x86-64) => /usr/local/cuda-12.5/targets/x86_64-linux/lib/libOpenCL.so
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libOpenCL.so (libc6,x86-64) => /usr/local/cuda-12.6/targets/x86_64-linux/lib/libOpenCL.so
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m 	libOpenCL.so (libc6,x86-64) => /usr/local/cuda-12.8/targets/x86_64-linux/lib/libOpenCL.so
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m + echo 'CUDA toolkit path:'
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m CUDA toolkit path:
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m + ls --color=auto -la /usr/local/cuda /usr/local/cuda-12.4 /usr/local/cuda-12.5 /usr/local/cuda-12.6 /usr/local/cuda-12.8
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root root   21 Aug  8  2025 /usr/local/cuda -> /usr/local/cuda-12.8/
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m /usr/local/cuda-12.4:
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m total 188
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x 19 root   root    4096 Aug  8  2025 .
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x 15 root   root    4096 Aug  8  2025 ..
+2026-03-24 09:16:59,503 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root     160 Aug  8  2025 DOCS
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root   63021 Aug  8  2025 EULA.txt
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 ubuntu ubuntu 29662 Nov 30  2023 LICENSE
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root    1895 Jun 11  2024 LICENSE.txt
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root     524 Aug  8  2025 README
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 bin
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 compute-sanitizer
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 efa
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 extras
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 gds
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 gds-12.4
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      28 Aug  8  2025 include -> targets/x86_64-linux/include
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxrwxr-x  3 root   root    4096 Aug  8  2025 lib
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      24 Aug  8  2025 lib64 -> targets/x86_64-linux/lib
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  7 root   root    4096 Aug  8  2025 libnvvp
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  7 root   root    4096 Aug  8  2025 nsight-compute-2024.1.1
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  6 root   root    4096 Aug  8  2025 nsight-systems-2023.4.4
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 nsightee_plugins
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 nvml
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  6 root   root    4096 Aug  8  2025 nvvm
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 share
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 src
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 targets
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 tools
+2026-03-24 09:16:59,504 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root    2957 Aug  8  2025 version.json
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m /usr/local/cuda-12.5:
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m total 188
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x 19 root   root    4096 Aug  8  2025 .
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x 15 root   root    4096 Aug  8  2025 ..
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root     160 Aug  8  2025 DOCS
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root   63021 Aug  8  2025 EULA.txt
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 ubuntu ubuntu 29574 Oct 21  2024 LICENSE
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root    1895 Nov  6  2024 LICENSE.txt
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root     524 Aug  8  2025 README
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 bin
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 compute-sanitizer
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 efa
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 extras
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 gds
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 gds-12.5
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      28 Aug  8  2025 include -> targets/x86_64-linux/include
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 lib
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      24 Aug  8  2025 lib64 -> targets/x86_64-linux/lib
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  7 root   root    4096 Aug  8  2025 libnvvp
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  7 root   root    4096 Aug  8  2025 nsight-compute-2024.2.0
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  6 root   root    4096 Aug  8  2025 nsight-systems-2024.2.3
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 nsightee_plugins
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 nvml
+2026-03-24 09:16:59,505 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  6 root   root    4096 Aug  8  2025 nvvm
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 share
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 src
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 targets
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 tools
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root    2940 Aug  8  2025 version.json
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m /usr/local/cuda-12.6:
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m total 188
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x 19 root   root    4096 Aug  8  2025 .
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x 15 root   root    4096 Aug  8  2025 ..
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root     160 Aug  8  2025 DOCS
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root   63021 Aug  8  2025 EULA.txt
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 ubuntu ubuntu 29574 Dec 30  2024 LICENSE
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root    1895 Dec  7  2024 LICENSE.txt
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root     524 Aug  8  2025 README
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxrwxr-x  3 root   root    4096 Dec  7  2024 bin
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 compute-sanitizer
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 efa
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 extras
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 gds
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 gds-12.6
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      28 Aug  8  2025 include -> targets/x86_64-linux/include
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxrwxr-x  3 root   root    4096 Aug  8  2025 lib
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      24 Aug  8  2025 lib64 -> targets/x86_64-linux/lib
+2026-03-24 09:16:59,506 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  7 root   root    4096 Aug  8  2025 libnvvp
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  7 root   root    4096 Aug  8  2025 nsight-compute-2024.3.2
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  6 root   root    4096 Aug  8  2025 nsight-systems-2024.5.1
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 nsightee_plugins
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 nvml
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  6 root   root    4096 Aug  8  2025 nvvm
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 share
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 src
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 targets
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 tools
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root    2935 Aug  8  2025 version.json
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m /usr/local/cuda-12.8:
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m total 188
+2026-03-24 09:16:59,507 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x 19 root   root    4096 Aug  8  2025 .
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x 15 root   root    4096 Aug  8  2025 ..
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root     160 Aug  8  2025 DOCS
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root   63021 Aug  8  2025 EULA.txt
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 ubuntu ubuntu 29574 May 31  2025 LICENSE
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root    1895 May 15  2025 LICENSE.txt
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root     524 Aug  8  2025 README
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 May 15  2025 bin
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 compute-sanitizer
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      20 Aug  8  2025 cuda-12.8 -> /usr/local/cuda-12.8
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 efa
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 extras
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  5 root   root    4096 Aug  8  2025 gds
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 gds-12.8
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      28 Aug  8  2025 include -> targets/x86_64-linux/include
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 lib
+2026-03-24 09:17:00,007 - INFO - [36m(setup pid=6476)[0m lrwxrwxrwx  1 root   root      24 Aug  8  2025 lib64 -> targets/x86_64-linux/lib
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  7 root   root    4096 Aug  8  2025 libnvvp
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  7 root   root    4096 Aug  8  2025 nsight-compute-2025.1.1
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  6 root   root    4096 Aug  8  2025 nsight-systems-2024.6.2
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 nsightee_plugins
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 nvml
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  6 root   root    4096 Aug  8  2025 nvvm
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 share
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 src
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  3 root   root    4096 Aug  8  2025 targets
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m drwxr-xr-x  2 root   root    4096 Aug  8  2025 tools
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m -rw-r--r--  1 root   root    2940 Aug  8  2025 version.json
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m + echo ===================================
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m ===================================
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m + command -v nvidia-smi
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m + '[' true = true ']'
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m + echo '=== Fabric Manager for NVSwitch ==='
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m === Fabric Manager for NVSwitch ===
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m + systemctl is-active --quiet nvidia-fabricmanager
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m + echo 'Fabric Manager already running'
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m Fabric Manager already running
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m + awk 'NR<=15'
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m + nvidia-smi topo -m
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m 	[4mGPU0	GPU1	GPU2	GPU3	GPU4	GPU5	GPU6	GPU7	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+2026-03-24 09:17:00,008 - INFO - [36m(setup pid=6476)[0m GPU0	 X 	NV12	NV12	NV12	NV12	NV12	NV12	NV12	0-23,48-71	0		N/A
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m GPU1	NV12	 X 	NV12	NV12	NV12	NV12	NV12	NV12	0-23,48-71	0		N/A
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m GPU2	NV12	NV12	 X 	NV12	NV12	NV12	NV12	NV12	0-23,48-71	0		N/A
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m GPU3	NV12	NV12	NV12	 X 	NV12	NV12	NV12	NV12	0-23,48-71	0		N/A
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m GPU4	NV12	NV12	NV12	NV12	 X 	NV12	NV12	NV12	24-47,72-95	1		N/A
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m GPU5	NV12	NV12	NV12	NV12	NV12	 X 	NV12	NV12	24-47,72-95	1		N/A
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m GPU6	NV12	NV12	NV12	NV12	NV12	NV12	 X 	NV12	24-47,72-95	1		N/A
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m GPU7	NV12	NV12	NV12	NV12	NV12	NV12	NV12	 X 	24-47,72-95	1		N/A
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m Legend:
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m   X    = Self
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m   SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m   NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m + sudo apt-get install -y numactl
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m Reading package lists...
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m Building dependency tree...
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m Reading state information...
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m + echo 'numactl installation skipped'
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m numactl installation skipped
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m + command -v uv
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m + export PATH=/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-24 09:17:00,009 - INFO - [36m(setup pid=6476)[0m + PATH=/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-24 09:17:00,710 - INFO - [36m(setup pid=6476)[0m + uv venv --python 3.12 --seed --allow-existing
+2026-03-24 09:17:00,710 - INFO - [36m(setup pid=6476)[0m Downloading cpython-3.12.13-linux-x86_64-gnu (download) (32.3MiB)
+2026-03-24 09:17:00,710 - INFO - [36m(setup pid=6476)[0m  Downloaded cpython-3.12.13-linux-x86_64-gnu (download)
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m Using CPython 3.12.13
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m Creating virtual environment with seed packages at: .venv
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m  + pip==26.0.1
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m Activate with: source .venv/bin/activate
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m + source .venv/bin/activate
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ '[' -n x ']'
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ SCRIPT_PATH=.venv/bin/activate
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ '[' .venv/bin/activate = /tmp/sky_setup_sky-2026-03-24-09-12-48-023830 ']'
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ deactivate nondestructive
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ unset -f pydoc
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ hash -r
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ unset VIRTUAL_ENV
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ unset VIRTUAL_ENV_PROMPT
+2026-03-24 09:17:01,416 - INFO - [36m(setup pid=6476)[0m ++ '[' '!' nondestructive = nondestructive ']'
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ VIRTUAL_ENV=/home/ubuntu/sky_workdir/.venv
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ '[' linux-gnu = cygwin ']'
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ '[' linux-gnu = msys ']'
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ export VIRTUAL_ENV
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ unset SCRIPT_PATH
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ _OLD_VIRTUAL_PATH=/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ PATH=/home/ubuntu/sky_workdir/.venv/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ export PATH
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ '[' xsky_workdir '!=' x ']'
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ VIRTUAL_ENV_PROMPT=sky_workdir
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ export VIRTUAL_ENV_PROMPT
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ _OLD_VIRTUAL_PS1='(base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ PS1='(sky_workdir) (base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ export PS1
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ alias pydoc
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ true
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m ++ hash -r
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m + uv pip install datasets requests pynvml aiohttp
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m Resolved 44 packages in 248ms
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m Downloading hf-xet (4.0MiB)
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m Downloading pyarrow (45.4MiB)
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m Downloading aiohttp (1.7MiB)
+2026-03-24 09:17:01,417 - INFO - [36m(setup pid=6476)[0m Downloading numpy (15.9MiB)
+2026-03-24 09:17:01,418 - INFO - [36m(setup pid=6476)[0m Downloading pandas (10.4MiB)
+2026-03-24 09:17:01,418 - INFO - [36m(setup pid=6476)[0m  Downloaded hf-xet
+2026-03-24 09:17:02,223 - INFO - [36m(setup pid=6476)[0m  Downloaded aiohttp
+2026-03-24 09:17:02,223 - INFO - [36m(setup pid=6476)[0m  Downloaded numpy
+2026-03-24 09:17:02,728 - INFO - [36m(setup pid=6476)[0m  Downloaded pandas
+2026-03-24 09:17:02,728 - INFO - [36m(setup pid=6476)[0m  Downloaded pyarrow
+2026-03-24 09:17:02,728 - INFO - [36m(setup pid=6476)[0m Prepared 21 packages in 1.08s
+2026-03-24 09:17:02,728 - INFO - [36m(setup pid=6476)[0m Installed 44 packages in 36ms
+2026-03-24 09:17:02,728 - INFO - [36m(setup pid=6476)[0m  + aiohappyeyeballs==2.6.1
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + aiohttp==3.13.3
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + aiosignal==1.4.0
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + annotated-doc==0.0.4
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + anyio==4.12.1
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + attrs==26.1.0
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + certifi==2026.2.25
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + charset-normalizer==3.4.6
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + click==8.3.1
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + datasets==4.8.4
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + dill==0.4.1
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + filelock==3.25.2
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + frozenlist==1.8.0
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + fsspec==2026.2.0
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + h11==0.16.0
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + hf-xet==1.4.2
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + httpcore==1.0.9
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + httpx==0.28.1
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + huggingface-hub==1.7.2
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + idna==3.11
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + markdown-it-py==4.0.0
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + mdurl==0.1.2
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + multidict==6.7.1
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + multiprocess==0.70.19
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + numpy==2.4.3
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + nvidia-ml-py==13.595.45
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + packaging==26.0
+2026-03-24 09:17:02,729 - INFO - [36m(setup pid=6476)[0m  + pandas==3.0.1
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + propcache==0.4.1
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + pyarrow==23.0.1
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + pygments==2.19.2
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + pynvml==13.0.1
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + python-dateutil==2.9.0.post0
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + pyyaml==6.0.3
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + requests==2.32.5
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + rich==14.3.3
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + shellingham==1.5.4
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + six==1.17.0
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + tqdm==4.67.3
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + typer==0.24.1
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + typing-extensions==4.15.0
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + urllib3==2.6.3
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + xxhash==3.6.0
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m  + yarl==1.23.0
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m + echo '=== Installing vLLM 0.10.0 ==='
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m === Installing vLLM 0.10.0 ===
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m + uv pip install vllm==0.10.0 'ray[cgraph]'
+2026-03-24 09:17:02,730 - INFO - [36m(setup pid=6476)[0m Resolved 141 packages in 598ms
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading pillow (6.7MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading triton (148.5MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading pycountry (7.7MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading sympy (6.0MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading tiktoken (1.1MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading tokenizers (3.1MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading xformers (111.6MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading uvloop (4.2MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading networkx (2.0MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading soundfile (1.3MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading vllm (368.7MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading outlines-core (2.2MiB)
+2026-03-24 09:17:03,335 - INFO - [36m(setup pid=6476)[0m Downloading torchvision (7.1MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cudnn-cu12 (544.5MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading opencv-python-headless (57.6MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-nccl-cu12 (192.0MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading transformers (10.2MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading scipy (33.6MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cufile-cu12 (1.1MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cusparse-cu12 (206.5MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading llguidance (14.3MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading mistral-common (6.2MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cuda-nvrtc-cu12 (22.6MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cusparselt-cu12 (149.5MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading torchaudio (3.3MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-nvjitlink-cu12 (18.8MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading pydantic-core (2.0MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading xgrammar (11.3MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading ray (69.6MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading sentencepiece (1.3MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading numpy (15.8MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading torch (783.0MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cusolver-cu12 (150.9MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-curand-cu12 (53.7MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading setuptools (1.2MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading cupy-cuda12x (128.4MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading llvmlite (40.4MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading numba (3.7MiB)
+2026-03-24 09:17:03,336 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cuda-cupti-cu12 (8.5MiB)
+2026-03-24 09:17:03,337 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cufft-cu12 (190.9MiB)
+2026-03-24 09:17:03,337 - INFO - [36m(setup pid=6476)[0m Downloading nvidia-cublas-cu12 (374.9MiB)
+2026-03-24 09:17:03,337 - INFO - [36m(setup pid=6476)[0m  Downloaded tiktoken
+2026-03-24 09:17:03,841 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cufile-cu12
+2026-03-24 09:17:03,841 - INFO - [36m(setup pid=6476)[0m  Downloaded soundfile
+2026-03-24 09:17:03,841 - INFO - [36m(setup pid=6476)[0m  Downloaded sentencepiece
+2026-03-24 09:17:03,841 - INFO - [36m(setup pid=6476)[0m  Downloaded pydantic-core
+2026-03-24 09:17:04,752 - INFO - [36m(setup pid=6476)[0m  Downloaded setuptools
+2026-03-24 09:17:04,752 - INFO - [36m(setup pid=6476)[0m  Downloaded outlines-core
+2026-03-24 09:17:04,752 - INFO - [36m(setup pid=6476)[0m  Downloaded networkx
+2026-03-24 09:17:04,752 - INFO - [36m(setup pid=6476)[0m  Downloaded tokenizers
+2026-03-24 09:17:05,458 - INFO - [36m(setup pid=6476)[0m  Downloaded torchaudio
+2026-03-24 09:17:05,458 - INFO - [36m(setup pid=6476)[0m  Downloaded uvloop
+2026-03-24 09:17:05,458 - INFO - [36m(setup pid=6476)[0m  Downloaded numba
+2026-03-24 09:17:05,458 - INFO - [36m(setup pid=6476)[0m  Downloaded mistral-common
+2026-03-24 09:17:06,470 - INFO - [36m(setup pid=6476)[0m  Downloaded pillow
+2026-03-24 09:17:06,470 - INFO - [36m(setup pid=6476)[0m  Downloaded torchvision
+2026-03-24 09:17:06,470 - INFO - [36m(setup pid=6476)[0m  Downloaded sympy
+2026-03-24 09:17:06,470 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cuda-cupti-cu12
+2026-03-24 09:17:06,470 - INFO - [36m(setup pid=6476)[0m  Downloaded pycountry
+2026-03-24 09:17:06,470 - INFO - [36m(setup pid=6476)[0m  Downloaded xgrammar
+2026-03-24 09:17:07,278 - INFO - [36m(setup pid=6476)[0m  Downloaded llguidance
+2026-03-24 09:17:07,883 - INFO - [36m(setup pid=6476)[0m  Downloaded transformers
+2026-03-24 09:17:07,884 - INFO - [36m(setup pid=6476)[0m  Downloaded numpy
+2026-03-24 09:17:07,884 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-nvjitlink-cu12
+2026-03-24 09:17:08,487 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cuda-nvrtc-cu12
+2026-03-24 09:17:09,700 - INFO - [36m(setup pid=6476)[0m  Downloaded scipy
+2026-03-24 09:17:10,303 - INFO - [36m(setup pid=6476)[0m  Downloaded llvmlite
+2026-03-24 09:17:11,308 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-curand-cu12
+2026-03-24 09:17:11,913 - INFO - [36m(setup pid=6476)[0m  Downloaded opencv-python-headless
+2026-03-24 09:17:14,334 - INFO - [36m(setup pid=6476)[0m  Downloaded ray
+2026-03-24 09:17:16,448 - INFO - [36m(setup pid=6476)[0m  Downloaded xformers
+2026-03-24 09:17:17,956 - INFO - [36m(setup pid=6476)[0m  Downloaded cupy-cuda12x
+2026-03-24 09:17:19,262 - INFO - [36m(setup pid=6476)[0m  Downloaded triton
+2026-03-24 09:17:19,767 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cusparselt-cu12
+2026-03-24 09:17:19,767 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cusolver-cu12
+2026-03-24 09:17:21,279 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-nccl-cu12
+2026-03-24 09:17:21,784 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cufft-cu12
+2026-03-24 09:17:22,387 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cusparse-cu12
+2026-03-24 09:17:27,509 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cublas-cu12
+2026-03-24 09:17:29,624 - INFO - [36m(setup pid=6476)[0m  Downloaded vllm
+2026-03-24 09:17:29,625 - INFO - [36m(setup pid=6476)[0m  Downloaded nvidia-cudnn-cu12
+2026-03-24 09:17:33,751 - INFO - [36m(setup pid=6476)[0m  Downloaded torch
+2026-03-24 09:17:34,559 - INFO - [36m(setup pid=6476)[0m Prepared 92 packages in 31.28s
+2026-03-24 09:17:34,559 - INFO - [36m(setup pid=6476)[0m Uninstalled 1 package in 11ms
+2026-03-24 09:17:34,559 - INFO - [36m(setup pid=6476)[0m Installed 106 packages in 856ms
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + annotated-types==0.7.0
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + astor==0.8.1
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + blake3==1.0.8
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + cachetools==7.0.5
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + cbor2==5.9.0
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + cffi==2.0.0
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + cloudpickle==3.1.2
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + compressed-tensors==0.10.2
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + cuda-pathfinder==1.4.4
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + cupy-cuda12x==14.0.1
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + depyf==0.19.0
+2026-03-24 09:17:35,066 - INFO - [36m(setup pid=6476)[0m  + diskcache==5.6.3
+2026-03-24 09:17:35,067 - INFO - [36m(setup pid=6476)[0m  + distro==1.9.0
+2026-03-24 09:17:35,067 - INFO - [36m(setup pid=6476)[0m  + dnspython==2.8.0
+2026-03-24 09:17:35,067 - INFO - [36m(setup pid=6476)[0m  + einops==0.8.2
+2026-03-24 09:17:35,067 - INFO - [36m(setup pid=6476)[0m  + email-validator==2.3.0
+2026-03-24 09:17:35,067 - INFO - [36m(setup pid=6476)[0m  + fastapi==0.135.2
+2026-03-24 09:17:35,067 - INFO - [36m(setup pid=6476)[0m  + fastapi-cli==0.0.24
+2026-03-24 09:17:35,067 - INFO - [36m(setup pid=6476)[0m  + fastapi-cloud-cli==0.15.0
+2026-03-24 09:17:35,871 - INFO - [36m(setup pid=6476)[0m  + fastar==0.9.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + gguf==0.18.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + httptools==0.7.1
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + interegular==0.3.3
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + jinja2==3.1.6
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + jiter==0.13.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + jsonschema==4.26.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + jsonschema-specifications==2025.9.1
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + lark==1.2.2
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + llguidance==0.7.30
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + llvmlite==0.44.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + lm-format-enforcer==0.10.12
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + markupsafe==3.0.3
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + mistral-common==1.10.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + mpmath==1.3.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + msgpack==1.1.2
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + msgspec==0.20.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + networkx==3.6.1
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + ninja==1.13.0
+2026-03-24 09:17:35,872 - INFO - [36m(setup pid=6476)[0m  + numba==0.61.2
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  - numpy==2.4.3
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + numpy==2.2.6
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cublas-cu12==12.6.4.1
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cuda-cupti-cu12==12.6.80
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cuda-nvrtc-cu12==12.6.77
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cuda-runtime-cu12==12.6.77
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cudnn-cu12==9.5.1.17
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cufft-cu12==11.3.0.4
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cufile-cu12==1.11.1.6
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-curand-cu12==10.3.7.77
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cusolver-cu12==11.7.1.2
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cusparse-cu12==12.5.4.2
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-cusparselt-cu12==0.6.3
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-nccl-cu12==2.26.2
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-nvjitlink-cu12==12.6.85
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + nvidia-nvtx-cu12==12.6.77
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + openai==1.90.0
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + opencv-python-headless==4.13.0.92
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + outlines-core==0.2.10
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + partial-json-parser==0.2.1.1.post7
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + pillow==12.1.1
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + prometheus-client==0.24.1
+2026-03-24 09:17:35,873 - INFO - [36m(setup pid=6476)[0m  + prometheus-fastapi-instrumentator==7.1.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + protobuf==7.34.1
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + psutil==7.2.2
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + py-cpuinfo==9.0.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + pybase64==1.4.3
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + pycountry==26.2.16
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + pycparser==3.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + pydantic==2.12.5
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + pydantic-core==2.41.5
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + pydantic-extra-types==2.11.1
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + pydantic-settings==2.13.1
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + python-dotenv==1.2.2
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + python-json-logger==4.0.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + python-multipart==0.0.22
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + pyzmq==27.1.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + ray==2.54.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + referencing==0.37.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + regex==2026.2.28
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + rich-toolkit==0.19.7
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + rignore==0.7.6
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + rpds-py==0.30.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + safetensors==0.7.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + scipy==1.17.1
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + sentencepiece==0.2.1
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + sentry-sdk==2.55.0
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + setuptools==79.0.1
+2026-03-24 09:17:35,874 - INFO - [36m(setup pid=6476)[0m  + sniffio==1.3.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + soundfile==0.13.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + soxr==1.0.0
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + starlette==0.52.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + sympy==1.14.0
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + tiktoken==0.12.0
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + tokenizers==0.22.2
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + torch==2.7.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + torchaudio==2.7.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + torchvision==0.22.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + transformers==5.3.0
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + triton==3.3.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + typing-inspection==0.4.2
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + uvicorn==0.42.0
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + uvloop==0.22.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + vllm==0.10.0
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + watchfiles==1.1.1
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + websockets==16.0
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + xformers==0.0.31
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  + xgrammar==0.1.21
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m + echo '=== Pinning transformers==4.57.3 (avoid 5.x breaking changes) ==='
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m === Pinning transformers==4.57.3 (avoid 5.x breaking changes) ===
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m + uv pip install transformers==4.57.3
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m Resolved 18 packages in 89ms
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m Downloading transformers (11.4MiB)
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m  Downloaded transformers
+2026-03-24 09:17:35,875 - INFO - [36m(setup pid=6476)[0m Prepared 2 packages in 414ms
+2026-03-24 09:17:35,876 - INFO - [36m(setup pid=6476)[0m Uninstalled 2 packages in 54ms
+2026-03-24 09:17:35,876 - INFO - [36m(setup pid=6476)[0m Installed 2 packages in 149ms
+2026-03-24 09:17:42,824 - INFO - [36m(setup pid=6476)[0m  - huggingface-hub==1.7.2
+2026-03-24 09:17:42,825 - INFO - [36m(setup pid=6476)[0m  + huggingface-hub==0.36.2
+2026-03-24 09:17:42,825 - INFO - [36m(setup pid=6476)[0m  - transformers==5.3.0
+2026-03-24 09:17:42,825 - INFO - [36m(setup pid=6476)[0m  + transformers==4.57.3
+2026-03-24 09:17:42,825 - INFO - [36m(setup pid=6476)[0m + echo '=== PyTorch CUDA Check ==='
+2026-03-24 09:17:42,825 - INFO - [36m(setup pid=6476)[0m === PyTorch CUDA Check ===
+2026-03-24 09:17:42,825 - INFO - [36m(setup pid=6476)[0m + python3 -c 'import torch; print('\''torch.cuda.is_available():'\'', torch.cuda.is_available()); print('\''torch.version.cuda:'\'', torch.version.cuda); print('\''torch.__version__:'\'', torch.__version__); print('\''torch.cuda.device_count():'\'', torch.cuda.device_count() if torch.cuda.is_available() else '\''N/A'\'')'
+2026-03-24 09:17:42,825 - INFO - [36m(setup pid=6476)[0m torch.cuda.is_available(): True
+2026-03-24 09:17:43,530 - INFO - [36m(setup pid=6476)[0m torch.version.cuda: 12.6
+2026-03-24 09:17:43,531 - INFO - [36m(setup pid=6476)[0m torch.__version__: 2.7.1+cu126
+2026-03-24 09:17:43,531 - INFO - [36m(setup pid=6476)[0m torch.cuda.device_count(): 8
+2026-03-24 09:17:44,337 - INFO - [36m(setup pid=6476)[0m + echo ===========================
+2026-03-24 09:17:45,043 - INFO - [36m(setup pid=6476)[0m ===========================
+2026-03-24 09:17:45,044 - INFO - [36m(setup pid=6476)[0m + echo '=== Setup complete ==='
+2026-03-24 09:17:45,044 - INFO - [36m(setup pid=6476)[0m === Setup complete ===
+2026-03-24 09:17:45,044 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export CUDA_HOME=/usr/local/cuda
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + CUDA_HOME=/usr/local/cuda
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '=== Pre-run Diagnostics ==='
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m === Pre-run Diagnostics ===
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + nvidia-smi
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Tue Mar 24 03:47:44 2026
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------------------------------------------------------+
+2026-03-24 09:17:45,752 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | NVIDIA-SMI 570.172.08             Driver Version: 570.172.08     CUDA Version: 12.8     |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |               MIG M. |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |=========================================+========================+======================|
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |   0  NVIDIA A100-SXM4-40GB          On  |   00000000:10:1C.0 Off |                    0 |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | N/A   32C    P0             53W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |   1  NVIDIA A100-SXM4-40GB          On  |   00000000:10:1D.0 Off |                    0 |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | N/A   31C    P0             52W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:17:45,753 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |   2  NVIDIA A100-SXM4-40GB          On  |   00000000:20:1C.0 Off |                    0 |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | N/A   32C    P0             52W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |   3  NVIDIA A100-SXM4-40GB          On  |   00000000:20:1D.0 Off |                    0 |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | N/A   31C    P0             57W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |   4  NVIDIA A100-SXM4-40GB          On  |   00000000:90:1C.0 Off |                    0 |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | N/A   32C    P0             52W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |   5  NVIDIA A100-SXM4-40GB          On  |   00000000:90:1D.0 Off |                    0 |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | N/A   30C    P0             56W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |   6  NVIDIA A100-SXM4-40GB          On  |   00000000:A0:1C.0 Off |                    0 |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | N/A   32C    P0             56W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |   7  NVIDIA A100-SXM4-40GB          On  |   00000000:A0:1D.0 Off |                    0 |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | N/A   30C    P0             52W /  400W |       0MiB /  40960MiB |      0%      Default |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |                                         |                        |             Disabled |
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------+------------------------+----------------------+
+2026-03-24 09:17:48,467 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:17:48,468 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------------------------------------------------------+
+2026-03-24 09:17:48,468 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m | Processes:                                                                              |
+2026-03-24 09:17:48,468 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+2026-03-24 09:17:48,468 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |        ID   ID                                                               Usage      |
+2026-03-24 09:17:48,468 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |=========================================================================================|
+2026-03-24 09:17:48,468 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m |  No running processes found                                                             |
+2026-03-24 09:17:48,468 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m +-----------------------------------------------------------------------------------------+
+2026-03-24 09:17:48,468 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- A100 SXM4 Diagnostics ---'
+2026-03-24 09:17:49,273 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- A100 SXM4 Diagnostics ---
+2026-03-24 09:17:49,273 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'Checking NVIDIA Fabric Manager (required for NVSwitch on A100-SXM4)...'
+2026-03-24 09:17:49,273 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Checking NVIDIA Fabric Manager (required for NVSwitch on A100-SXM4)...
+2026-03-24 09:17:49,273 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + systemctl status nvidia-fabricmanager
+2026-03-24 09:17:49,273 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ● nvidia-fabricmanager.service - NVIDIA fabric manager service
+2026-03-24 09:17:49,979 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m      Loaded: loaded (/lib/systemd/system/nvidia-fabricmanager.service; enabled; vendor preset: enabled)
+2026-03-24 09:17:49,979 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m      Active: active (running) since Tue 2026-03-24 03:45:38 UTC; 2min 10s ago
+2026-03-24 09:17:49,979 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m    Main PID: 3648 (nv-fabricmanage)
+2026-03-24 09:17:49,979 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m       Tasks: 19
+2026-03-24 09:17:49,979 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m      Memory: 26.7M
+2026-03-24 09:17:49,979 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m         CPU: 11.367s
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m      CGroup: /system.slice/nvidia-fabricmanager.service
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m              └─3648 /usr/bin/nv-fabricmanager -c /usr/share/nvidia/nvswitch/fabricmanager.cfg
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Mar 24 03:45:22 ip-172-31-7-25 systemd[1]: Starting NVIDIA fabric manager service...
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Mar 24 03:45:22 ip-172-31-7-25 nvidia-fabricmanager-start.sh[3416]: Detected Pre-NVL5 system
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Mar 24 03:45:28 ip-172-31-7-25 nv-fabricmanager[3648]: Connected to 1 node.
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Mar 24 03:45:38 ip-172-31-7-25 nv-fabricmanager[3648]: Successfully configured all the available GPUs and NVSwitches to route NVLink traffic.
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Mar 24 03:45:38 ip-172-31-7-25 nvidia-fabricmanager-start.sh[3416]: Started "Nvidia Fabric Manager"
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Mar 24 03:45:38 ip-172-31-7-25 systemd[1]: Started NVIDIA fabric manager service.
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'Checking for NVLink topology...'
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Checking for NVLink topology...
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + nvidia-smi topo -m
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 	[4mGPU0	GPU1	GPU2	GPU3	GPU4	GPU5	GPU6	GPU7	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU0	 X 	NV12	NV12	NV12	NV12	NV12	NV12	NV12	0-23,48-71	0		N/A
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU1	NV12	 X 	NV12	NV12	NV12	NV12	NV12	NV12	0-23,48-71	0		N/A
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU2	NV12	NV12	 X 	NV12	NV12	NV12	NV12	NV12	0-23,48-71	0		N/A
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU3	NV12	NV12	NV12	 X 	NV12	NV12	NV12	NV12	0-23,48-71	0		N/A
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU4	NV12	NV12	NV12	NV12	 X 	NV12	NV12	NV12	24-47,72-95	1		N/A
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU5	NV12	NV12	NV12	NV12	NV12	 X 	NV12	NV12	24-47,72-95	1		N/A
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU6	NV12	NV12	NV12	NV12	NV12	NV12	 X 	NV12	24-47,72-95	1		N/A
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU7	NV12	NV12	NV12	NV12	NV12	NV12	NV12	 X 	24-47,72-95	1		N/A
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Legend:
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   X    = Self
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   PIX  = Connection traversing at most a single PCIe bridge
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   NV#  = Connection traversing a bonded set of # NVLinks
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- NUMA Topology and GPU-NUMA Mapping ---'
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- NUMA Topology and GPU-NUMA Mapping ---
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'NUMA hardware layout:'
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m NUMA hardware layout:
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + numactl --hardware
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + '[' -x /usr/lib/command-not-found ']'
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + /usr/lib/command-not-found -- numactl
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Command 'numactl' not found, but can be installed with:
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m sudo apt install numactl
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'numactl not available'
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m numactl not available
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo ''
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'GPU PCIe Bus IDs and NUMA node assignments:'
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m GPU PCIe Bus IDs and NUMA node assignments:
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ nvidia-smi --query-gpu=count --format=csv,noheader
+2026-03-24 09:17:49,980 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ head -1
+2026-03-24 09:17:49,981 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ echo 0
+2026-03-24 09:17:51,692 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + gpu_count='8
+2026-03-24 09:17:51,692 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 0'
+2026-03-24 09:17:51,692 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + '[' '8
+2026-03-24 09:17:51,692 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 0' -gt 0 ']'
+2026-03-24 09:17:51,692 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'Could not detect GPU count'
+2026-03-24 09:17:51,692 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Could not detect GPU count
+2026-03-24 09:17:51,692 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo -------------------------------------------
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m -------------------------------------------
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'Checking for GPU processes and errors...'
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Checking for GPU processes and errors...
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + awk 'NR<=50'
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + nvidia-smi -q -d ERRORS
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Failed to parse --display/-d flags
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'Error check failed'
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Error check failed
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- CUDA Device Query ---'
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- CUDA Device Query ---
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + python3 -c 'import ctypes; cudart = ctypes.CDLL('\''libcudart.so.12'\''); count = ctypes.c_int(); result = cudart.cudaGetDeviceCount(ctypes.byref(count)); print(f'\''cudaGetDeviceCount result: {result} (0=success), device count: {count.value}'\'')'
+2026-03-24 09:17:51,693 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m cudaGetDeviceCount result: 0 (0=success), device count: 8
+2026-03-24 09:17:53,003 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo ===========================
+2026-03-24 09:17:53,707 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ===========================
+2026-03-24 09:17:53,707 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + source .venv/bin/activate
+2026-03-24 09:17:53,707 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:53,707 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' -n x ']'
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ SCRIPT_PATH=.venv/bin/activate
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' .venv/bin/activate = /tmp/sky_app_puxwvrji ']'
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ deactivate nondestructive
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ unset -f pydoc
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ hash -r
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:53,708 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ unset VIRTUAL_ENV
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ unset VIRTUAL_ENV_PROMPT
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' '!' nondestructive = nondestructive ']'
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ VIRTUAL_ENV=/home/ubuntu/sky_workdir/.venv
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' linux-gnu = cygwin ']'
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' linux-gnu = msys ']'
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ export VIRTUAL_ENV
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ unset SCRIPT_PATH
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ _OLD_VIRTUAL_PATH=/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ PATH=/home/ubuntu/sky_workdir/.venv/bin:/home/ubuntu/.local/bin:/home/ubuntu/.local/bin:/home/ubuntu/miniconda3/bin:/home/ubuntu/miniconda3/condabin:/opt/amazon/openmpi/bin:/opt/amazon/efa/bin:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/cuda-12.8/bin:/usr/local/cuda-12.8/include:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ export PATH
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' xsky_workdir '!=' x ']'
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ VIRTUAL_ENV_PROMPT=sky_workdir
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ export VIRTUAL_ENV_PROMPT
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ '[' -z '' ']'
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ _OLD_VIRTUAL_PS1='(base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ PS1='(sky_workdir) (base) ${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ export PS1
+2026-03-24 09:17:54,312 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ alias pydoc
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ true
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ++ hash -r
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '=== DETAILED PyTorch CUDA Diagnostics (in run phase) ==='
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m === DETAILED PyTorch CUDA Diagnostics (in run phase) ===
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- Environment ---'
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- Environment ---
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'LD_LIBRARY_PATH: /usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib'
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m LD_LIBRARY_PATH: /usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'CUDA_HOME: /usr/local/cuda'
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m CUDA_HOME: /usr/local/cuda
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + which python3
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m /home/ubuntu/sky_workdir/.venv/bin/python3
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- Torch info ---'
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- Torch info ---
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + python3 -c 'import torch; print('\''torch.__version__:'\'', torch.__version__); print('\''torch.__file__:'\'', torch.__file__); print('\''torch.version.cuda:'\'', torch.version.cuda); print('\''torch.backends.cuda.is_built():'\'', torch.backends.cuda.is_built())'
+2026-03-24 09:17:54,313 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torch.__version__: 2.7.1+cu126
+2026-03-24 09:17:55,019 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torch.__file__: /home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/torch/__init__.py
+2026-03-24 09:17:55,020 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torch.version.cuda: 12.6
+2026-03-24 09:17:55,020 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torch.backends.cuda.is_built(): True
+2026-03-24 09:17:55,020 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- CUDA check ---'
+2026-03-24 09:17:58,042 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- CUDA check ---
+2026-03-24 09:17:58,042 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + python3 -c 'import torch; print('\''torch.cuda.is_available():'\'', torch.cuda.is_available()); print('\''torch.cuda.device_count():'\'', torch.cuda.device_count() if torch.cuda.is_available() else '\''N/A - checking why...'\'')'
+2026-03-24 09:17:58,042 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torch.cuda.is_available(): True
+2026-03-24 09:17:58,747 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torch.cuda.device_count(): 8
+2026-03-24 09:17:59,754 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- Loading CUDA libs directly ---'
+2026-03-24 09:18:03,588 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- Loading CUDA libs directly ---
+2026-03-24 09:18:03,588 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + python3 -c 'import ctypes; libs=['\''libcuda.so.1'\'','\''libcudart.so.12'\'','\''libnvidia-ml.so.1'\'']; [print(l+'\'': OK'\'') if ctypes.CDLL(l) else None for l in libs]'
+2026-03-24 09:18:03,588 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m libcuda.so.1: OK
+2026-03-24 09:18:03,588 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m libcudart.so.12: OK
+2026-03-24 09:18:03,588 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m libnvidia-ml.so.1: OK
+2026-03-24 09:18:03,588 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- Manual CUDA init attempt ---'
+2026-03-24 09:18:03,588 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- Manual CUDA init attempt ---
+2026-03-24 09:18:03,588 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + python3 -c 'import torch; torch.cuda.init(); print('\''torch.cuda.init() OK, device_count:'\'', torch.cuda.device_count())'
+2026-03-24 09:18:03,589 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torch.cuda.init() OK, device_count: 8
+2026-03-24 09:18:04,796 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo '--- Installed torch packages ---'
+2026-03-24 09:18:05,302 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m --- Installed torch packages ---
+2026-03-24 09:18:05,302 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + pip list
+2026-03-24 09:18:05,303 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + grep --color=auto -i -E 'torch|nvidia|cuda|triton'
+2026-03-24 09:18:05,303 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m cuda-pathfinder                   1.4.4
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m cupy-cuda12x                      14.0.1
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cublas-cu12                12.6.4.1
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cuda-cupti-cu12            12.6.80
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cuda-nvrtc-cu12            12.6.77
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cuda-runtime-cu12          12.6.77
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cudnn-cu12                 9.5.1.17
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cufft-cu12                 11.3.0.4
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cufile-cu12                1.11.1.6
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-curand-cu12                10.3.7.77
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cusolver-cu12              11.7.1.2
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cusparse-cu12              12.5.4.2
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-cusparselt-cu12            0.6.3
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-ml-py                      13.595.45
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-nccl-cu12                  2.26.2
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-nvjitlink-cu12             12.6.85
+2026-03-24 09:18:06,111 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m nvidia-nvtx-cu12                  12.6.77
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torch                             2.7.1
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torchaudio                        2.7.1
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m torchvision                       0.22.1
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m triton                            3.3.1
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo =========================================
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m =========================================
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export NCCL_P2P_DISABLE=0
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + NCCL_P2P_DISABLE=0
+2026-03-24 09:18:06,112 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export NCCL_TIMEOUT=3600
+2026-03-24 09:18:07,119 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + NCCL_TIMEOUT=3600
+2026-03-24 09:18:07,119 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export TORCH_NCCL_BLOCKING_WAIT=1
+2026-03-24 09:18:07,119 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + TORCH_NCCL_BLOCKING_WAIT=1
+2026-03-24 09:18:07,119 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+2026-03-24 09:18:07,119 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+2026-03-24 09:18:07,119 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+2026-03-24 09:18:07,119 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + TORCH_NCCL_TRACE_BUFFER_SIZE=10000
+2026-03-24 09:18:07,119 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export TORCH_DISTRIBUTED_DEBUG=DETAIL
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + TORCH_DISTRIBUTED_DEBUG=DETAIL
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export NCCL_DEBUG=INFO
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + NCCL_DEBUG=INFO
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export LD_LIBRARY_PATH=/opt/amazon/ofi-nccl/lib:/opt/amazon/efa/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + LD_LIBRARY_PATH=/opt/amazon/ofi-nccl/lib:/opt/amazon/efa/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda/lib64:/usr/local/cuda/targets/x86_64-linux/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib:/usr/local/cuda-12.8/lib:/usr/local/cuda-12.8/lib64:/usr/local/cuda-12.8:/usr/local/cuda-12.8/targets/x86_64-linux/lib/:/usr/local/cuda-12.8/extras/CUPTI/lib64:/opt/amazon/efa/lib:/opt/amazon/openmpi/lib:/opt/amazon/ofi-nccl/lib/x86_64-linux-gnu:/usr/local/lib:/usr/lib
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export NCCL_NET_PLUGIN=ofi
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + NCCL_NET_PLUGIN=ofi
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export FI_EFA_USE_DEVICE_RDMA=1
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + FI_EFA_USE_DEVICE_RDMA=1
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export FI_PROVIDER=efa
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + FI_PROVIDER=efa
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export NCCL_DEBUG_SUBSYS=NET
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + NCCL_DEBUG_SUBSYS=NET
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export RAY_DASHBOARD_HOST=0.0.0.0
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + RAY_DASHBOARD_HOST=0.0.0.0
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export RAY_HEAD_PORT=6379
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + RAY_HEAD_PORT=6379
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + export RAY_DASHBOARD_PORT=8265
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + RAY_DASHBOARD_PORT=8265
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'Starting Ray for single-node pipeline parallelism...'
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Starting Ray for single-node pipeline parallelism...
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + uv run ray start --head --port=6379 --dashboard-host=0.0.0.0 --dashboard-port=8265 --num-cpus=0
+2026-03-24 09:18:07,120 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:06,846	INFO usage_lib.py:447 -- Usage stats collection is disabled.
+2026-03-24 09:18:10,545 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:06,846	INFO scripts.py:936 -- Local node IP: 172.31.7.25
+2026-03-24 09:18:10,545 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,133	SUCC scripts.py:975 -- --------------------
+2026-03-24 09:18:11,152 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,133	SUCC scripts.py:976 -- Ray runtime started.
+2026-03-24 09:18:11,152 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,133	SUCC scripts.py:977 -- --------------------
+2026-03-24 09:18:11,152 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,133	INFO scripts.py:979 -- Next steps
+2026-03-24 09:18:11,152 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,133	INFO scripts.py:982 -- To add another node to this Ray cluster, run
+2026-03-24 09:18:11,152 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,133	INFO scripts.py:985 --   ray start --address='172.31.7.25:6379'
+2026-03-24 09:18:11,152 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,134	INFO scripts.py:996 -- To connect to this Ray cluster:
+2026-03-24 09:18:11,152 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,134	INFO scripts.py:998 -- import ray
+2026-03-24 09:18:11,152 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,134	INFO scripts.py:999 -- ray.init()
+2026-03-24 09:18:11,153 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,134	INFO scripts.py:1032 -- To terminate the Ray runtime, run
+2026-03-24 09:18:11,153 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,134	INFO scripts.py:1033 --   ray stop
+2026-03-24 09:18:11,153 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,134	INFO scripts.py:1036 -- To view the status of the cluster, use
+2026-03-24 09:18:11,153 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:48:10,134	INFO scripts.py:1037 --   ray status
+2026-03-24 09:18:11,153 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + sleep 5
+2026-03-24 09:18:15,987 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + uv run ray status --address=127.0.0.1:6379
+2026-03-24 09:18:16,998 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ======== Autoscaler status: 2026-03-24 03:48:13.569677 ========
+2026-03-24 09:18:18,113 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Node status
+2026-03-24 09:18:18,113 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ---------------------------------------------------------------
+2026-03-24 09:18:18,113 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Active:
+2026-03-24 09:18:18,113 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m  1 node_c172fee384b4f08c378c65d5006f223c1e42a551a5c360b500c9c98f
+2026-03-24 09:18:18,113 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Pending:
+2026-03-24 09:18:18,113 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m  (no pending nodes)
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Recent failures:
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m  (no failures)
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Resources
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ---------------------------------------------------------------
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Total Usage:
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m  0.0/8.0 GPU
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m  0B/895.73GiB memory
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m  0B/186.26GiB object_store_memory
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m From request_resources:
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m  (none)
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Pending Demands:
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m  (no resource demands)
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + PYTHONHASHSEED=0
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + python roofline_benchmarks/benchmark_rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb.py
+2026-03-24 09:18:18,114 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 🚀 Starting vLLM server: /home/ubuntu/sky_workdir/.venv/bin/python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-72B-Instruct --tensor-parallel-size 4 --pipeline-parallel-size 2 --max-model-len 18432 --gpu-memory-utilization 0.85 --enforce-eager --no-enable-prefix-caching --disable-log-requests --port 8000 --distributed-executor-backend ray
+2026-03-24 09:20:41,338 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ⏳ Waiting for server health (timeout=600s)...
+2026-03-24 09:20:41,338 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ✅ Server healthy after 143.0s
+2026-03-24 09:20:42,350 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📊 Parsed from server log: KV cache=388128 tokens, num_gpu_blocks=24258, block_size=16
+2026-03-24 09:20:42,350 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📊 target_concurrency = 21 (24258 blocks × 16 / 18432)
+2026-03-24 09:20:42,351 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:20:42,351 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ======================================================================
+2026-03-24 09:20:42,351 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Running: TP=4, PP=2, input=8192, output=256
+2026-03-24 09:20:42,351 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Target concurrency: 21
+2026-03-24 09:20:42,351 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ======================================================================
+2026-03-24 09:20:42,351 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:50:42,027	INFO worker.py:1810 -- Connecting to existing Ray cluster at address: 172.31.7.25:6379...
+2026-03-24 09:20:47,386 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 03:50:42,105	INFO worker.py:2013 -- Connected to Ray cluster.
+2026-03-24 09:20:47,386 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-24 09:20:47,387 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 🔥 Running warmup (5 requests)...
+2026-03-24 09:20:47,387 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Loading tokenizer for Qwen/Qwen2.5-72B-Instruct...
+2026-03-24 09:20:47,990 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Loading dataset emozilla/pg19-test...
+2026-03-24 09:20:50,912 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m `trust_remote_code` is not supported anymore.
+2026-03-24 09:20:50,912 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-24 09:20:50,912 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-24 09:20:51,719 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:20:52,226 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Generating test split:   0%|          | 0/100 [00:00<?, ? examples/s]
+2026-03-24 09:20:52,226 - INFO - Generating test split: 100%|██████████| 100/100 [00:00<00:00, 406.99 examples/s]
+2026-03-24 09:20:52,226 - INFO - Generating test split: 100%|██████████| 100/100 [00:00<00:00, 402.76 examples/s]
+2026-03-24 09:20:52,226 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-24 09:21:10,453 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 1/5 (18s elapsed)
+2026-03-24 09:21:11,360 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 2/5 (19s elapsed)
+2026-03-24 09:21:26,465 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 3/5 (34s elapsed)
+2026-03-24 09:21:27,071 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 4/5 (35s elapsed)
+2026-03-24 09:21:40,675 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 5/5 (48s elapsed)
+2026-03-24 09:21:41,482 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:21:41,483 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ============================================================
+2026-03-24 09:21:41,483 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Benchmark complete: 5/5 successful
+2026-03-24 09:21:41,483 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Wall clock: 48.5s
+2026-03-24 09:21:41,483 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Results saved to: /tmp/warmup_results.json
+2026-03-24 09:21:41,483 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m TTFT p50/p95/p99: 1489.2 / 3315.0 / 3554.8 ms
+2026-03-24 09:21:41,483 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m E2E  p50/p95/p99: 16200.4 / 18624.4 / 18699.9 ms
+2026-03-24 09:21:41,483 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ✅ Warmup complete
+2026-03-24 09:21:43,498 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📊 Running benchmark: 84 requests, concurrency=21
+2026-03-24 09:21:47,329 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Loading tokenizer for Qwen/Qwen2.5-72B-Instruct...
+2026-03-24 09:21:48,136 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Loading dataset emozilla/pg19-test...
+2026-03-24 09:21:52,470 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m `trust_remote_code` is not supported anymore.
+2026-03-24 09:21:52,471 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-24 09:21:52,471 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-24 09:21:52,471 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-24 09:22:14,546 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Running 84 benchmark requests (concurrency=21)...
+2026-03-24 09:22:54,352 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 8/84 (40s elapsed)
+2026-03-24 09:23:01,812 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 16/84 (47s elapsed)
+2026-03-24 09:23:22,264 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 24/84 (68s elapsed)
+2026-03-24 09:23:29,626 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 32/84 (75s elapsed)
+2026-03-24 09:23:37,085 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 40/84 (83s elapsed)
+2026-03-24 09:23:57,233 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 48/84 (103s elapsed)
+2026-03-24 09:24:04,698 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 56/84 (110s elapsed)
+2026-03-24 09:24:25,552 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 64/84 (131s elapsed)
+2026-03-24 09:24:26,559 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 72/84 (132s elapsed)
+2026-03-24 09:24:27,363 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 80/84 (133s elapsed)
+2026-03-24 09:24:28,272 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 84/84 (133s elapsed)
+2026-03-24 09:24:28,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:24:28,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ============================================================
+2026-03-24 09:24:28,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Benchmark complete: 84/84 successful
+2026-03-24 09:24:28,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Wall clock: 133.2s
+2026-03-24 09:24:28,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Results saved to: /tmp/client_results_tp4_pp2_in8192_out256.json
+2026-03-24 09:24:28,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m TTFT p50/p95/p99: 1854.4 / 14878.7 / 17864.4 ms
+2026-03-24 09:24:28,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m E2E  p50/p95/p99: 32372.3 / 48180.9 / 51273.8 ms
+2026-03-24 09:24:28,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📊 GPU monitoring: local (single node)
+2026-03-24 09:24:29,382 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📈 Time-series saved to /tmp/timeseries_tp4_pp2_in8192_out256.json
+2026-03-24 09:24:29,382 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Result: success
+2026-03-24 09:24:29,382 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:24:29,382 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ======================================================================
+2026-03-24 09:24:29,382 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Running: TP=4, PP=2, input=16384, output=2048
+2026-03-24 09:24:29,382 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Target concurrency: 21
+2026-03-24 09:24:29,382 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ======================================================================
+2026-03-24 09:24:29,382 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📊 Using local GPU monitoring (single-node Ray cluster)
+2026-03-24 09:24:32,707 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 🔥 Running warmup (5 requests)...
+2026-03-24 09:24:32,707 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Loading tokenizer for Qwen/Qwen2.5-72B-Instruct...
+2026-03-24 09:24:33,514 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Loading dataset emozilla/pg19-test...
+2026-03-24 09:24:35,730 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m `trust_remote_code` is not supported anymore.
+2026-03-24 09:24:35,730 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-24 09:24:35,730 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-24 09:24:35,730 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Running 5 benchmark requests (concurrency=2)...
+2026-03-24 09:26:33,071 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 1/5 (117s elapsed)
+2026-03-24 09:26:34,486 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 2/5 (119s elapsed)
+2026-03-24 09:28:27,725 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 3/5 (232s elapsed)
+2026-03-24 09:28:29,270 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 4/5 (233s elapsed)
+2026-03-24 09:30:13,034 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 5/5 (337s elapsed)
+2026-03-24 09:30:13,840 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 09:30:13,840 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ============================================================
+2026-03-24 09:30:13,840 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Benchmark complete: 5/5 successful
+2026-03-24 09:30:13,840 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Wall clock: 337.2s
+2026-03-24 09:30:13,840 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Results saved to: /tmp/warmup_results.json
+2026-03-24 09:30:13,840 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m TTFT p50/p95/p99: 2337.0 / 3644.0 / 3849.6 ms
+2026-03-24 09:30:13,840 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m E2E  p50/p95/p99: 114659.1 / 118443.3 / 118666.5 ms
+2026-03-24 09:30:13,840 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ✅ Warmup complete
+2026-03-24 09:30:15,854 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📊 Running benchmark: 84 requests, concurrency=21
+2026-03-24 09:30:19,686 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Loading tokenizer for Qwen/Qwen2.5-72B-Instruct...
+2026-03-24 09:30:20,293 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Loading dataset emozilla/pg19-test...
+2026-03-24 09:30:24,833 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m `trust_remote_code` is not supported anymore.
+2026-03-24 09:30:24,833 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Please check that the Hugging Face dataset 'emozilla/pg19-test' isn't based on a loading script and remove `trust_remote_code`.
+2026-03-24 09:30:24,833 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m If the dataset is based on a loading script, please ask the dataset author to remove it and convert it to a standard format like Parquet.
+2026-03-24 09:30:24,833 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Token indices sequence length is longer than the specified maximum sequence length for this model (136936 > 131072). Running this sequence through the model will result in indexing errors
+2026-03-24 09:30:47,895 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Running 84 benchmark requests (concurrency=21)...
+2026-03-24 09:40:48,776 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 8/84 (601s elapsed)
+2026-03-24 09:50:49,874 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 16/84 (601s elapsed)
+2026-03-24 09:50:49,874 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 24/84 (1202s elapsed)
+2026-03-24 10:00:50,711 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 32/84 (1202s elapsed)
+2026-03-24 10:00:50,711 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 40/84 (1202s elapsed)
+2026-03-24 10:00:50,711 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 48/84 (1803s elapsed)
+2026-03-24 10:10:51,745 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 56/84 (1803s elapsed)
+2026-03-24 10:10:51,745 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 64/84 (2404s elapsed)
+2026-03-24 10:10:52,556 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 72/84 (2404s elapsed)
+2026-03-24 10:10:52,557 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 80/84 (2404s elapsed)
+2026-03-24 10:10:52,557 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m   Progress: 84/84 (2404s elapsed)
+2026-03-24 10:10:52,557 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 10:10:52,557 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ============================================================
+2026-03-24 10:10:52,557 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Benchmark complete: 0/84 successful
+2026-03-24 10:10:52,557 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Wall clock: 2403.8s
+2026-03-24 10:10:52,557 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Results saved to: /tmp/client_results_tp4_pp2_in16384_out2048.json
+2026-03-24 10:10:52,557 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📊 GPU monitoring: local (single node)
+2026-03-24 10:10:53,465 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 📈 Time-series saved to /tmp/timeseries_tp4_pp2_in16384_out2048.json
+2026-03-24 10:10:56,390 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Result: success
+2026-03-24 10:10:56,390 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m
+2026-03-24 10:10:56,390 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ✅ All done! Results in /tmp/benchmark_results.json
+2026-03-24 10:10:56,391 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 🛑 Stopping vLLM server...
+2026-03-24 10:10:56,391 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m ✅ Server stopped
+2026-03-24 10:10:57,602 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + echo 'Cleaning up Ray (this may show warnings if vLLM workers are still active)...'
+2026-03-24 10:10:59,519 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m Cleaning up Ray (this may show warnings if vLLM workers are still active)...
+2026-03-24 10:10:59,520 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + sleep 2
+2026-03-24 10:10:59,520 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m + uv run ray stop
+2026-03-24 10:11:01,132 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 04:40:59,985	VINFO scripts.py:1315 -- Send termination request to `/home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/core/src/ray/raylet/raylet --raylet_socket_name=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/sockets/raylet --store_socket_name=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/sockets/plasma_store --object_manager_port=8076 --min_worker_port=11002 --max_worker_port=19999 --node_manager_port=0 --node_ip_address=172.31.7.25 --maximum_startup_concurrency=96 --static_resource_list=A100,8,node:172.31.7.25,1.0,node:__internal_head__,1.0,accelerator_type:A100,1,CPU,96,GPU,8,memory,969013894144,object_store_memory,200000000000 "--python_worker_command=/home/ubuntu/skypilot-runtime/bin/python /home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/_private/workers/setup_worker.py /home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/_private/workers/default_worker.py --node-ip-address=172.31.7.25 --node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER --object-store-name=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/sockets/plasma_store --raylet-name=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/sockets/raylet --redis-address=None --temp-dir=/tmp/ray_skypilot --metrics-agent-port=49850 --runtime-env-agent-port=52331 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --runtime-env-agent-port=52331 --gcs-address=172.31.7.25:6380 --session-name=session_2026-03-24_03-46-03_038116_5572 --temp-dir=/tmp/ray_skypilot --webui=127.0.0.1:8266 --cluster-id=9738735def8339bafcd7c4f7020095c50cfd6b353e8a699980fb9f18 RAY_WORKER_DYNAMIC_OPTION_PLACEHOLDER" "--java_worker_command=/home/ubuntu/skypilot-runtime/bin/python /home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/_private/workers/setup_worker.py -Dray.address=172.31.7.25:6380 -Dray.raylet.node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER -Dray.object-store.socket-name=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/sockets/plasma_store -Dray.raylet.socket-name=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/sockets/raylet -Dray.redis.password= -Dray.node-ip=172.31.7.25 -Dray.home=/home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/../.. -Dray.logging.dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/logs -Dray.session-dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572 RAY_WORKER_DYNAMIC_OPTION_PLACEHOLDER io.ray.runtime.runner.worker.DefaultWorker" --cpp_worker_command= --native_library_path=/home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/cpp/lib --temp_dir=/tmp/ray_skypilot --session_dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572 --log_dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/logs --resource_dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/runtime_resources --metrics-agent-port=49850 --metrics_export_port=60683 --runtime_env_agent_port=52331 --object_store_memory=200000000000 --plasma_directory=/dev/shm --ray-debugger-external=0 --gcs-address=172.31.7.25:6380 --session-name=session_2026-03-24_03-46-03_038116_5572 --labels= --cluster-id=9738735def8339bafcd7c4f7020095c50cfd6b353e8a699980fb9f18 --head --num_prestart_python_workers=96 "--dashboard_agent_command=/home/ubuntu/skypilot-runtime/bin/python -u /home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/dashboard/agent.py --node-ip-address=172.31.7.25 --metrics-export-port=60683 --dashboard-agent-port=49850 --listen-port=52365 --node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER --object-store-name=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/sockets/plasma_store --raylet-name=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/sockets/raylet --temp-dir=/tmp/ray_skypilot --session-dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572 --log-dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/logs --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --session-name=session_2026-03-24_03-46-03_038116_5572 --gcs-address=172.31.7.25:6380" "--runtime_env_agent_command=/home/ubuntu/skypilot-runtime/bin/python -u /home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/_private/runtime_env/agent/main.py --node-ip-address=172.31.7.25 --runtime-env-agent-port=52331 --gcs-address=172.31.7.25:6380 --runtime-env-dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/runtime_resources --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --log-dir=/tmp/ray_skypilot/session_2026-03-24_03-46-03_038116_5572/logs --temp-dir=/tmp/ray_skypilot"` (via SIGTERM)
+2026-03-24 10:11:01,132 - INFO - [36m(rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb, pid=6476)[0m 2026-03-24 04:40:59,985	VINFO scripts.py:1315 -- Send termination request to `/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/ray/core/src/ray/raylet/raylet --raylet_socket_name=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/sockets/raylet --store_socket_name=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/sockets/plasma_store --object_manager_port=0 --min_worker_port=10002 --max_worker_port=19999 --node_manager_port=0 --node_id=c172fee384b4f08c378c65d5006f223c1e42a551a5c360b500c9c98f --node_ip_address=172.31.7.25 --maximum_startup_concurrency=1 --static_resource_list=node:172.31.7.25,1.0,node:__internal_head__,1.0,accelerator_type:A100,1,GPU,8,memory,961779433472,object_store_memory,200000000000 "--python_worker_command=/home/ubuntu/sky_workdir/.venv/bin/python3 /home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/ray/_private/workers/setup_worker.py /home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/ray/_private/workers/default_worker.py --node-ip-address=172.31.7.25 --node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER --object-store-name=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/sockets/plasma_store --raylet-name=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/sockets/raylet --redis-address=None --metrics-agent-port=0 --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --runtime-env-agent-port=0 --gcs-address=172.31.7.25:6379 --session-name=session_2026-03-24_03-48-06_846755_14420 --temp-dir=/tmp/ray --webui= --cluster-id=e4fcebd427c5cda364cbc146445f7d0fc6d4dd1a7cf9daef7ede367b RAY_WORKER_DYNAMIC_OPTION_PLACEHOLDER" "--java_worker_command=/home/ubuntu/sky_workdir/.venv/bin/python3 /home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/ray/_private/workers/setup_worker.py -Dray.address=172.31.7.25:6379 -Dray.raylet.node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER -Dray.object-store.socket-name=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/sockets/plasma_store -Dray.raylet.socket-name=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/sockets/raylet -Dray.redis.username= -Dray.redis.password= -Dray.node-ip=172.31.7.25 -Dray.home=/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/ray/../.. -Dray.logging.dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs -Dray.session-dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420 RAY_WORKER_DYNAMIC_OPTION_PLACEHOLDER io.ray.runtime.runner.worker.DefaultWorker" --cpp_worker_command= --native_library_path=/home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/ray/cpp/lib --temp_dir=/tmp/ray --session_dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420 --log_dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs --resource_dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/runtime_resources --metrics-agent-port=0 --metrics_export_port=0 --runtime_env_agent_port=0 --object_store_memory=200000000000 --plasma_directory=/dev/shm --fallback_directory=/tmp/ray/session_2026-03-24_03-48-06_846755_14420 --ray-debugger-external=0 --gcs-address=172.31.7.25:6379 --session-name=session_2026-03-24_03-48-06_846755_14420 "--labels={\"ray.io/accelerator-type\": \"A100\"}" --cluster-id=e4fcebd427c5cda364cbc146445f7d0fc6d4dd1a7cf9daef7ede367b --stdout_filepath=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs/raylet.out --stderr_filepath=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs/raylet.err --head --num_prestart_python_workers=0 "--dashboard_agent_command=/home/ubuntu/sky_workdir/.venv/bin/python3 -u /home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/ray/dashboard/agent.py --node-id=c172fee384b4f08c378c65d5006f223c1e42a551a5c360b500c9c98f --node-ip-address=172.31.7.25 --metrics-export-port=0 --grpc-port=0 --listen-port=52365 --node-manager-port=RAY_NODE_MANAGER_PORT_PLACEHOLDER --object-store-name=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/sockets/plasma_store --raylet-name=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/sockets/raylet --temp-dir=/tmp/ray --session-dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420 --log-dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --session-name=session_2026-03-24_03-48-06_846755_14420 --gcs-address=172.31.7.25:6379 --cluster-id-hex=e4fcebd427c5cda364cbc146445f7d0fc6d4dd1a7cf9daef7ede367b --stdout-filepath=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs/dashboard_agent.out --stderr-filepath=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs/dashboard_agent.err --minimal --head" "--runtime_env_agent_command=/home/ubuntu/sky_workdir/.venv/bin/python3 -u /home/ubuntu/sky_workdir/.venv/lib/python3.12/site-packages/ray/_private/runtime_env/agent/main.py --node-id=c172fee384b4f08c378c65d5006f223c1e42a551a5c360b500c9c98f --node-ip-address=172.31.7.25 --runtime-env-agent-port=0 --session-dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420 --gcs-address=172.31.7.25:6379 --cluster-id-hex=e4fcebd427c5cda364cbc146445f7d0fc6d4dd1a7cf9daef7ede367b --runtime-env-dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/runtime_resources --logging-rotate-bytes=536870912 --logging-rotate-backup-count=5 --log-dir=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs --temp-dir=/tmp/ray --stdout-filepath=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs/runtime_env_agent.out --stderr-filepath=/tmp/ray/session_2026-03-24_03-48-06_846755_14420/logs/runtime_env_agent.err"` (via SIGTERM)
+2026-03-24 10:11:23,980 - INFO - Traceback (most recent call last):
+2026-03-24 10:11:23,980 - INFO -   File "/home/ubuntu/.sky/sky_app/sky_job_1", line 621, in <module>
+2026-03-24 10:11:23,980 - INFO -     returncodes, _ = get_or_fail(futures, pg)
+2026-03-24 10:11:23,980 - INFO -   File "/home/ubuntu/.sky/sky_app/sky_job_1", line 76, in get_or_fail
+2026-03-24 10:11:23,980 - INFO -     handle_ready_tasks(ready)
+2026-03-24 10:11:23,980 - INFO -   File "/home/ubuntu/.sky/sky_app/sky_job_1", line 68, in handle_ready_tasks
+2026-03-24 10:11:23,980 - INFO -     res = ray.get(task)
+2026-03-24 10:11:23,981 - INFO -   File "/home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/_private/auto_init_hook.py", line 22, in auto_init_wrapper
+2026-03-24 10:11:23,981 - INFO -     return fn(*args, **kwargs)
+2026-03-24 10:11:23,981 - INFO -   File "/home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+2026-03-24 10:11:23,981 - INFO -     return func(*args, **kwargs)
+2026-03-24 10:11:23,981 - INFO -   File "/home/ubuntu/skypilot-runtime/lib/python3.10/site-packages/ray/_private/worker.py", line 2640, in get
+2026-03-24 10:11:23,981 - INFO -     raise value
+2026-03-24 10:11:23,981 - INFO - ray.exceptions.LocalRayletDiedError: The task's local raylet died. Check raylet.out for more information.
+2026-03-24 10:11:23,981 - INFO - [0m[32m✓ Job finished (status: FAILED_DRIVER).[0m[0m
+2026-03-24 10:11:26,208 - INFO - 
+2026-03-24 10:11:27,371 - INFO - 📋 Useful Commands
+2026-03-24 10:11:27,371 - INFO - Job ID: 1
+2026-03-24 10:11:27,371 - INFO - ├── To cancel the job:		sky cancel rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb 1
+2026-03-24 10:11:27,371 - INFO - ├── To stream job logs:		sky logs rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb 1
+2026-03-24 10:11:27,371 - INFO - └── To view job queue:		sky queue rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb
+2026-03-24 10:11:27,371 - INFO - Cluster name: rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb
+2026-03-24 10:11:27,371 - INFO - ├── To log into the head VM:	ssh rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb
+2026-03-24 10:11:27,371 - INFO - ├── To submit a job:		sky exec rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb yaml_file
+2026-03-24 10:11:27,371 - INFO - ├── To stop the cluster:	sky stop rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb
+2026-03-24 10:11:27,371 - INFO - └── To teardown the cluster:	sky down rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb
+2026-03-24 10:11:27,371 - ERROR - ❌ Cluster error: Command 'sky launch' returned non-zero exit status 100.
+2026-03-24 10:11:27,371 - INFO - 📥 Attempting to fetch results (benchmark may have completed)...
+2026-03-24 10:11:27,371 - INFO - 📥 Fetching results.json from cluster...
+2026-03-24 10:11:33,760 - INFO - 📈 Attempting to fetch timeseries data from cluster (best-effort)...
+2026-03-24 10:11:45,484 - INFO - ✅ Found successful benchmark results despite cluster error!
+2026-03-24 10:11:45,485 - INFO -    This is likely a cleanup error, not a benchmark failure.
+2026-03-24 10:11:46,028 - INFO - 📁 Renaming directory: tp4-pp2-p4d_24xlarge-20260324_091246 -> tp4-pp2-p4d_24xlarge-20260324_091246-success
+2026-03-24 10:11:46,031 - INFO - 📈 Plotting timeseries for successful experiment(s) after cluster error...
+2026-03-24 10:11:46,084 - INFO - 🗑️  Tearing down rf-qwen2-5-72b-instruct-tp4pp2-A100-40gb...
