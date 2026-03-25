@@ -86,7 +86,7 @@ GPU_CONFIGS = {
             4: {"instance_type": "p4de.24xlarge", "price_per_hour": 40.96},  # 8 GPUs, but can use 4
             8: {"instance_type": "p4de.24xlarge", "price_per_hour": 40.96},  # 8 GPUs (80GB per GPU)
         },
-        "canonical_gpu_name": "A100",
+        "canonical_gpu_name": "A100-80GB",
         "gpu_mem_gb": 80,
         "gpu_tflops_fp16": 312,
         "gpu_bandwidth_gbps": 2039,
