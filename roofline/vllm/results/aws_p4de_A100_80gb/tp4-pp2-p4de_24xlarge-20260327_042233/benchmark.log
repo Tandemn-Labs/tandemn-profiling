@@ -1,0 +1,55 @@
+2026-03-27 04:22:33,351 - INFO - Results will be saved to: results/aws_p4de_A100_80gb/tp4-pp2-p4de_24xlarge-20260327_042233
+2026-03-27 04:22:33,352 - INFO - 📋 Copied benchmark_client.py to roofline_benchmarks/
+2026-03-27 04:22:33,352 - INFO - 📋 Copied prometheus_parser.py to roofline_benchmarks/
+2026-03-27 04:22:33,352 - INFO - 🚀 Launching rf-qwen3-235b-a22b-tp4pp2-A100-80gb...
+2026-03-27 04:22:33,352 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-235b-a22b-tp4pp2-A100-80gb.yaml
+2026-03-27 04:22:33,352 - INFO - Running on cluster: rf-qwen3-235b-a22b-tp4pp2-A100-80gb
+2026-03-27 04:22:34,056 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-235b-a22b-tp4pp2-A100-80gb.yaml
+2026-03-27 04:22:34,144 - INFO - Running on cluster: rf-qwen3-235b-a22b-tp4pp2-A100-80gb
+2026-03-27 04:22:35,342 - INFO - [33mLaunching a spot job that does not automatically recover from preemptions. To get automatic recovery, use managed job instead: [0m[1msky jobs launch[0m [33mor[0m [1msky.jobs.launch()[0m.
+2026-03-27 04:22:35,342 - INFO - Considered resources (1 node):
+2026-03-27 04:22:35,444 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-27 04:22:35,444 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-27 04:22:35,444 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-27 04:22:35,444 - INFO -  AWS (ap-northeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   9.67       [32m   ✔[0m
+2026-03-27 04:22:35,444 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-27 04:22:35,444 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-27 04:22:36,147 - INFO - 
+2026-03-27 04:22:36,147 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-27 04:22:36,147 - INFO - Considered resources (1 node):
+2026-03-27 04:22:36,147 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-27 04:22:36,147 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-27 04:22:36,147 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-27 04:22:36,147 - INFO -  AWS (eu-central-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   10.63      [32m   ✔[0m
+2026-03-27 04:22:36,147 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-27 04:22:36,147 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-27 04:22:36,248 - INFO - 
+2026-03-27 04:22:36,248 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-27 04:22:36,248 - INFO - Considered resources (1 node):
+2026-03-27 04:22:36,954 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-27 04:22:36,954 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-27 04:22:36,954 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-27 04:22:36,954 - INFO -  AWS (eu-central-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   13.11      [32m   ✔[0m
+2026-03-27 04:22:36,954 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-27 04:22:36,954 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-27 04:22:37,055 - INFO - 
+2026-03-27 04:22:37,055 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-27 04:22:37,055 - INFO - Considered resources (1 node):
+2026-03-27 04:22:38,162 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-27 04:22:38,162 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-27 04:22:38,162 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-27 04:22:38,162 - INFO -  AWS (us-west-2a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   13.53      [32m   ✔[0m
+2026-03-27 04:22:38,162 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-27 04:22:38,162 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-27 04:22:38,263 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-27 04:22:38,263 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-27 04:22:38,263 - INFO - Option 1 (with SSM):
+2026-03-27 04:22:38,263 - INFO -   aws:
+2026-03-27 04:22:38,263 - INFO -     use_internal_ips: true
+2026-03-27 04:22:38,263 - INFO -     use_ssm: true
+2026-03-27 04:22:38,263 - INFO - Option 2 (with SSH proxy):
+2026-03-27 04:22:38,263 - INFO -   aws:
+2026-03-27 04:22:38,263 - INFO -     use_internal_ips: true
+2026-03-27 04:22:38,263 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-27 04:22:38,263 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-27 04:22:38,263 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
