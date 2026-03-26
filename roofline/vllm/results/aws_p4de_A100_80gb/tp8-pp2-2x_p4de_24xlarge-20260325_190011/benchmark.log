@@ -1,0 +1,900 @@
+2026-03-25 19:00:11,252 - INFO - Results will be saved to: results/aws_p4de_A100_80gb/tp8-pp2-2x_p4de_24xlarge-20260325_190011
+2026-03-25 19:00:11,254 - INFO - 📋 Copied benchmark_client.py to roofline_benchmarks/
+2026-03-25 19:00:11,254 - INFO - 📋 Copied prometheus_parser.py to roofline_benchmarks/
+2026-03-25 19:00:11,254 - INFO - 🚀 Launching rf-qwen3-32b-tp8pp2-A100-80gb...
+2026-03-25 19:00:11,254 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-32b-tp8pp2-A100-80gb.yaml
+2026-03-25 19:00:11,254 - INFO - Running on cluster: rf-qwen3-32b-tp8pp2-A100-80gb
+2026-03-25 19:00:12,611 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-32b-tp8pp2-A100-80gb.yaml
+2026-03-25 19:00:12,749 - INFO - Running on cluster: rf-qwen3-32b-tp8pp2-A100-80gb
+2026-03-25 19:00:14,158 - INFO - [33mLaunching a spot job that does not automatically recover from preemptions. To get automatic recovery, use managed job instead: [0m[1msky jobs launch[0m [33mor[0m [1msky.jobs.launch()[0m.
+2026-03-25 19:00:14,159 - INFO - Considered resources (2 nodes):
+2026-03-25 19:00:14,563 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:00:14,563 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:00:14,563 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:00:14,563 - INFO -  AWS (ap-northeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   19.80      [32m   ✔[0m
+2026-03-25 19:00:14,563 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:00:14,564 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:00:14,766 - INFO - 
+2026-03-25 19:00:14,766 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:00:14,766 - INFO - Considered resources (2 nodes):
+2026-03-25 19:00:15,570 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:00:15,571 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:00:15,571 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:00:15,571 - INFO -  AWS (eu-central-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   20.30      [32m   ✔[0m
+2026-03-25 19:00:15,571 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:00:15,571 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:00:15,974 - INFO - 
+2026-03-25 19:00:15,974 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:00:15,974 - INFO - Considered resources (2 nodes):
+2026-03-25 19:00:17,085 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:00:17,085 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:00:17,085 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:00:17,085 - INFO -  AWS (us-west-2a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   24.57      [32m   ✔[0m
+2026-03-25 19:00:17,085 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:00:17,085 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:00:17,187 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:00:17,187 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:00:17,187 - INFO - Option 1 (with SSM):
+2026-03-25 19:00:17,187 - INFO -   aws:
+2026-03-25 19:00:17,187 - INFO -     use_internal_ips: true
+2026-03-25 19:00:17,187 - INFO -     use_ssm: true
+2026-03-25 19:00:17,187 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:00:17,187 - INFO -   aws:
+2026-03-25 19:00:17,187 - INFO -     use_internal_ips: true
+2026-03-25 19:00:17,187 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:00:17,187 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:00:17,187 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
+2026-03-25 19:00:40,454 - INFO - [2mW 03-25 19:00:40.397 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2a). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2b, us-west-2c.[0m
+2026-03-25 19:00:44,381 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:00:44,685 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:00:44,685 - INFO - 
+2026-03-25 19:00:44,685 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:00:44,685 - INFO - Considered resources (2 nodes):
+2026-03-25 19:00:45,490 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:00:45,490 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:00:45,490 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:00:45,490 - INFO -  AWS (eu-central-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   26.88      [32m   ✔[0m
+2026-03-25 19:00:45,490 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:00:45,490 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:00:45,791 - INFO - 
+2026-03-25 19:00:45,791 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:00:45,791 - INFO - Considered resources (2 nodes):
+2026-03-25 19:00:47,000 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:00:47,000 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:00:47,001 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:00:47,001 - INFO -  AWS (us-west-2c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   29.77      [32m   ✔[0m
+2026-03-25 19:00:47,001 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:00:47,001 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:00:47,101 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:00:47,102 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:00:47,102 - INFO - Option 1 (with SSM):
+2026-03-25 19:00:47,102 - INFO -   aws:
+2026-03-25 19:00:47,102 - INFO -     use_internal_ips: true
+2026-03-25 19:00:47,102 - INFO -     use_ssm: true
+2026-03-25 19:00:47,102 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:00:47,102 - INFO -   aws:
+2026-03-25 19:00:47,102 - INFO -     use_internal_ips: true
+2026-03-25 19:00:47,102 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:00:47,102 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:00:47,102 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2c).
+2026-03-25 19:01:09,056 - INFO - [2mW 03-25 19:01:08.965 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2c). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2b.[0m
+2026-03-25 19:01:13,190 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:01:13,292 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2c for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:01:13,292 - INFO - 
+2026-03-25 19:01:13,596 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:01:13,597 - INFO - Considered resources (2 nodes):
+2026-03-25 19:01:14,298 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:01:14,298 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:01:14,298 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:01:14,298 - INFO -  AWS (ap-northeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   32.81      [32m   ✔[0m
+2026-03-25 19:01:14,298 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:01:14,298 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:01:14,602 - INFO - 
+2026-03-25 19:01:14,602 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:01:14,602 - INFO - Considered resources (2 nodes):
+2026-03-25 19:01:15,709 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:01:15,710 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:01:15,710 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:01:15,710 - INFO -  AWS (us-west-2b)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   33.39      [32m   ✔[0m
+2026-03-25 19:01:15,710 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:01:15,710 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:01:15,811 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:01:15,811 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:01:15,811 - INFO - Option 1 (with SSM):
+2026-03-25 19:01:15,811 - INFO -   aws:
+2026-03-25 19:01:15,811 - INFO -     use_internal_ips: true
+2026-03-25 19:01:15,811 - INFO -     use_ssm: true
+2026-03-25 19:01:15,811 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:01:15,811 - INFO -   aws:
+2026-03-25 19:01:15,811 - INFO -     use_internal_ips: true
+2026-03-25 19:01:15,811 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:01:15,811 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:01:15,811 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2b).
+2026-03-25 19:01:37,362 - INFO - [2mW 03-25 19:01:37.338 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2b). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2c.[0m
+2026-03-25 19:01:42,197 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:01:42,298 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2b for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:01:42,298 - INFO - 
+2026-03-25 19:01:42,601 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:01:42,601 - INFO - Considered resources (2 nodes):
+2026-03-25 19:01:43,711 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:01:43,711 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:01:43,711 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:01:43,711 - INFO -  AWS (us-east-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   34.11      [32m   ✔[0m
+2026-03-25 19:01:43,711 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:01:43,711 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:01:43,814 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:01:43,814 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:01:43,814 - INFO - Option 1 (with SSM):
+2026-03-25 19:01:43,814 - INFO -   aws:
+2026-03-25 19:01:43,814 - INFO -     use_internal_ips: true
+2026-03-25 19:01:43,814 - INFO -     use_ssm: true
+2026-03-25 19:01:43,814 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:01:43,814 - INFO -   aws:
+2026-03-25 19:01:43,814 - INFO -     use_internal_ips: true
+2026-03-25 19:01:43,814 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:01:43,814 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:01:43,814 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-03-25 19:02:06,069 - INFO - [2mW 03-25 19:02:05.983 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (MaxSpotInstanceCountExceeded) when calling the RunInstances operation: Max spot instance count exceeded[0m
+2026-03-25 19:02:10,699 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:02:10,800 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:02:10,801 - INFO - 
+2026-03-25 19:02:11,103 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:02:11,103 - INFO - Considered resources (2 nodes):
+2026-03-25 19:02:11,505 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:02:11,505 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:02:11,505 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:02:11,506 - INFO -  AWS (ap-southeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   36.36      [32m   ✔[0m
+2026-03-25 19:02:11,506 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:02:11,506 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:02:11,607 - INFO - 
+2026-03-25 19:02:11,910 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:02:11,910 - INFO - Considered resources (2 nodes):
+2026-03-25 19:02:13,021 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:02:13,022 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:02:13,022 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:02:13,022 - INFO -  AWS (us-east-1d)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   54.89      [32m   ✔[0m
+2026-03-25 19:02:13,022 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:02:13,022 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:02:13,224 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:02:13,224 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:02:13,224 - INFO - Option 1 (with SSM):
+2026-03-25 19:02:13,224 - INFO -   aws:
+2026-03-25 19:02:13,224 - INFO -     use_internal_ips: true
+2026-03-25 19:02:13,224 - INFO -     use_ssm: true
+2026-03-25 19:02:13,224 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:02:13,224 - INFO -   aws:
+2026-03-25 19:02:13,224 - INFO -     use_internal_ips: true
+2026-03-25 19:02:13,224 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:02:13,224 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:02:13,224 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1d).
+2026-03-25 19:02:34,495 - INFO - [2mW 03-25 19:02:34.423 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-east-1d). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a.[0m
+2026-03-25 19:02:38,130 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:02:38,233 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1d for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:02:38,635 - INFO - 
+2026-03-25 19:02:38,635 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:02:38,635 - INFO - Considered resources (2 nodes):
+2026-03-25 19:02:39,039 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:02:39,039 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:02:39,039 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:02:39,039 - INFO -  AWS (ap-southeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   65.87      [32m   ✔[0m
+2026-03-25 19:02:39,039 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:02:39,039 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:02:39,141 - INFO - 
+2026-03-25 19:02:40,556 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:02:40,556 - INFO - 
+2026-03-25 19:03:11,799 - INFO - [?25h[31mFailed to provision all possible launchable resources.[0m Relax the task's resource requirements: 2x AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)
+2026-03-25 19:03:11,799 - INFO - 
+2026-03-25 19:03:11,799 - INFO - [0m[33m↺[0m Retry after 30s  [2mView logs: [1msky logs --provision rf-qwen3-32b-tp8pp2-A100-80gb[0m[0m[0m
+2026-03-25 19:03:11,799 - INFO - [33mLaunching a spot job that does not automatically recover from preemptions. To get automatic recovery, use managed job instead: [0m[1msky jobs launch[0m [33mor[0m [1msky.jobs.launch()[0m.
+2026-03-25 19:03:11,901 - INFO - Considered resources (2 nodes):
+2026-03-25 19:03:12,002 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:03:12,709 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:03:12,709 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:03:12,709 - INFO -  AWS (ap-northeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   19.34      [32m   ✔[0m
+2026-03-25 19:03:12,709 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:03:12,709 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:03:13,010 - INFO - 
+2026-03-25 19:03:13,010 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:03:13,010 - INFO - Considered resources (2 nodes):
+2026-03-25 19:03:13,818 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:03:13,818 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:03:13,819 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:03:13,819 - INFO -  AWS (eu-central-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   21.26      [32m   ✔[0m
+2026-03-25 19:03:13,819 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:03:13,819 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:03:14,021 - INFO - 
+2026-03-25 19:03:14,021 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:03:14,021 - INFO - Considered resources (2 nodes):
+2026-03-25 19:03:14,122 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:03:14,931 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:03:14,931 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:03:14,931 - INFO -  AWS (eu-central-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   26.21      [32m   ✔[0m
+2026-03-25 19:03:14,931 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:03:14,931 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:03:15,233 - INFO - 
+2026-03-25 19:03:15,233 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:03:15,233 - INFO - Considered resources (2 nodes):
+2026-03-25 19:03:16,439 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:03:16,439 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:03:16,440 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:03:16,440 - INFO -  AWS (us-west-2a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   27.07      [32m   ✔[0m
+2026-03-25 19:03:16,440 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:03:16,440 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:03:16,542 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:03:16,542 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:03:16,542 - INFO - Option 1 (with SSM):
+2026-03-25 19:03:16,542 - INFO -   aws:
+2026-03-25 19:03:16,543 - INFO -     use_internal_ips: true
+2026-03-25 19:03:16,543 - INFO -     use_ssm: true
+2026-03-25 19:03:16,543 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:03:16,543 - INFO -   aws:
+2026-03-25 19:03:16,543 - INFO -     use_internal_ips: true
+2026-03-25 19:03:16,543 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:03:16,543 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:03:16,543 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
+2026-03-25 19:03:40,139 - INFO - [2mW 03-25 19:03:40.108 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2a). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2b, us-west-2c.[0m
+2026-03-25 19:03:44,977 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:03:45,281 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:03:45,281 - INFO - 
+2026-03-25 19:03:45,281 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:03:45,281 - INFO - Considered resources (2 nodes):
+2026-03-25 19:03:46,490 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:03:46,490 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:03:46,490 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:03:46,490 - INFO -  AWS (us-west-2c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   30.74      [32m   ✔[0m
+2026-03-25 19:03:46,490 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:03:46,490 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:03:46,591 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:03:46,592 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:03:46,592 - INFO - Option 1 (with SSM):
+2026-03-25 19:03:46,592 - INFO -   aws:
+2026-03-25 19:03:46,592 - INFO -     use_internal_ips: true
+2026-03-25 19:03:46,592 - INFO -     use_ssm: true
+2026-03-25 19:03:46,592 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:03:46,592 - INFO -   aws:
+2026-03-25 19:03:46,592 - INFO -     use_internal_ips: true
+2026-03-25 19:03:46,592 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:03:46,592 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:03:46,592 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2c).
+2026-03-25 19:04:08,366 - INFO - [2mW 03-25 19:04:08.275 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2c). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2b.[0m
+2026-03-25 19:04:12,498 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:04:12,899 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2c for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:04:12,900 - INFO - 
+2026-03-25 19:04:12,900 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:04:12,900 - INFO - Considered resources (2 nodes):
+2026-03-25 19:04:13,505 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:04:13,505 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:04:13,505 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:04:13,505 - INFO -  AWS (ap-northeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   32.78      [32m   ✔[0m
+2026-03-25 19:04:13,505 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:04:13,505 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:04:13,606 - INFO - 
+2026-03-25 19:04:13,910 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:04:13,910 - INFO - Considered resources (2 nodes):
+2026-03-25 19:04:15,121 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:04:15,121 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:04:15,121 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:04:15,121 - INFO -  AWS (us-west-2b)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   34.02      [32m   ✔[0m
+2026-03-25 19:04:15,121 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:04:15,121 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:04:15,222 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:04:15,222 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:04:15,222 - INFO - Option 1 (with SSM):
+2026-03-25 19:04:15,222 - INFO -   aws:
+2026-03-25 19:04:15,222 - INFO -     use_internal_ips: true
+2026-03-25 19:04:15,222 - INFO -     use_ssm: true
+2026-03-25 19:04:15,222 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:04:15,222 - INFO -   aws:
+2026-03-25 19:04:15,222 - INFO -     use_internal_ips: true
+2026-03-25 19:04:15,222 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:04:15,222 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:04:15,222 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2b).
+2026-03-25 19:04:36,179 - INFO - [2mW 03-25 19:04:36.138 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2b). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2c.[0m
+2026-03-25 19:04:41,015 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:04:41,116 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2b for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:04:41,521 - INFO - 
+2026-03-25 19:04:41,521 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:04:41,521 - INFO - Considered resources (2 nodes):
+2026-03-25 19:04:42,431 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:04:42,432 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:04:42,432 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:04:42,432 - INFO -  AWS (us-east-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   38.20      [32m   ✔[0m
+2026-03-25 19:04:42,432 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:04:42,432 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:04:42,634 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:04:42,634 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:04:42,634 - INFO - Option 1 (with SSM):
+2026-03-25 19:04:42,634 - INFO -   aws:
+2026-03-25 19:04:42,634 - INFO -     use_internal_ips: true
+2026-03-25 19:04:42,634 - INFO -     use_ssm: true
+2026-03-25 19:04:42,634 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:04:42,634 - INFO -   aws:
+2026-03-25 19:04:42,634 - INFO -     use_internal_ips: true
+2026-03-25 19:04:42,634 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:04:42,634 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:04:42,634 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-03-25 19:05:06,020 - INFO - [2mW 03-25 19:05:06.002 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (MaxSpotInstanceCountExceeded) when calling the RunInstances operation: Max spot instance count exceeded[0m
+2026-03-25 19:05:10,864 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:05:10,965 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:05:11,368 - INFO - 
+2026-03-25 19:05:11,368 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:05:11,368 - INFO - Considered resources (2 nodes):
+2026-03-25 19:05:11,771 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:05:11,772 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:05:11,772 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:05:11,772 - INFO -  AWS (ap-southeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   40.14      [32m   ✔[0m
+2026-03-25 19:05:11,772 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:05:11,772 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:05:11,872 - INFO - 
+2026-03-25 19:05:12,174 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:05:12,174 - INFO - Considered resources (2 nodes):
+2026-03-25 19:05:12,276 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:05:13,186 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:05:13,186 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:05:13,186 - INFO -  AWS (us-east-1d)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   54.89      [32m   ✔[0m
+2026-03-25 19:05:13,186 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:05:13,186 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:05:13,287 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:05:13,287 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:05:13,287 - INFO - Option 1 (with SSM):
+2026-03-25 19:05:13,287 - INFO -   aws:
+2026-03-25 19:05:13,287 - INFO -     use_internal_ips: true
+2026-03-25 19:05:13,287 - INFO -     use_ssm: true
+2026-03-25 19:05:13,287 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:05:13,287 - INFO -   aws:
+2026-03-25 19:05:13,287 - INFO -     use_internal_ips: true
+2026-03-25 19:05:13,287 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:05:13,287 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:05:13,287 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1d).
+2026-03-25 19:05:33,226 - INFO - [2mW 03-25 19:05:33.193 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-east-1d). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a.[0m
+2026-03-25 19:05:37,767 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:05:37,869 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1d for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:05:38,271 - INFO - 
+2026-03-25 19:05:38,272 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:05:38,272 - INFO - Considered resources (2 nodes):
+2026-03-25 19:05:38,677 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:05:38,677 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:05:38,677 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:05:38,677 - INFO -  AWS (ap-southeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   65.87      [32m   ✔[0m
+2026-03-25 19:05:38,677 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:05:38,677 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:05:38,778 - INFO - 
+2026-03-25 19:05:40,292 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:05:40,292 - INFO - 
+2026-03-25 19:06:11,633 - INFO - [?25h[31mFailed to provision all possible launchable resources.[0m Relax the task's resource requirements: 2x AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)
+2026-03-25 19:06:11,633 - INFO - 
+2026-03-25 19:06:11,633 - INFO - [0m[33m↺[0m Retry after 30s  [2mView logs: [1msky logs --provision rf-qwen3-32b-tp8pp2-A100-80gb[0m[0m[0m
+2026-03-25 19:06:11,633 - INFO - [33mLaunching a spot job that does not automatically recover from preemptions. To get automatic recovery, use managed job instead: [0m[1msky jobs launch[0m [33mor[0m [1msky.jobs.launch()[0m.
+2026-03-25 19:06:11,735 - INFO - Considered resources (2 nodes):
+2026-03-25 19:06:11,836 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:06:12,540 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:06:12,540 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:06:12,540 - INFO -  AWS (ap-northeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   24.02      [32m   ✔[0m
+2026-03-25 19:06:12,540 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:06:12,540 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:06:12,740 - INFO - 
+2026-03-25 19:06:12,741 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:06:12,741 - INFO - Considered resources (2 nodes):
+2026-03-25 19:06:12,842 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:06:13,449 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:06:13,450 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:06:13,450 - INFO -  AWS (ap-northeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   28.71      [32m   ✔[0m
+2026-03-25 19:06:13,450 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:06:13,450 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:06:13,752 - INFO - 
+2026-03-25 19:06:13,752 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:06:13,752 - INFO - Considered resources (2 nodes):
+2026-03-25 19:06:14,460 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:06:14,460 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:06:14,460 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:06:14,460 - INFO -  AWS (eu-central-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   29.85      [32m   ✔[0m
+2026-03-25 19:06:14,460 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:06:14,460 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:06:14,560 - INFO - 
+2026-03-25 19:06:14,763 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:06:14,764 - INFO - Considered resources (2 nodes):
+2026-03-25 19:06:17,389 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:06:17,390 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:06:17,390 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:06:17,390 - INFO -  AWS (us-west-2c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   32.16      [32m   ✔[0m
+2026-03-25 19:06:17,390 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:06:17,390 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:06:19,203 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:06:19,203 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:06:19,203 - INFO - Option 1 (with SSM):
+2026-03-25 19:06:19,203 - INFO -   aws:
+2026-03-25 19:06:19,203 - INFO -     use_internal_ips: true
+2026-03-25 19:06:19,203 - INFO -     use_ssm: true
+2026-03-25 19:06:19,203 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:06:19,203 - INFO -   aws:
+2026-03-25 19:06:19,203 - INFO -     use_internal_ips: true
+2026-03-25 19:06:19,203 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:06:19,203 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:06:19,203 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2c).
+2026-03-25 19:06:42,101 - INFO - [2mW 03-25 19:06:42.083 PID=743527 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2c). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2b.[0m
+2026-03-25 19:06:46,031 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:06:46,133 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2c for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:06:46,133 - INFO - 
+2026-03-25 19:06:46,336 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:06:46,336 - INFO - Considered resources (2 nodes):
+2026-03-25 19:06:47,142 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:06:47,143 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:06:47,143 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:06:47,143 - INFO -  AWS (eu-central-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   32.33      [32m   ✔[0m
+2026-03-25 19:06:47,143 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:06:47,143 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:06:47,444 - INFO - 
+2026-03-25 19:06:47,445 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:06:47,445 - INFO - Considered resources (2 nodes):
+2026-03-25 19:06:47,546 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:06:48,656 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:06:48,656 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:06:48,656 - INFO -  AWS (us-west-2b)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   34.35      [32m   ✔[0m
+2026-03-25 19:06:48,656 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:06:48,656 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:06:48,758 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:06:48,758 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:06:48,758 - INFO - Option 1 (with SSM):
+2026-03-25 19:06:48,758 - INFO -   aws:
+2026-03-25 19:06:48,758 - INFO -     use_internal_ips: true
+2026-03-25 19:06:48,758 - INFO -     use_ssm: true
+2026-03-25 19:06:48,758 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:06:48,758 - INFO -   aws:
+2026-03-25 19:06:48,758 - INFO -     use_internal_ips: true
+2026-03-25 19:06:48,759 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:06:48,759 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:06:48,759 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2b).
+2026-03-25 19:07:09,128 - INFO - [2mW 03-25 19:07:09.108 PID=743527 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2b). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2c.[0m
+2026-03-25 19:07:12,855 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:07:13,258 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2b for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:07:13,259 - INFO - 
+2026-03-25 19:07:13,259 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:07:13,259 - INFO - Considered resources (2 nodes):
+2026-03-25 19:07:15,375 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:07:15,375 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:07:15,375 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:07:15,375 - INFO -  AWS (us-east-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   36.92      [32m   ✔[0m
+2026-03-25 19:07:15,375 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:07:15,375 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:07:16,991 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:07:16,991 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:07:16,991 - INFO - Option 1 (with SSM):
+2026-03-25 19:07:16,991 - INFO -   aws:
+2026-03-25 19:07:16,992 - INFO -     use_internal_ips: true
+2026-03-25 19:07:16,992 - INFO -     use_ssm: true
+2026-03-25 19:07:16,992 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:07:16,992 - INFO -   aws:
+2026-03-25 19:07:16,992 - INFO -     use_internal_ips: true
+2026-03-25 19:07:16,992 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:07:16,992 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:07:16,992 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-03-25 19:07:40,173 - INFO - [2mW 03-25 19:07:40.132 PID=743527 instance.py:288] create_instances: Attempt failed with An error occurred (MaxSpotInstanceCountExceeded) when calling the RunInstances operation: Max spot instance count exceeded[0m
+2026-03-25 19:07:44,909 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:07:45,010 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:07:45,010 - INFO - 
+2026-03-25 19:07:45,311 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:07:45,312 - INFO - Considered resources (2 nodes):
+2026-03-25 19:07:46,521 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:07:46,521 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:07:46,521 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:07:46,521 - INFO -  AWS (us-west-2a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   39.18      [32m   ✔[0m
+2026-03-25 19:07:46,521 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:07:46,521 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:07:46,623 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:07:46,623 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:07:46,624 - INFO - Option 1 (with SSM):
+2026-03-25 19:07:46,624 - INFO -   aws:
+2026-03-25 19:07:46,624 - INFO -     use_internal_ips: true
+2026-03-25 19:07:46,624 - INFO -     use_ssm: true
+2026-03-25 19:07:46,624 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:07:46,624 - INFO -   aws:
+2026-03-25 19:07:46,624 - INFO -     use_internal_ips: true
+2026-03-25 19:07:46,624 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:07:46,624 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:07:46,624 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
+2026-03-25 19:08:07,488 - INFO - [2mW 03-25 19:08:07.477 PID=743527 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2a). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2b, us-west-2c.[0m
+2026-03-25 19:08:11,424 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:08:11,829 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:08:11,830 - INFO - 
+2026-03-25 19:08:11,830 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:08:11,830 - INFO - Considered resources (2 nodes):
+2026-03-25 19:08:12,739 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:08:12,740 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:08:12,740 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:08:12,740 - INFO -  AWS (us-east-1d)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   49.02      [32m   ✔[0m
+2026-03-25 19:08:12,740 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:08:12,740 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:08:12,943 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:08:12,943 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:08:12,943 - INFO - Option 1 (with SSM):
+2026-03-25 19:08:12,943 - INFO -   aws:
+2026-03-25 19:08:12,943 - INFO -     use_internal_ips: true
+2026-03-25 19:08:12,943 - INFO -     use_ssm: true
+2026-03-25 19:08:12,943 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:08:12,943 - INFO -   aws:
+2026-03-25 19:08:12,943 - INFO -     use_internal_ips: true
+2026-03-25 19:08:12,943 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:08:12,943 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:08:12,943 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1d).
+2026-03-25 19:08:34,440 - INFO - [2mW 03-25 19:08:34.339 PID=743527 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-east-1d). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a.[0m
+2026-03-25 19:08:39,073 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:08:39,175 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1d for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:08:39,477 - INFO - 
+2026-03-25 19:08:39,477 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:08:39,477 - INFO - Considered resources (2 nodes):
+2026-03-25 19:08:39,881 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:08:39,881 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:08:39,881 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:08:39,881 - INFO -  AWS (ap-southeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   57.83      [32m   ✔[0m
+2026-03-25 19:08:39,881 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:08:39,881 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:08:39,982 - INFO - 
+2026-03-25 19:08:40,285 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:08:40,285 - INFO - Considered resources (2 nodes):
+2026-03-25 19:08:40,689 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:08:40,689 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:08:40,689 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:08:40,690 - INFO -  AWS (ap-southeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   65.87      [32m   ✔[0m
+2026-03-25 19:08:40,690 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:08:40,690 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:08:42,000 - INFO - 
+2026-03-25 19:08:42,000 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:08:42,000 - INFO - 
+2026-03-25 19:09:13,231 - INFO - [?25h[31mFailed to provision all possible launchable resources.[0m Relax the task's resource requirements: 2x AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)
+2026-03-25 19:09:13,231 - INFO - 
+2026-03-25 19:09:13,231 - INFO - [0m[33m↺[0m Retry after 30s  [2mView logs: [1msky logs --provision rf-qwen3-32b-tp8pp2-A100-80gb[0m[0m[0m
+2026-03-25 19:09:13,231 - INFO - [33mLaunching a spot job that does not automatically recover from preemptions. To get automatic recovery, use managed job instead: [0m[1msky jobs launch[0m [33mor[0m [1msky.jobs.launch()[0m.
+2026-03-25 19:09:13,333 - INFO - Considered resources (2 nodes):
+2026-03-25 19:09:14,139 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:09:14,139 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:09:14,139 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:09:14,139 - INFO -  AWS (ap-northeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   19.80      [32m   ✔[0m
+2026-03-25 19:09:14,139 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:09:14,139 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:09:14,241 - INFO - 
+2026-03-25 19:09:14,241 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:09:14,241 - INFO - Considered resources (2 nodes):
+2026-03-25 19:09:14,947 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:09:14,947 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:09:14,947 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:09:14,947 - INFO -  AWS (eu-central-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   20.30      [32m   ✔[0m
+2026-03-25 19:09:14,947 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:09:14,947 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:09:15,150 - INFO - 
+2026-03-25 19:09:15,150 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:09:15,150 - INFO - Considered resources (2 nodes):
+2026-03-25 19:09:16,256 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:09:16,256 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:09:16,256 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:09:16,256 - INFO -  AWS (us-west-2a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   24.57      [32m   ✔[0m
+2026-03-25 19:09:16,256 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:09:16,256 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:09:16,459 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:09:16,459 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:09:16,459 - INFO - Option 1 (with SSM):
+2026-03-25 19:09:16,459 - INFO -   aws:
+2026-03-25 19:09:16,459 - INFO -     use_internal_ips: true
+2026-03-25 19:09:16,459 - INFO -     use_ssm: true
+2026-03-25 19:09:16,459 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:09:16,459 - INFO -   aws:
+2026-03-25 19:09:16,459 - INFO -     use_internal_ips: true
+2026-03-25 19:09:16,459 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:09:16,459 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:09:16,459 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
+2026-03-25 19:09:37,412 - INFO - [2mW 03-25 19:09:37.381 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2a). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2b, us-west-2c.[0m
+2026-03-25 19:09:41,140 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:09:41,242 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:09:41,242 - INFO - 
+2026-03-25 19:09:41,443 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:09:41,443 - INFO - Considered resources (2 nodes):
+2026-03-25 19:09:42,250 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:09:42,251 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:09:42,251 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:09:42,251 - INFO -  AWS (eu-central-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   26.88      [32m   ✔[0m
+2026-03-25 19:09:42,251 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:09:42,251 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:09:42,351 - INFO - 
+2026-03-25 19:09:42,554 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:09:42,554 - INFO - Considered resources (2 nodes):
+2026-03-25 19:09:43,768 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:09:43,768 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:09:43,768 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:09:43,768 - INFO -  AWS (us-west-2c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   29.77      [32m   ✔[0m
+2026-03-25 19:09:43,768 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:09:43,768 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:09:43,971 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:09:43,971 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:09:43,971 - INFO - Option 1 (with SSM):
+2026-03-25 19:09:43,971 - INFO -   aws:
+2026-03-25 19:09:43,971 - INFO -     use_internal_ips: true
+2026-03-25 19:09:43,971 - INFO -     use_ssm: true
+2026-03-25 19:09:43,971 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:09:43,971 - INFO -   aws:
+2026-03-25 19:09:43,971 - INFO -     use_internal_ips: true
+2026-03-25 19:09:43,972 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:09:43,972 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:09:43,972 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2c).
+2026-03-25 19:10:05,128 - INFO - [2mW 03-25 19:10:05.113 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2c). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2b.[0m
+2026-03-25 19:10:08,853 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:10:09,154 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2c for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:10:09,154 - INFO - 
+2026-03-25 19:10:09,154 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:10:09,154 - INFO - Considered resources (2 nodes):
+2026-03-25 19:10:09,759 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:10:09,760 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:10:09,760 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:10:09,760 - INFO -  AWS (ap-northeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   32.81      [32m   ✔[0m
+2026-03-25 19:10:09,760 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:10:09,760 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:10:09,862 - INFO - 
+2026-03-25 19:10:10,267 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:10:10,267 - INFO - Considered resources (2 nodes):
+2026-03-25 19:10:11,377 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:10:11,377 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:10:11,377 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:10:11,377 - INFO -  AWS (us-west-2b)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   33.39      [32m   ✔[0m
+2026-03-25 19:10:11,377 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:10:11,377 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:10:11,478 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:10:11,479 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:10:11,479 - INFO - Option 1 (with SSM):
+2026-03-25 19:10:11,479 - INFO -   aws:
+2026-03-25 19:10:11,479 - INFO -     use_internal_ips: true
+2026-03-25 19:10:11,479 - INFO -     use_ssm: true
+2026-03-25 19:10:11,479 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:10:11,479 - INFO -   aws:
+2026-03-25 19:10:11,479 - INFO -     use_internal_ips: true
+2026-03-25 19:10:11,479 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:10:11,479 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:10:11,479 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2b).
+2026-03-25 19:10:31,822 - INFO - [2mW 03-25 19:10:31.731 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2b). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2c.[0m
+2026-03-25 19:10:35,646 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:10:35,748 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2b for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:10:36,151 - INFO - 
+2026-03-25 19:10:36,151 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:10:36,151 - INFO - Considered resources (2 nodes):
+2026-03-25 19:10:37,059 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:10:37,060 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:10:37,060 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:10:37,060 - INFO -  AWS (us-east-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   34.11      [32m   ✔[0m
+2026-03-25 19:10:37,060 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:10:37,060 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:10:37,262 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:10:37,262 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:10:37,262 - INFO - Option 1 (with SSM):
+2026-03-25 19:10:37,262 - INFO -   aws:
+2026-03-25 19:10:37,262 - INFO -     use_internal_ips: true
+2026-03-25 19:10:37,262 - INFO -     use_ssm: true
+2026-03-25 19:10:37,262 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:10:37,262 - INFO -   aws:
+2026-03-25 19:10:37,262 - INFO -     use_internal_ips: true
+2026-03-25 19:10:37,262 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:10:37,262 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:10:37,263 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-03-25 19:10:57,530 - INFO - [2mW 03-25 19:10:57.463 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (MaxSpotInstanceCountExceeded) when calling the RunInstances operation: Max spot instance count exceeded[0m
+2026-03-25 19:11:01,063 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:11:01,467 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:11:01,467 - INFO - 
+2026-03-25 19:11:01,467 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:11:01,467 - INFO - Considered resources (2 nodes):
+2026-03-25 19:11:01,872 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:11:01,873 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:11:01,873 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:11:01,873 - INFO -  AWS (ap-southeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   36.36      [32m   ✔[0m
+2026-03-25 19:11:01,873 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:11:01,873 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:11:02,278 - INFO - 
+2026-03-25 19:11:02,278 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:11:02,278 - INFO - Considered resources (2 nodes):
+2026-03-25 19:11:03,183 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:11:03,184 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:11:03,184 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:11:03,184 - INFO -  AWS (us-east-1d)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   54.89      [32m   ✔[0m
+2026-03-25 19:11:03,184 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:11:03,184 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:11:03,286 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:11:03,286 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:11:03,286 - INFO - Option 1 (with SSM):
+2026-03-25 19:11:03,286 - INFO -   aws:
+2026-03-25 19:11:03,286 - INFO -     use_internal_ips: true
+2026-03-25 19:11:03,286 - INFO -     use_ssm: true
+2026-03-25 19:11:03,286 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:11:03,286 - INFO -   aws:
+2026-03-25 19:11:03,286 - INFO -     use_internal_ips: true
+2026-03-25 19:11:03,286 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:11:03,286 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:11:03,287 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1d).
+2026-03-25 19:11:22,721 - INFO - [2mW 03-25 19:11:22.652 PID=1652500 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-east-1d). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a.[0m
+2026-03-25 19:11:26,047 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:11:26,148 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1d for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:11:26,553 - INFO - 
+2026-03-25 19:11:26,553 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:11:26,553 - INFO - Considered resources (2 nodes):
+2026-03-25 19:11:26,958 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:11:26,958 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:11:26,958 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:11:26,958 - INFO -  AWS (ap-southeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   65.87      [32m   ✔[0m
+2026-03-25 19:11:26,958 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:11:26,958 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:11:27,060 - INFO - 
+2026-03-25 19:11:28,780 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:11:28,780 - INFO - 
+2026-03-25 19:12:00,062 - INFO - [?25h[31mFailed to provision all possible launchable resources.[0m Relax the task's resource requirements: 2x AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)
+2026-03-25 19:12:00,062 - INFO - 
+2026-03-25 19:12:00,062 - INFO - [0m[33m↺[0m Retry after 30s  [2mView logs: [1msky logs --provision rf-qwen3-32b-tp8pp2-A100-80gb[0m[0m[0m
+2026-03-25 19:12:00,062 - INFO - [33mLaunching a spot job that does not automatically recover from preemptions. To get automatic recovery, use managed job instead: [0m[1msky jobs launch[0m [33mor[0m [1msky.jobs.launch()[0m.
+2026-03-25 19:12:00,162 - INFO - Considered resources (2 nodes):
+2026-03-25 19:12:00,866 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:12:00,866 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:12:00,866 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:12:00,866 - INFO -  AWS (ap-northeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   19.34      [32m   ✔[0m
+2026-03-25 19:12:00,866 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:12:00,866 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:12:01,167 - INFO - 
+2026-03-25 19:12:01,167 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:12:01,167 - INFO - Considered resources (2 nodes):
+2026-03-25 19:12:01,976 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:12:01,977 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:12:01,977 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:12:01,977 - INFO -  AWS (eu-central-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   21.26      [32m   ✔[0m
+2026-03-25 19:12:01,977 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:12:01,977 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:12:02,278 - INFO - 
+2026-03-25 19:12:02,278 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:12:02,279 - INFO - Considered resources (2 nodes):
+2026-03-25 19:12:03,084 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:12:03,085 - INFO -  INFRA                 INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:12:03,085 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:12:03,085 - INFO -  AWS (eu-central-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   26.21      [32m   ✔[0m
+2026-03-25 19:12:03,085 - INFO - -------------------------------------------------------------------------------------------------
+2026-03-25 19:12:03,085 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region eu-central-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:12:03,387 - INFO - 
+2026-03-25 19:12:03,387 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:12:03,387 - INFO - Considered resources (2 nodes):
+2026-03-25 19:12:03,489 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:04,595 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:12:04,596 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:04,596 - INFO -  AWS (us-west-2a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   27.07      [32m   ✔[0m
+2026-03-25 19:12:04,596 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:04,596 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:12:04,898 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:12:04,898 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:12:04,898 - INFO - Option 1 (with SSM):
+2026-03-25 19:12:04,898 - INFO -   aws:
+2026-03-25 19:12:04,898 - INFO -     use_internal_ips: true
+2026-03-25 19:12:04,898 - INFO -     use_ssm: true
+2026-03-25 19:12:04,898 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:12:04,898 - INFO -   aws:
+2026-03-25 19:12:04,898 - INFO -     use_internal_ips: true
+2026-03-25 19:12:04,898 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:12:04,898 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:12:04,899 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2a).
+2026-03-25 19:12:26,358 - INFO - [2mW 03-25 19:12:26.293 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2a). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2b, us-west-2c.[0m
+2026-03-25 19:12:30,083 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:12:30,385 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:12:30,385 - INFO - 
+2026-03-25 19:12:30,385 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:12:30,385 - INFO - Considered resources (2 nodes):
+2026-03-25 19:12:31,495 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:31,495 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:12:31,495 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:31,495 - INFO -  AWS (us-west-2c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   30.74      [32m   ✔[0m
+2026-03-25 19:12:31,495 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:31,495 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:12:31,597 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:12:31,597 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:12:31,597 - INFO - Option 1 (with SSM):
+2026-03-25 19:12:31,597 - INFO -   aws:
+2026-03-25 19:12:31,597 - INFO -     use_internal_ips: true
+2026-03-25 19:12:31,597 - INFO -     use_ssm: true
+2026-03-25 19:12:31,597 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:12:31,597 - INFO -   aws:
+2026-03-25 19:12:31,597 - INFO -     use_internal_ips: true
+2026-03-25 19:12:31,598 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:12:31,598 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:12:31,598 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2c).
+2026-03-25 19:12:52,245 - INFO - [2mW 03-25 19:12:52.147 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2c). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2b.[0m
+2026-03-25 19:12:55,470 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:12:55,571 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2c for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:12:55,572 - INFO - 
+2026-03-25 19:12:55,874 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:12:55,874 - INFO - Considered resources (2 nodes):
+2026-03-25 19:12:56,480 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:12:56,480 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:12:56,480 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:12:56,481 - INFO -  AWS (ap-northeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   32.78      [32m   ✔[0m
+2026-03-25 19:12:56,481 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:12:56,481 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-northeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:12:56,581 - INFO - 
+2026-03-25 19:12:56,884 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:12:56,884 - INFO - Considered resources (2 nodes):
+2026-03-25 19:12:57,893 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:57,894 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:12:57,894 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:57,894 - INFO -  AWS (us-west-2b)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   34.02      [32m   ✔[0m
+2026-03-25 19:12:57,894 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:12:57,894 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:12:57,994 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:12:57,995 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:12:57,995 - INFO - Option 1 (with SSM):
+2026-03-25 19:12:57,995 - INFO -   aws:
+2026-03-25 19:12:57,995 - INFO -     use_internal_ips: true
+2026-03-25 19:12:57,995 - INFO -     use_ssm: true
+2026-03-25 19:12:57,995 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:12:57,995 - INFO -   aws:
+2026-03-25 19:12:57,995 - INFO -     use_internal_ips: true
+2026-03-25 19:12:57,995 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:12:57,995 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:12:57,995 - INFO - [0m⚙︎ Launching on AWS us-west-2[0m (us-west-2b).
+2026-03-25 19:13:19,163 - INFO - [2mW 03-25 19:13:19.086 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-west-2b). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-west-2a, us-west-2c.[0m
+2026-03-25 19:13:23,390 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:13:23,793 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-west-2b for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:13:23,793 - INFO - 
+2026-03-25 19:13:23,793 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:13:23,793 - INFO - Considered resources (2 nodes):
+2026-03-25 19:13:24,800 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:13:24,800 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:13:24,800 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:13:24,800 - INFO -  AWS (us-east-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   38.20      [32m   ✔[0m
+2026-03-25 19:13:24,800 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:13:24,800 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:13:25,103 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:13:25,103 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:13:25,103 - INFO - Option 1 (with SSM):
+2026-03-25 19:13:25,103 - INFO -   aws:
+2026-03-25 19:13:25,103 - INFO -     use_internal_ips: true
+2026-03-25 19:13:25,103 - INFO -     use_ssm: true
+2026-03-25 19:13:25,103 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:13:25,103 - INFO -   aws:
+2026-03-25 19:13:25,104 - INFO -     use_internal_ips: true
+2026-03-25 19:13:25,104 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:13:25,104 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:13:25,104 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-03-25 19:13:46,285 - INFO - [2mW 03-25 19:13:46.221 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (MaxSpotInstanceCountExceeded) when calling the RunInstances operation: Max spot instance count exceeded[0m
+2026-03-25 19:13:50,829 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:13:50,931 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1a for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:13:50,931 - INFO - 
+2026-03-25 19:13:51,234 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:13:51,234 - INFO - Considered resources (2 nodes):
+2026-03-25 19:13:51,636 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:13:51,637 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:13:51,637 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:13:51,637 - INFO -  AWS (ap-southeast-1a)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   40.14      [32m   ✔[0m
+2026-03-25 19:13:51,637 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:13:51,637 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:13:52,042 - INFO - 
+2026-03-25 19:13:52,042 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:13:52,042 - INFO - Considered resources (2 nodes):
+2026-03-25 19:13:53,052 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:13:53,052 - INFO -  INFRA              INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:13:53,052 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:13:53,052 - INFO -  AWS (us-east-1d)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   54.89      [32m   ✔[0m
+2026-03-25 19:13:53,052 - INFO - ----------------------------------------------------------------------------------------------
+2026-03-25 19:13:53,052 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-25 19:13:53,256 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-25 19:13:53,256 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-25 19:13:53,256 - INFO - Option 1 (with SSM):
+2026-03-25 19:13:53,256 - INFO -   aws:
+2026-03-25 19:13:53,256 - INFO -     use_internal_ips: true
+2026-03-25 19:13:53,256 - INFO -     use_ssm: true
+2026-03-25 19:13:53,256 - INFO - Option 2 (with SSH proxy):
+2026-03-25 19:13:53,256 - INFO -   aws:
+2026-03-25 19:13:53,256 - INFO -     use_internal_ips: true
+2026-03-25 19:13:53,256 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-25 19:13:53,256 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-25 19:13:53,257 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1d).
+2026-03-25 19:14:13,735 - INFO - [2mW 03-25 19:14:13.715 PID=2248878 instance.py:288] create_instances: Attempt failed with An error occurred (InsufficientInstanceCapacity) when calling the RunInstances operation (reached max retries: 0): We currently do not have sufficient p4de.24xlarge capacity in the Availability Zone you requested (us-east-1d). Our system will be working on provisioning additional capacity. You can currently get p4de.24xlarge capacity by not specifying an Availability Zone in your request or choosing us-east-1a.[0m
+2026-03-25 19:14:17,368 - INFO - AWS handler error: Failed to launch instances. Max attempts exceeded.
+2026-03-25 19:14:17,470 - INFO - sky.exceptions.ResourcesUnavailableError: Failed to acquire resources in us-east-1d for {AWS(p4de.24xlarge[Spot], mem=64.0+, {'A100-80GB': 8}, network_tier=best, disk_size=500)}.
+2026-03-25 19:14:17,873 - INFO - 
+2026-03-25 19:14:17,874 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:14:17,874 - INFO - Considered resources (2 nodes):
+2026-03-25 19:14:18,174 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:14:18,174 - INFO -  INFRA                   INSTANCE              vCPUs   Mem(GB)   GPUS          COST ($)   CHOSEN
+2026-03-25 19:14:18,174 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:14:18,174 - INFO -  AWS (ap-southeast-1c)   p4de.24xlarge[Spot]   96      1152      A100-80GB:8   65.87      [32m   ✔[0m
+2026-03-25 19:14:18,174 - INFO - ---------------------------------------------------------------------------------------------------
+2026-03-25 19:14:18,174 - INFO - sky.exceptions.ResourcesUnavailableError: [33mFound no quota for p4de.24xlarge spot instances in region ap-southeast-1 in AWS. [0mTo request quotas, check the instruction: https://docs.skypilot.co/en/latest/cloud-setup/quota.html.
+2026-03-25 19:14:18,276 - INFO - 
+2026-03-25 19:14:20,296 - INFO - [0m[33m↺[0m Trying other potential resources.
+2026-03-25 19:14:20,296 - INFO - 
