@@ -1,0 +1,51 @@
+2026-03-27 15:08:24,314 - INFO - Results will be saved to: results/aws_p4de_A100_80gb/tp4-pp2-p4de_24xlarge-20260327_150824
+2026-03-27 15:08:24,315 - INFO - 📋 Copied benchmark_client.py to roofline_benchmarks/
+2026-03-27 15:08:24,315 - INFO - 📋 Copied prometheus_parser.py to roofline_benchmarks/
+2026-03-27 15:08:24,315 - INFO - 🚀 Launching rf-qwen3-235b-a22b-tp4pp2-A100-80gb...
+2026-03-27 15:08:24,315 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-235b-a22b-tp4pp2-A100-80gb.yaml
+2026-03-27 15:08:24,315 - INFO - Running on cluster: rf-qwen3-235b-a22b-tp4pp2-A100-80gb
+2026-03-27 15:08:25,031 - INFO - YAML to run: roofline_benchmarks/rf-qwen3-235b-a22b-tp4pp2-A100-80gb.yaml
+2026-03-27 15:08:25,123 - INFO - Running on cluster: rf-qwen3-235b-a22b-tp4pp2-A100-80gb
+2026-03-27 15:09:26,332 - INFO - [2mCluster 'rf-qwen3-235b-a22b-tp4pp2-A100-80gb' (status: INIT) was previously in AWS (us-east-1). Restarting.[0m
+2026-03-27 15:09:26,432 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-27 15:09:26,432 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-27 15:09:26,432 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-27 15:09:26,432 - INFO - Option 1 (with SSM):
+2026-03-27 15:09:26,432 - INFO -   aws:
+2026-03-27 15:09:26,432 - INFO -     use_internal_ips: true
+2026-03-27 15:09:26,432 - INFO -     use_ssm: true
+2026-03-27 15:09:26,432 - INFO - Option 2 (with SSH proxy):
+2026-03-27 15:09:26,432 - INFO -   aws:
+2026-03-27 15:09:26,432 - INFO -     use_internal_ips: true
+2026-03-27 15:09:26,432 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-27 15:09:26,432 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-27 15:09:26,432 - INFO - [0m⚙︎ Launching on AWS us-east-1[0m (us-east-1a).
+2026-03-27 15:09:40,291 - INFO - [33mInstance type p4de.24xlarge supports up to 4 EFA interfaces, but `use_internal_ips` is not enabled.
+2026-03-27 15:09:46,417 - INFO - Launching with the current configuration will use only 1 EFA interface.
+2026-03-27 15:09:46,417 - INFO - To use all 4 EFA interfaces, enable internal IPs by adding one of the following configurations to SkyPilot config:
+2026-03-27 15:09:46,417 - INFO - Option 1 (with SSM):
+2026-03-27 15:09:46,417 - INFO -   aws:
+2026-03-27 15:09:46,417 - INFO -     use_internal_ips: true
+2026-03-27 15:09:46,417 - INFO -     use_ssm: true
+2026-03-27 15:09:46,417 - INFO - Option 2 (with SSH proxy):
+2026-03-27 15:09:46,417 - INFO -   aws:
+2026-03-27 15:09:46,417 - INFO -     use_internal_ips: true
+2026-03-27 15:09:46,417 - INFO -     ssh_proxy_command: ssh -W %h:%p -i <ssh key path> -o StrictHostKeyChecking=no <user>@<jump server public ip>
+2026-03-27 15:09:46,417 - INFO - Refer to https://docs.skypilot.co/en/latest/reference/config.html#aws-use-internal-ips for more details.[0m
+2026-03-27 15:09:46,417 - INFO - [2m└── [0m[2mInstance is up.[0m
+2026-03-27 15:10:01,792 - INFO - [0m[32m✓ Cluster launched: rf-qwen3-235b-a22b-tp4pp2-A100-80gb.[0m[0m  [2mView logs: [1msky logs --provision rf-qwen3-235b-a22b-tp4pp2-A100-80gb[0m[0m
+2026-03-27 15:10:03,805 - INFO - [0m⚙︎ Syncing files.
+2026-03-27 15:10:03,906 - INFO -   [33mThe size of workdir '/home/orange/Desktop/tandemn/tandemn-profiling/roofline/vllm' is 547 MB. Try to keep workdir small or use .skyignore to exclude large files, as large sizes will slow down rsync.[0m
+2026-03-27 15:10:06,417 - INFO -   [2mSyncing workdir (to 1 node): /home/orange/Desktop/tandemn/tandemn-profiling/roofline/vllm -> ~/sky_workdir[0m
+2026-03-27 15:10:06,417 - INFO - [0m[32m✓ Synced workdir.[0m[0m  [2mView logs: sky api logs -l sky-2026-03-27-15-08-25-213878/workdir_sync.log[0m
+2026-03-27 15:10:10,538 - INFO - 'sky.launch' request 10a8fbe8-a6fc-44d6-a204-3a498d08cdb4 cancelled
+2026-03-27 15:10:11,388 - INFO - sky.exceptions.RequestCancelled: [33mCurrent 'sky.launch' request (10a8fbe8-a6fc-44d6-a204-3a498d08cdb4) is cancelled by another process.[0m
+2026-03-27 15:10:11,567 - ERROR - ❌ Cluster error: Command 'sky launch' returned non-zero exit status 1.
+2026-03-27 15:10:11,567 - INFO - 📥 Attempting to fetch results (benchmark may have completed)...
+2026-03-27 15:10:11,567 - INFO - 📥 Fetching results.json from cluster...
+2026-03-27 15:10:16,727 - INFO - 📈 Attempting to fetch timeseries data from cluster (best-effort)...
+2026-03-27 15:10:26,556 - INFO - ✅ Found successful benchmark results despite cluster error!
+2026-03-27 15:10:26,556 - INFO -    This is likely a cleanup error, not a benchmark failure.
+2026-03-27 15:10:27,082 - INFO - 📁 Renaming directory: tp4-pp2-p4de_24xlarge-20260327_150824 -> tp4-pp2-p4de_24xlarge-20260327_150824-success
+2026-03-27 15:10:27,083 - INFO - 📈 Plotting timeseries for successful experiment(s) after cluster error...
+2026-03-27 15:10:27,104 - INFO - 🗑️  Tearing down rf-qwen3-235b-a22b-tp4pp2-A100-80gb...

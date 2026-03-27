@@ -1,0 +1,2 @@
+tp,pp,max_input_length,max_output_length,model,status,error
+4,2,4096,1024,Qwen/Qwen3-235B-A22B,cluster_error,Command 'sky launch' returned non-zero exit status 255.
